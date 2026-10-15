@@ -4,9 +4,6 @@ x_session.json
 drafts/
 *.log
 *.png
-history.json
-history_headlines.json
-last_style.txt
 test_*.js
 render_*.js
 revert_*.js

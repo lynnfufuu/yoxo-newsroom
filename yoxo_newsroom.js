@@ -844,10 +844,11 @@ async function renderCard({ style, badge, headline, subdeck, photoBase64, source
     const candidates = [
       process.env.PUPPETEER_EXECUTABLE_PATH,
       process.env.CHROME_BIN,
-      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      '/usr/bin/google-chrome',
       '/usr/bin/google-chrome-stable',
       '/usr/bin/chromium',
-      '/usr/bin/chromium-browser'
+      '/usr/bin/chromium-browser',
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
     ].filter(Boolean);
 
     for (const c of candidates) {
