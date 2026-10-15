@@ -1236,16 +1236,27 @@ async function handleCallbackQuery(cq) {
   const [action, draftId] = data.split(':');
   const draftFile = path.resolve(__dirname, 'drafts', `${draftId}.json`);
 
-  if (!fs.existsSync(draftFile)) {
+  let caption = (message && message.caption) ? message.caption : '';
+  let photoFileId = (message && message.photo && message.photo.length) ? message.photo[message.photo.length - 1].file_id : null;
+  let localImagePath = null;
+
+  if (fs.existsSync(draftFile)) {
+    try {
+      const draft = JSON.parse(fs.readFileSync(draftFile, 'utf8'));
+      if (draft.tweetCopy) caption = draft.tweetCopy;
+      if (draft.imagePath && fs.existsSync(draft.imagePath)) localImagePath = draft.imagePath;
+    } catch (e) {}
+  }
+
+  // If neither photoFileId nor localImagePath exists, then and only then is it missing
+  if (!photoFileId && !localImagePath) {
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/answerCallbackQuery`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ callback_query_id: queryId, text: 'Draft expired or not found', show_alert: true })
+      body: JSON.stringify({ callback_query_id: queryId, text: 'Draft photo not found', show_alert: true })
     });
     return;
   }
-
-  const draft = JSON.parse(fs.readFileSync(draftFile, 'utf8'));
 
   // Immediate toast feedback
   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/answerCallbackQuery`, {
@@ -1261,21 +1272,36 @@ async function handleCallbackQuery(cq) {
   if (action === 'pub_both' || action === 'pub_tg') {
     try {
       console.log(`📢 Dispatching to Telegram Channel [${CHANNEL_ID}]...`);
-      const form = new FormData();
-      form.append('chat_id', CHANNEL_ID);
-      form.append('photo', fs.createReadStream(draft.imagePath));
-      form.append('caption', draft.tweetCopy);
+      let tgRes;
+      if (photoFileId) {
+        // Direct instant publish via Telegram CDN file_id (no disk lookup needed!)
+        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: CHANNEL_ID,
+            photo: photoFileId,
+            caption: caption
+          })
+        });
+        tgRes = await res.json();
+      } else if (localImagePath) {
+        const form = new FormData();
+        form.append('chat_id', CHANNEL_ID);
+        form.append('photo', fs.createReadStream(localImagePath));
+        form.append('caption', caption);
+        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+          method: 'POST',
+          body: form
+        });
+        tgRes = await res.json();
+      }
 
-      const tgRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-        method: 'POST',
-        body: form
-      });
-      const tgJson = await tgRes.json();
-      if (tgJson.ok) {
+      if (tgRes && tgRes.ok) {
         tgSuccess = true;
         console.log('✅ Published to Telegram Channel @yoxo_station!');
       } else {
-        console.error('Telegram channel publish failed:', tgJson);
+        console.error('Telegram channel publish failed:', tgRes);
       }
     } catch (err) {
       console.error('Error posting to channel:', err.message);
@@ -1286,12 +1312,29 @@ async function handleCallbackQuery(cq) {
   if (action === 'pub_both' || action === 'pub_x') {
     try {
       console.log('🐦 Dispatching to X (@YoXo_Station)...');
-      const xRes = await postToX({ imagePath: draft.imagePath, text: draft.tweetCopy });
-      if (xRes.ok) {
+      if (!localImagePath && photoFileId) {
+        try {
+          const fileRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${photoFileId}`);
+          const fileData = await fileRes.json();
+          if (fileData.ok && fileData.result.file_path) {
+            const dlUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
+            const imgRes = await fetch(dlUrl);
+            const buf = await imgRes.buffer();
+            const draftsDir = path.resolve(__dirname, 'drafts');
+            if (!fs.existsSync(draftsDir)) fs.mkdirSync(draftsDir, { recursive: true });
+            localImagePath = path.join(draftsDir, `${draftId}.png`);
+            fs.writeFileSync(localImagePath, buf);
+          }
+        } catch (e) {
+          console.error('Failed to download photo from TG CDN for X:', e.message);
+        }
+      }
+      const xRes = await postToX({ imagePath: localImagePath, text: caption });
+      if (xRes && xRes.ok) {
         xSuccess = true;
         console.log('✅ Published to X (@YoXo_Station)!');
       } else {
-        console.warn('X publish notice:', xRes.error);
+        console.warn('X publish notice:', xRes ? xRes.error : 'failed');
       }
     } catch (err) {
       console.error('Error posting to X:', err.message);
