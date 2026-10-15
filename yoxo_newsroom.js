@@ -1396,6 +1396,13 @@ if (process.argv.includes('--daemon')) {
     runCycle().catch(console.error);
   }, 15 * 60 * 1000);
 } else {
-  startTelegramCallbackListener();
-  runCycle().catch(console.error);
+  // Single cycle mode (used by GitHub Actions cron) - runs once and exits cleanly
+  runCycle().then(() => {
+    console.log('🏁 Single cycle finished successfully.');
+    server.close();
+    process.exit(0);
+  }).catch(err => {
+    console.error('Fatal cycle error:', err);
+    process.exit(1);
+  });
 }
