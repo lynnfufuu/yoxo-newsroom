@@ -1,0 +1,17 @@
+{
+  "name": "yoxo-x-automator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test_telegram.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "form-data": "^4.0.6",
+    "node-fetch": "^2.7.0",
+    "puppeteer-core": "19.11.1"
+  }
+}
