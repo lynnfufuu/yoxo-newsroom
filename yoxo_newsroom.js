@@ -264,6 +264,60 @@ function isWithinCommentRecencyWindow(publishedAt) {
   return true;
 }
 
+
+
+function getContextualFallbackReply(text) {
+  const lower = (text || '').toLowerCase();
+  if (lower.includes('bitcoin') || lower.includes('btc')) {
+    const opts = [
+      "Still the only asset that does not care who is sitting in the Oval Office.",
+      "People overcomplicating a supply cap that was solved in 2008.",
+      "Liquidity cycle always wins in the end regardless of the noise.",
+      "Just another Tuesday for anyone who survived the 2022 drawdowns."
+    ];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  if (lower.includes('etf') || lower.includes('sec') || lower.includes('regulation') || lower.includes('bank') || lower.includes('custody')) {
+    const opts = [
+      "Wall Street spent years calling it a scam just to front-run the retail inflows.",
+      "Traditional finance moving slow as always while decentralized rails settle in seconds.",
+      "The pivot from fighting the tech to capturing the fees was entirely predictable."
+    ];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  if (lower.includes('solana') || lower.includes('sol') || lower.includes('meme') || lower.includes('pump') || lower.includes('volume')) {
+    const opts = [
+      "The speed is great until the entire validator network starts sweating from meme volume.",
+      "Casino velocity at scale, whether people want to admit it or not.",
+      "Volume is real, retention is the only question that matters next quarter."
+    ];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  if (lower.includes('ai') || lower.includes('model') || lower.includes('agent') || lower.includes('token')) {
+    const opts = [
+      "Most of these enterprise pilots are just expensive wrappers around API calls.",
+      "Everyone building autonomous agents until the hallucinated token bill lands.",
+      "The compute spend is staggering compared to the actual organic ARR being generated."
+    ];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  if (lower.includes('fed') || lower.includes('rate') || lower.includes('inflation') || lower.includes('market') || lower.includes('stock')) {
+    const opts = [
+      "Markets pricing in rate cuts every three weeks only to get blindsided by macro data.",
+      "Smart money already rebalanced before retail finished reading the headline.",
+      "Volatility is back and that is really the only thing traders actually care about."
+    ];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  const generalOpts = [
+    "Most will miss the actual takeaway buried behind the engagement bait.",
+    "The narrative shifts fast but the underlying incentive structure remains unchanged.",
+    "People reacting to the symptom instead of looking at the balance sheet.",
+    "Classic example of market positioning speaking louder than official statements."
+  ];
+  return generalOpts[Math.floor(Math.random() * generalOpts.length)];
+}
+
 async function generateHumanReply(tweetText) {
   try {
     const prompt = `You are a sharp, seasoned human industry insider on X (Twitter).
@@ -281,25 +335,32 @@ STRICT RULES:
 - Sound like an authentic industry native making a sharp, memorable observation or pointing out an irony.
 - Write purely as the reply text, no quotes, no extra formatting.`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_KEY}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      }),
-      signal: AbortSignal.timeout(15000)
-    });
-    const data = await res.json();
-    if (data && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-      let text = data.candidates[0].content.parts[0].text.trim();
-      return text.replace(/^["']|["']$/g, '').trim();
+    // Try primary gemini-3.8-flash first
+    for (const model of ['gemini-3.8-flash', 'gemini-3.5-flash-lite']) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          }),
+          signal: AbortSignal.timeout(15000)
+        });
+        const data = await res.json();
+        if (data && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+          let text = data.candidates[0].content.parts[0].text.trim();
+          return text.replace(/^["']|["']$/g, '').trim();
+        }
+      } catch (me) {}
     }
-    console.warn('generateHumanReply Gemini notice:', data?.error?.message || 'no candidates returned');
-    return null;
+
+    // Heuristic fallback if Google free tier quota runs out
+    console.log('🤖 Utilizing native CT heuristic observer fallback...');
+    return getContextualFallbackReply(tweetText);
   } catch (e) {
     console.error('generateHumanReply exception:', e.message);
-    return null;
+    return getContextualFallbackReply(tweetText);
   }
 }
 
@@ -587,20 +648,26 @@ Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
   "tweet_copy": "BREAKING: Brazil's Congress has approved comprehensive legislation to reduce the national workweek framework.\\n\\nThe milestone reform caps weekly labor hours while providing targeted transition tax offsets for corporate employers.\\n\\n• Phased implementation scheduled across next 18 months\\n• Manufacturing and service sectors granted structured compliance timelines\\n• Employer federations warn of operational productivity challenges\\n\\nCan Brazilian productivity survive 32-hour limits?"
 }`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_KEY}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" }
-    }),
-    timeout: 25000
-  });
-
-  const data = await res.json();
-  const rawText = data.candidates[0].content.parts[0].text;
-  return JSON.parse(rawText);
+  for (const model of ['gemini-3.8-flash', 'gemini-3.5-flash-lite']) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: "application/json" }
+        }),
+        signal: AbortSignal.timeout(25000)
+      });
+      const data = await res.json();
+      if (data && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+        const rawText = data.candidates[0].content.parts[0].text;
+        return JSON.parse(rawText);
+      }
+    } catch (e) {}
+  }
+  return null;
 }
 
 // Live Internet Image Search: Grabs authentic editorial photography from all over the internet
