@@ -28,6 +28,13 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Restore X Session Cookies
+        run: |
+          if [ -n "${{ secrets.X_SESSION_COOKIES }}" ]; then
+            echo '${{ secrets.X_SESSION_COOKIES }}' > x_session.json
+            echo "✅ Restored X session cookies for @YoXo_Station"
+          fi
+
       - name: Run Editorial Newsroom Cycle
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

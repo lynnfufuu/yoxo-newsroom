@@ -42,10 +42,10 @@ async function postToX({ imagePath, text }) {
     await page.setCookie(...cookies);
 
     console.log('🐦 Opening X composer...');
-    await page.goto('https://x.com/compose/post', { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto('https://x.com/compose/post', { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // Verify logged in
-    if (page.url().includes('/i/flow/login')) {
+    if (page.url().includes('/i/flow/login') || page.url().includes('/login')) {
       console.error('⚠️ X session expired or logged out.');
       await browser.close();
       return { ok: false, error: 'X session expired. Please re-login.' };
@@ -53,7 +53,7 @@ async function postToX({ imagePath, text }) {
 
     // Wait for text input
     const textSelector = 'div[data-testid="tweetTextarea_0"], div[role="textbox"]';
-    await page.waitForSelector(textSelector, { timeout: 15000 });
+    await page.waitForSelector(textSelector, { timeout: 20000 });
     await page.click(textSelector);
     
     // Type tweet copy cleanly
@@ -69,19 +69,23 @@ async function postToX({ imagePath, text }) {
     // Attach image if provided
     if (imagePath && fs.existsSync(imagePath)) {
       console.log('📸 Attaching editorial graphic to tweet...');
-      const fileInput = await page.$('input[type="file"][data-testid="fileInput"]');
-      if (fileInput) {
-        await fileInput.uploadFile(imagePath);
-        // Wait for image thumbnail to render
-        await page.waitForTimeout ? page.waitForTimeout(3000) : new Promise(r => setTimeout(r, 3000));
+      try {
+        await page.waitForSelector('input[type="file"][data-testid="fileInput"]', { timeout: 8000 });
+        const fileInput = await page.$('input[type="file"][data-testid="fileInput"]');
+        if (fileInput) {
+          await fileInput.uploadFile(imagePath);
+          await new Promise(r => setTimeout(r, 3500));
+        }
+      } catch (e) {
+        console.warn('Image upload selector warning:', e.message);
       }
     }
 
     // Click Tweet Post button
     console.log('🚀 Clicking Tweet button...');
-    const postButton = 'div[data-testid="tweetButton"]';
-    await page.waitForSelector(postButton, { timeout: 10000 });
-    await page.click(postButton);
+    const postButtonSelector = 'div[data-testid="tweetButton"], button[data-testid="tweetButtonInline"], div[data-testid="tweetButtonInline"], [data-testid="tweetButton"]';
+    await page.waitForSelector(postButtonSelector, { timeout: 12000 });
+    await page.click(postButtonSelector);
 
     // Wait for tweet to dispatch
     await new Promise(r => setTimeout(r, 4000));

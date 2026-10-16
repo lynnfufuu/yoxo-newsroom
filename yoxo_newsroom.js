@@ -969,6 +969,7 @@ async function sendDraftToTelegram({ imagePath, tweetCopy, channel, threadId, sc
 async function runCycle() {
   console.log(`[${new Date().toLocaleTimeString()}] Scanning sources across all 3 News Desks...`);
   const history = loadHistory();
+  let autoPostedXThisCycle = false;
 
   for (const desk of DESKS) {
     console.log(`\n========================================`);
@@ -1164,18 +1165,37 @@ async function runCycle() {
             console.log(`✅ Sent successfully to [${desk.name}]!`);
             saveHeadline(cleanHeadline);
 
-            // Cross-desk MUST POST dispatcher (Thread #57)
-            if (analysis.is_must_post && desk.threadId !== 57) {
-              console.log(`🔥 [MUST POST MEGA EVENT] Dispatched cross-desk viral story to MUST POST (Thread #57)!`);
-              await sendDraftToTelegram({
-                imagePath,
-                tweetCopy: cleanTweet,
-                channel: post.channel,
-                threadId: 57,
-                score: analysis.score,
-                publishedAt: post.publishedAt,
-                articleUrl: post.url || post.postId
-              });
+            // 100% Autopilot Publishing to X and Telegram Channel for top viral stories (score >= 9 or MUST POST)
+            if (!autoPostedXThisCycle && (analysis.score >= 9 || analysis.is_must_post)) {
+              autoPostedXThisCycle = true;
+
+              // 1. Auto-publish directly to Telegram Channel @yoxo_station
+              try {
+                console.log(`📢 [AUTOPILOT] Auto-publishing breaking story to Telegram Channel [@yoxo_station]...`);
+                const form = new FormData();
+                form.append('chat_id', CHANNEL_ID);
+                form.append('photo', fs.createReadStream(imagePath));
+                form.append('caption', cleanTweet);
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: form });
+                console.log(`✅ [AUTOPILOT] Published to Telegram Channel!`);
+              } catch (e) {
+                console.error('Channel auto-publish error:', e.message);
+              }
+
+              // 2. Auto-publish directly to X (@YoXo_Station) via authenticated session
+              if (fs.existsSync(path.resolve(__dirname, 'x_session.json'))) {
+                try {
+                  console.log(`🚀 [AUTOPILOT] Auto-publishing breaking story to X (@YoXo_Station)...`);
+                  const xRes = await postToX({ imagePath, text: cleanTweet });
+                  if (xRes && xRes.ok) {
+                    console.log(`✅ [AUTOPILOT] Successfully published to X (@YoXo_Station)!`);
+                  } else {
+                    console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
+                  }
+                } catch (e) {
+                  console.error('X auto-publish error:', e.message);
+                }
+              }
             }
 
             break; // Send 1 high quality story per desk per cycle
