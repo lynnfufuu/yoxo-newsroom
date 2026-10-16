@@ -1428,10 +1428,10 @@ async function fetchUserTweetsViaSyndication(username) {
   }
 }
 
-async function discoverAndCommentOnX() {
+async function discoverAndCommentOnX(maxComments = 1) {
   const SESSION_FILE = path.resolve(__dirname, 'x_session.json');
-  if (!fs.existsSync(SESSION_FILE)) return;
-  console.log('🌐 [X Explorer] Scanning live breaking feeds across crypto & top news sources...');
+  if (!fs.existsSync(SESSION_FILE)) return 0;
+  console.log(`🌐 [X Explorer] Scanning live breaking feeds across crypto & top news sources (Target: ${maxComments} replies)...`);
 
   try {
     // Scan top outlets via high-speed syndication stream (instant, 0% failure rate)
@@ -1441,15 +1441,12 @@ async function discoverAndCommentOnX() {
       if (list && list.length > 0) {
         allTweets = allTweets.concat(list);
       }
-      await new Promise(r => setTimeout(r, 250));
+      await new Promise(r => setTimeout(r, 200));
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
-    // Find the best fresh tweet (10m - 4h old) not already commented on
+    // Find the best fresh tweets (10m - 4h old) not already commented on
     const now = Date.now();
-    let candidate = null;
-
-    // Filter out retweets, already commented, or too short
     const validTweets = allTweets.filter(tw => {
       if (!tw.url || !tw.text || tw.text.length < 20) return false;
       if (tw.text.startsWith('RT @')) return false;
@@ -1457,61 +1454,52 @@ async function discoverAndCommentOnX() {
       return true;
     });
 
-    // 1. First priority: tweets between 10m and 120m (2 hours) old
-    for (const tw of validTweets) {
-      const ageMins = (now - new Date(tw.createdAt).getTime()) / 60000;
-      if (ageMins >= 10 && ageMins <= 120) {
-        candidate = tw;
-        break;
-      }
-    }
+    const candidates = validTweets.map(tw => ({
+      ...tw,
+      ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
+    })).filter(tw => tw.ageMins >= 8 && tw.ageMins <= 300)
+      .sort((a, b) => a.ageMins - b.ageMins);
 
-    // 2. Second priority: any recent unreplied tweet under 4 hours (240 mins)
-    if (!candidate) {
-      for (const tw of validTweets) {
-        const ageMins = (now - new Date(tw.createdAt).getTime()) / 60000;
-        if (ageMins >= 10 && ageMins <= 240) {
-          candidate = tw;
-          break;
-        }
-      }
-    }
-
-    if (!candidate) {
+    if (!candidates || candidates.length === 0) {
       console.log('🌐 [X Explorer] No new candidate tweet found in recency window this cycle.');
-      return;
+      return 0;
     }
 
-    const candidateAgeMins = Math.round((now - new Date(candidate.createdAt).getTime()) / 60000);
-    console.log(`🎯 [X Explorer] Selected target from @${candidate.user} (${candidateAgeMins}m ago): ${candidate.url}`);
-    console.log(`Original Text: "${candidate.text.slice(0, 80)}..."`);
+    let placed = 0;
+    for (const candidate of candidates) {
+      if (placed >= maxComments) break;
 
-    const humanComment = await generateHumanReply(candidate.text);
-    if (!humanComment) {
-      console.warn('X Explorer: generateHumanReply returned null');
-      return;
+      console.log(`🎯 [X Explorer] Selected target from @${candidate.user} (${candidate.ageMins}m ago): ${candidate.url}`);
+      console.log(`Original Text: "${candidate.text.slice(0, 80)}..."`);
+
+      const humanComment = await generateHumanReply(candidate.text);
+      if (!humanComment) continue;
+
+      console.log(`💬 [X Explorer] Generated Comment: "${humanComment}"`);
+      const replyRes = await replyToTweetOnX({
+        tweetUrl: candidate.url,
+        replyText: humanComment
+      });
+
+      if (replyRes && replyRes.ok) {
+        recordXComment(candidate.url, humanComment);
+        placed++;
+        console.log(`✅ [X Explorer] Successfully placed top comment (${placed}/${maxComments}) under breaking post!`);
+        await new Promise(r => setTimeout(r, 3500));
+      } else {
+        console.warn('X Explorer reply error:', replyRes ? replyRes.error : 'unknown');
+      }
     }
-
-    console.log(`💬 [X Explorer] Generated Comment: "${humanComment}"`);
-    const replyRes = await replyToTweetOnX({
-      tweetUrl: candidate.url,
-      replyText: humanComment
-    });
-
-    if (replyRes && replyRes.ok) {
-      recordXComment(candidate.url, humanComment);
-      console.log('✅ [X Explorer] Successfully placed top comment on live breaking post!');
-    } else {
-      console.warn('X Explorer reply error:', replyRes ? replyRes.error : 'unknown');
-    }
+    return placed;
   } catch (err) {
     console.warn('X Explorer notice:', err.message);
+    return 0;
   }
 }
 
-async function browseFeedAndCommentOnX() {
+async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
   const SESSION_FILE = path.resolve(__dirname, 'x_session.json');
-  if (!fs.existsSync(SESSION_FILE)) return false;
+  if (!fs.existsSync(SESSION_FILE)) return 0;
 
   console.log('🌐 [Feed Explorer] Navigating to your live X home timeline...');
   const cookies = JSON.parse(fs.readFileSync(SESSION_FILE, 'utf8'));
@@ -1597,7 +1585,6 @@ async function browseFeedAndCommentOnX() {
     }
 
     let commentsPlaced = 0;
-    const targetCommentsCount = 2; // Place up to 2 comments per cycle for accelerated growth
 
     for (const target of candidates) {
       if (commentsPlaced >= targetCommentsCount) break;
@@ -1624,24 +1611,29 @@ async function browseFeedAndCommentOnX() {
       }
     }
 
-    return commentsPlaced > 0;
+    return commentsPlaced;
   } catch (err) {
     console.warn('Feed Explorer notice:', err.message);
     if (browser) {
       try { await browser.close(); } catch (e) {}
     }
-    return false;
+    return 0;
   }
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  // Priority 1: Direct Home Feed Deep Scroll (User's personal algorithm, following, & CT creators)
-  const feedSuccess = await browseFeedAndCommentOnX();
-  if (feedSuccess) return;
+  const TARGET_TOTAL_COMMENTS = 4; // Target 4 to 5 high-visibility replies per cycle for aggressive follower growth
+  console.log(`🎯 [Follower Growth Sprint] Commencing cycle targeting ${TARGET_TOTAL_COMMENTS} replies...`);
 
+  // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following CT creators)
+  const feedCount = await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
+  
   // Priority 2: Syndication Scan across top 15+ Crypto & News Outlets
-  console.log('🔄 Engaging Multi-Outlet Crypto & News Explorer...');
-  await discoverAndCommentOnX();
+  const remainingNeeded = TARGET_TOTAL_COMMENTS - (feedCount || 0);
+  if (remainingNeeded > 0) {
+    console.log(`🔄 Topping up with ${remainingNeeded} reply/replies from breaking crypto outlets...`);
+    await discoverAndCommentOnX(remainingNeeded);
+  }
 }
 
 // 6. Interactive Telegram 1-Click Callback Listener

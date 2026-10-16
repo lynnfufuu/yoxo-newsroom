@@ -2,8 +2,8 @@ name: YoXo Newsroom Autonomous Cloud Dispatcher
 
 on:
   schedule:
-    # Runs every 20 minutes automatically 24/7/365 in GitHub Cloud ($0, no card needed)
-    - cron: '*/20 * * * *'
+    # Runs every 15 minutes automatically 24/7/365 in GitHub Cloud ($0, no card needed)
+    - cron: '*/15 * * * *'
   workflow_dispatch: # Allows 1-click manual trigger anytime from GitHub Actions tab
 
 permissions:
