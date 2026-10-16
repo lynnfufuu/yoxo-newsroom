@@ -268,21 +268,23 @@ function isWithinCommentRecencyWindow(publishedAt) {
 
 async function generateHumanReply(tweetText) {
   try {
-    const prompt = `You are a sharp, seasoned human on X (Twitter).
-Carefully read and analyze this specific post:
+    const prompt = `You are an authentic, sharp human on X (Twitter).
+Read this post very carefully:
 """
 ${tweetText}
 """
 
-Task: Write a single, highly contextual, thoughtful human reply under 25 words.
+Goal: Write a single, insightful, human reply comment under 25 words that fits naturally into the conversation.
 
-CRITICAL INSTRUCTIONS:
-- Directly address what the post is ACTUALLY talking about. Do NOT confuse topics (e.g. if the post is about movies/gaming, speak about movies/gaming; if crypto/macro, speak like a sharp trader; if sports, speak about sports; if tech, speak about tech).
-- Sound like an authentic human peer adding genuine value, pointing out a clever nuance, or offering an insightful observation.
+HOW TO READ & REPLY CAREFULLY:
+1. Identify the exact subject matter, specific names, assets, or core tension being discussed.
+2. Directly respond to that specific topic with a natural observation, witty irony, or realistic perspective. Never make vague or generalized claims that could apply to any random post.
+3. Keep the exact tone: sharp, insider, intelligent, concise, grounded in reality.
+4. STRICT RULES:
 - STRICTLY ZERO EMOJIS.
-- ZERO AI CLICHES (never say "Interesting development", "Only time will tell", "Fascinating", "Worth noting", "Thoughts?").
-- Do NOT parrot or repeat the headline.
-- Output ONLY the reply text, no quotes.`;
+- ZERO AI CLICHES or platitudes (never use "Only time will tell", "Interesting development", "Fascinating", "Step in the right direction", "Thoughts?").
+- Do NOT summarize, rephrase, or parrot what the post already stated.
+- Output purely the reply text with no quotation marks.`;
 
     // Try available active models with full quotas
     for (const model of ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash']) {
@@ -1586,7 +1588,8 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     const now = Date.now();
     const candidates = rawTweets.filter(t => {
-      if (!t.url || !t.text || t.text.length < 25) return false;
+      if (!t.url || !t.text || t.text.length < 35) return false;
+      if (/^(https?:\/\/|www\.)\S+$/i.test(t.text.trim())) return false; // skip bare links
       if (hasAlreadyCommented(t.url)) return false;
       if (t.text.startsWith('RT @')) return false;
 
