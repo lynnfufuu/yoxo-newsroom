@@ -1371,10 +1371,10 @@ async function runCycle() {
     }
   }
 
-  // Autonomous Multi-Source X Comment Explorer (Explores all top news sources on X every 15-20 mins)
+  // Autonomous Multi-Source X Comment Explorer (Feed scroll + top crypto/news sources every 10-15 mins)
   try {
     if (canCommentOnX()) {
-      await discoverAndCommentOnX();
+      await autoCommentOnXFeedOrOutlets();
     }
   } catch (err) {
     console.warn('X Comment Explorer notice:', err.message);
@@ -1513,6 +1513,133 @@ async function discoverAndCommentOnX() {
   } catch (err) {
     console.warn('X Explorer notice:', err.message);
   }
+}
+
+async function browseFeedAndCommentOnX() {
+  const SESSION_FILE = path.resolve(__dirname, 'x_session.json');
+  if (!fs.existsSync(SESSION_FILE)) return false;
+
+  console.log('🌐 [Feed Explorer] Navigating to your live X home timeline...');
+  const cookies = JSON.parse(fs.readFileSync(SESSION_FILE, 'utf8'));
+  const executablePath = await getChromeExecutable();
+
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      executablePath,
+      headless: 'new',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-blink-features=AutomationControlled',
+        '--window-size=1280,1000'
+      ]
+    });
+
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 1000 });
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+    });
+    await page.setCookie(...cookies);
+
+    await page.goto('https://x.com/home', { waitUntil: 'load', timeout: 35000 }).catch(e => console.log('Feed goto notice:', e.message));
+    await dismissCookieBanner(page);
+    await new Promise(r => setTimeout(r, 3000));
+
+    // Scroll timeline to load 15-20 fresh posts from your feed
+    console.log('📜 [Feed Explorer] Scrolling down your timeline to load fresh creator & news posts...');
+    for (let s = 0; s < 3; s++) {
+      await page.evaluate(() => window.scrollBy(0, 1000));
+      await new Promise(r => setTimeout(r, 2000));
+    }
+
+    const rawTweets = await page.evaluate(() => {
+      const articles = Array.from(document.querySelectorAll('article[data-testid="tweet"]'));
+      return articles.map(a => {
+        const linkElem = a.querySelector('a[href*="/status/"]');
+        const textElem = a.querySelector('div[data-testid="tweetText"]');
+        const userElem = a.querySelector('div[data-testid="User-Name"]');
+        const timeElem = a.querySelector('time');
+
+        let rawUrl = linkElem ? linkElem.getAttribute('href') : null;
+        if (rawUrl) {
+          rawUrl = rawUrl.split('?')[0].replace(/\/analytics$/, '');
+          if (!rawUrl.startsWith('http')) rawUrl = 'https://x.com' + rawUrl;
+        }
+
+        return {
+          user: userElem?.innerText.replace(/\n/g, ' ') || '',
+          text: textElem?.innerText.trim() || '',
+          url: rawUrl,
+          time: timeElem?.getAttribute('datetime')
+        };
+      });
+    });
+
+    await browser.close();
+    browser = null;
+
+    console.log(`📊 [Feed Explorer] Extracted ${rawTweets.length} tweets from your feed.`);
+
+    const now = Date.now();
+    const candidates = rawTweets.filter(t => {
+      if (!t.url || !t.text || t.text.length < 25) return false;
+      if (hasAlreadyCommented(t.url)) return false;
+      if (t.text.startsWith('RT @')) return false;
+
+      if (t.time) {
+        const ageMins = (now - new Date(t.time).getTime()) / 60000;
+        if (ageMins < 5 || ageMins > 360) return false;
+      }
+      return true;
+    });
+
+    if (!candidates || candidates.length === 0) {
+      console.log('🌐 [Feed Explorer] No fresh unreplied candidate found directly on home feed.');
+      return false;
+    }
+
+    const target = candidates[0];
+    console.log(`🎯 [Feed Explorer] Selected feed post from ${target.user}: ${target.url}`);
+    console.log(`Original Text: "${target.text.slice(0, 80)}..."`);
+
+    const humanComment = await generateHumanReply(target.text);
+    if (!humanComment) return false;
+
+    console.log(`💬 [Feed Explorer] Generated Comment: "${humanComment}"`);
+    const replyRes = await replyToTweetOnX({
+      tweetUrl: target.url,
+      replyText: humanComment
+    });
+
+    if (replyRes && replyRes.ok) {
+      recordXComment(target.url, humanComment);
+      console.log('✅ [Feed Explorer] Successfully commented on post from your personal feed!');
+      return true;
+    } else {
+      console.warn('Feed Explorer reply note:', replyRes ? replyRes.error : 'unknown');
+      return false;
+    }
+  } catch (err) {
+    console.warn('Feed Explorer notice:', err.message);
+    if (browser) {
+      try { await browser.close(); } catch (e) {}
+    }
+    return false;
+  }
+}
+
+async function autoCommentOnXFeedOrOutlets() {
+  // Priority 1: Direct Home Feed Scroll (User's personal algorithm, following, & CT creators)
+  const feedSuccess = await browseFeedAndCommentOnX();
+  if (feedSuccess) return;
+
+  // Priority 2: Syndication Scan across top 15+ Crypto & News Outlets
+  console.log('🔄 Falling back to Multi-Outlet Crypto & News Explorer...');
+  await discoverAndCommentOnX();
 }
 
 // 6. Interactive Telegram 1-Click Callback Listener
@@ -1740,6 +1867,8 @@ if (require.main === module) {
 
 module.exports = {
   runCycle,
+  browseFeedAndCommentOnX,
+  autoCommentOnXFeedOrOutlets,
   discoverAndCommentOnX,
   generateHumanReply,
   canPostToX,
