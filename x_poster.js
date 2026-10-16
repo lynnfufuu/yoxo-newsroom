@@ -223,6 +223,16 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
     await new Promise(r => setTimeout(r, 4500));
     console.log('✅ Successfully placed Reply under target post!');
 
+    // Algorithmic rank boost: Like the tweet to trigger author notification & boost reply ranking
+    try {
+      const likeBtn = await page.$('article[data-testid="tweet"] [data-testid="like"]');
+      if (likeBtn) {
+        await likeBtn.click();
+        console.log('❤️ Liked author post for algorithmic boost and author notification!');
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    } catch (e) {}
+
     await browser.close();
     return { ok: true };
   } catch (err) {

@@ -266,77 +266,26 @@ function isWithinCommentRecencyWindow(publishedAt) {
 
 
 
-function getContextualFallbackReply(text) {
-  const lower = (text || '').toLowerCase();
-  if (lower.includes('bitcoin') || lower.includes('btc')) {
-    const opts = [
-      "Still the only asset that does not care who is sitting in the Oval Office.",
-      "People overcomplicating a supply cap that was solved in 2008.",
-      "Liquidity cycle always wins in the end regardless of the noise.",
-      "Just another Tuesday for anyone who survived the 2022 drawdowns."
-    ];
-    return opts[Math.floor(Math.random() * opts.length)];
-  }
-  if (lower.includes('etf') || lower.includes('sec') || lower.includes('regulation') || lower.includes('bank') || lower.includes('custody')) {
-    const opts = [
-      "Wall Street spent years calling it a scam just to front-run the retail inflows.",
-      "Traditional finance moving slow as always while decentralized rails settle in seconds.",
-      "The pivot from fighting the tech to capturing the fees was entirely predictable."
-    ];
-    return opts[Math.floor(Math.random() * opts.length)];
-  }
-  if (lower.includes('solana') || lower.includes('sol') || lower.includes('meme') || lower.includes('pump') || lower.includes('volume')) {
-    const opts = [
-      "The speed is great until the entire validator network starts sweating from meme volume.",
-      "Casino velocity at scale, whether people want to admit it or not.",
-      "Volume is real, retention is the only question that matters next quarter."
-    ];
-    return opts[Math.floor(Math.random() * opts.length)];
-  }
-  if (lower.includes('ai') || lower.includes('model') || lower.includes('agent') || lower.includes('token')) {
-    const opts = [
-      "Most of these enterprise pilots are just expensive wrappers around API calls.",
-      "Everyone building autonomous agents until the hallucinated token bill lands.",
-      "The compute spend is staggering compared to the actual organic ARR being generated."
-    ];
-    return opts[Math.floor(Math.random() * opts.length)];
-  }
-  if (lower.includes('fed') || lower.includes('rate') || lower.includes('inflation') || lower.includes('market') || lower.includes('stock')) {
-    const opts = [
-      "Markets pricing in rate cuts every three weeks only to get blindsided by macro data.",
-      "Smart money already rebalanced before retail finished reading the headline.",
-      "Volatility is back and that is really the only thing traders actually care about."
-    ];
-    return opts[Math.floor(Math.random() * opts.length)];
-  }
-  const generalOpts = [
-    "Most will miss the actual takeaway buried behind the engagement bait.",
-    "The narrative shifts fast but the underlying incentive structure remains unchanged.",
-    "People reacting to the symptom instead of looking at the balance sheet.",
-    "Classic example of market positioning speaking louder than official statements."
-  ];
-  return generalOpts[Math.floor(Math.random() * generalOpts.length)];
-}
-
 async function generateHumanReply(tweetText) {
   try {
-    const prompt = `You are a sharp, seasoned human industry insider on X (Twitter).
-Read this viral tweet:
+    const prompt = `You are a sharp, seasoned human on X (Twitter).
+Carefully read and analyze this specific post:
 """
 ${tweetText}
 """
 
-Task: Write a single, short, human reply comment (1 to 2 sentences max, under 30 words).
+Task: Write a single, highly contextual, thoughtful human reply under 25 words.
 
-STRICT RULES:
+CRITICAL INSTRUCTIONS:
+- Directly address what the post is ACTUALLY talking about. Do NOT confuse topics (e.g. if the post is about movies/gaming, speak about movies/gaming; if crypto/macro, speak like a sharp trader; if sports, speak about sports; if tech, speak about tech).
+- Sound like an authentic human peer adding genuine value, pointing out a clever nuance, or offering an insightful observation.
 - STRICTLY ZERO EMOJIS.
-- ZERO AI CLICHES or generic commentary (NEVER write "Interesting development", "Only time will tell", "It's worth noting", "A step in the right direction", "Fascinating", "Huge implications", "Thoughts?").
-- Do NOT summarize or repeat the tweet facts.
-- Sound like an authentic industry native making a sharp, memorable observation or pointing out an irony.
-- Write purely as the reply text, no quotes, no extra formatting.`;
+- ZERO AI CLICHES (never say "Interesting development", "Only time will tell", "Fascinating", "Worth noting", "Thoughts?").
+- Do NOT parrot or repeat the headline.
+- Output ONLY the reply text, no quotes.`;
 
-    // Try primary gemini-3.8-flash first
-    for (const model of ['gemini-3.8-flash', 'gemini-3.5-flash-lite']) {
+    // Try available active models with full quotas
+    for (const model of ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash']) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
         const res = await fetch(url, {
@@ -355,12 +304,10 @@ STRICT RULES:
       } catch (me) {}
     }
 
-    // Heuristic fallback if Google free tier quota runs out
-    console.log('🤖 Utilizing native CT heuristic observer fallback...');
-    return getContextualFallbackReply(tweetText);
+    return null; // Skip if no high-context reply can be generated
   } catch (e) {
     console.error('generateHumanReply exception:', e.message);
-    return getContextualFallbackReply(tweetText);
+    return null;
   }
 }
 
@@ -1552,7 +1499,11 @@ async function discoverAndCommentOnX(maxComments = 1) {
         recordXComment(candidate.url, humanComment);
         placed++;
         console.log(`✅ [X Explorer] Successfully placed top comment (${placed}/${maxComments}) under breaking post!`);
-        await new Promise(r => setTimeout(r, 3500));
+        if (placed < maxComments) {
+          const waitMins = 3.5;
+          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins} minutes before engaging with next outlet...`);
+          await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
+        }
       } else {
         console.warn('X Explorer reply error:', replyRes ? replyRes.error : 'unknown');
       }
@@ -1660,9 +1611,12 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       console.log(`Original Text: "${target.text.slice(0, 80)}..."`);
 
       const humanComment = await generateHumanReply(target.text);
-      if (!humanComment) continue;
+      if (!humanComment) {
+        console.log(`⏩ Skipping post (could not verify high-context alignment).`);
+        continue;
+      }
 
-      console.log(`💬 [Feed Explorer] Generated Comment: "${humanComment}"`);
+      console.log(`💬 [Feed Explorer] Thoughtful Comment: "${humanComment}"`);
       const replyRes = await replyToTweetOnX({
         tweetUrl: target.url,
         replyText: humanComment
@@ -1672,7 +1626,12 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
         recordXComment(target.url, humanComment);
         commentsPlaced++;
         console.log(`✅ [Feed Explorer] Successfully placed Reply under post (${commentsPlaced}/${targetCommentsCount})!`);
-        await new Promise(r => setTimeout(r, 3500));
+        
+        if (commentsPlaced < targetCommentsCount) {
+          const waitMins = 3.5;
+          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins} minutes before engaging with next post...`);
+          await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
+        }
       } else {
         console.warn('Feed Explorer reply note:', replyRes ? replyRes.error : 'unknown');
       }
@@ -1689,8 +1648,8 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  const TARGET_TOTAL_COMMENTS = 4; // Target 4 to 5 high-visibility replies per cycle for aggressive follower growth
-  console.log(`🎯 [Follower Growth Sprint] Commencing cycle targeting ${TARGET_TOTAL_COMMENTS} replies...`);
+  const TARGET_TOTAL_COMMENTS = 2; // Relaxed 3-5 min rhythm (2 thoughtful comments per 15m cycle)
+  console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting ${TARGET_TOTAL_COMMENTS} thoughtful replies...`);
 
   // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following CT creators)
   const feedCount = await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
@@ -1698,7 +1657,7 @@ async function autoCommentOnXFeedOrOutlets() {
   // Priority 2: Syndication Scan across top 15+ Crypto & News Outlets
   const remainingNeeded = TARGET_TOTAL_COMMENTS - (feedCount || 0);
   if (remainingNeeded > 0) {
-    console.log(`🔄 Topping up with ${remainingNeeded} reply/replies from breaking crypto outlets...`);
+    console.log(`🔄 Engaging breaking crypto outlets for ${remainingNeeded} reply/replies with 3-5 min pacing...`);
     await discoverAndCommentOnX(remainingNeeded);
   }
 }
