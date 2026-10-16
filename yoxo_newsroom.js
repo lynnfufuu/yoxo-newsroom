@@ -217,24 +217,13 @@ function recordXPost(headline, url) {
   } catch (e) {}
 }
 
-// Comment Rate Limiter & Recency Filter (8-10 mins cadence, strictly targets posts 15m - 2h old)
+// Comment Rate Limiter (Unrestricted continuous commenting as requested)
 const X_COMMENT_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_comment.json');
-const X_MIN_COMMENT_COOLDOWN_MS = 8 * 60 * 1000; // 8 minutes (allows comments every 15m cycle)
+const X_MIN_COMMENT_COOLDOWN_MS = 0; // Unrestricted commenting without time limits
 const COMMENTED_TWEETS_FILE = path.resolve(__dirname, 'commented_tweets.json');
 
 function canCommentOnX() {
-  if (!fs.existsSync(X_COMMENT_COOLDOWN_FILE)) return true;
-  try {
-    const data = JSON.parse(fs.readFileSync(X_COMMENT_COOLDOWN_FILE, 'utf8'));
-    const lastTime = data.lastCommentedAt || data.timestamp || 0;
-    const elapsed = Date.now() - lastTime;
-    if (elapsed < X_MIN_COMMENT_COOLDOWN_MS) {
-      const remainingMins = Math.ceil((X_MIN_COMMENT_COOLDOWN_MS - elapsed) / 60000);
-      console.log(`⏳ [Comment Cadence] Cooldown active (${remainingMins} mins remaining). Skipping reply this cycle.`);
-      return false;
-    }
-  } catch (e) {}
-  return true;
+  return true; // No time limit restriction on comments
 }
 
 function hasAlreadyCommented(tweetUrl) {
@@ -299,12 +288,17 @@ STRICT RULES:
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }]
       }),
-      timeout: 15000
+      signal: AbortSignal.timeout(15000)
     });
     const data = await res.json();
-    let text = data.candidates[0].content.parts[0].text.trim();
-    return text.replace(/^["']|["']$/g, '').trim();
+    if (data && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+      let text = data.candidates[0].content.parts[0].text.trim();
+      return text.replace(/^["']|["']$/g, '').trim();
+    }
+    console.warn('generateHumanReply Gemini notice:', data?.error?.message || 'no candidates returned');
+    return null;
   } catch (e) {
+    console.error('generateHumanReply exception:', e.message);
     return null;
   }
 }
@@ -1549,11 +1543,11 @@ async function browseFeedAndCommentOnX() {
     await dismissCookieBanner(page);
     await new Promise(r => setTimeout(r, 3000));
 
-    // Scroll timeline to load 15-20 fresh posts from your feed
-    console.log('📜 [Feed Explorer] Scrolling down your timeline to load fresh creator & news posts...');
-    for (let s = 0; s < 3; s++) {
-      await page.evaluate(() => window.scrollBy(0, 1000));
-      await new Promise(r => setTimeout(r, 2000));
+    // Deep scroll timeline to load 40-50+ fresh posts from your feed
+    console.log('📜 [Feed Explorer] Deep scrolling your timeline (8 scrolls) to load 40+ creator & news posts...');
+    for (let s = 0; s < 8; s++) {
+      await page.evaluate(() => window.scrollBy(0, 1200));
+      await new Promise(r => setTimeout(r, 1200));
     }
 
     const rawTweets = await page.evaluate(() => {
@@ -1602,27 +1596,35 @@ async function browseFeedAndCommentOnX() {
       return false;
     }
 
-    const target = candidates[0];
-    console.log(`🎯 [Feed Explorer] Selected feed post from ${target.user}: ${target.url}`);
-    console.log(`Original Text: "${target.text.slice(0, 80)}..."`);
+    let commentsPlaced = 0;
+    const targetCommentsCount = 2; // Place up to 2 comments per cycle for accelerated growth
 
-    const humanComment = await generateHumanReply(target.text);
-    if (!humanComment) return false;
+    for (const target of candidates) {
+      if (commentsPlaced >= targetCommentsCount) break;
 
-    console.log(`💬 [Feed Explorer] Generated Comment: "${humanComment}"`);
-    const replyRes = await replyToTweetOnX({
-      tweetUrl: target.url,
-      replyText: humanComment
-    });
+      console.log(`🎯 [Feed Explorer] Selected feed post from ${target.user}: ${target.url}`);
+      console.log(`Original Text: "${target.text.slice(0, 80)}..."`);
 
-    if (replyRes && replyRes.ok) {
-      recordXComment(target.url, humanComment);
-      console.log('✅ [Feed Explorer] Successfully commented on post from your personal feed!');
-      return true;
-    } else {
-      console.warn('Feed Explorer reply note:', replyRes ? replyRes.error : 'unknown');
-      return false;
+      const humanComment = await generateHumanReply(target.text);
+      if (!humanComment) continue;
+
+      console.log(`💬 [Feed Explorer] Generated Comment: "${humanComment}"`);
+      const replyRes = await replyToTweetOnX({
+        tweetUrl: target.url,
+        replyText: humanComment
+      });
+
+      if (replyRes && replyRes.ok) {
+        recordXComment(target.url, humanComment);
+        commentsPlaced++;
+        console.log(`✅ [Feed Explorer] Successfully placed Reply under post (${commentsPlaced}/${targetCommentsCount})!`);
+        await new Promise(r => setTimeout(r, 3500));
+      } else {
+        console.warn('Feed Explorer reply note:', replyRes ? replyRes.error : 'unknown');
+      }
     }
+
+    return commentsPlaced > 0;
   } catch (err) {
     console.warn('Feed Explorer notice:', err.message);
     if (browser) {
@@ -1633,12 +1635,12 @@ async function browseFeedAndCommentOnX() {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  // Priority 1: Direct Home Feed Scroll (User's personal algorithm, following, & CT creators)
+  // Priority 1: Direct Home Feed Deep Scroll (User's personal algorithm, following, & CT creators)
   const feedSuccess = await browseFeedAndCommentOnX();
   if (feedSuccess) return;
 
   // Priority 2: Syndication Scan across top 15+ Crypto & News Outlets
-  console.log('🔄 Falling back to Multi-Outlet Crypto & News Explorer...');
+  console.log('🔄 Engaging Multi-Outlet Crypto & News Explorer...');
   await discoverAndCommentOnX();
 }
 
