@@ -188,20 +188,19 @@ function getChromeExecutable() {
   return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 }
 
-// X Cooldown & Anti-Shadowban Rate Limiter (Protects @YoXo_Station from automated spam flags)
+// X Cooldown & Anti-Shadowban Rate Limiter (Strict 45-minute minimum spacing between standalone tweets)
 const X_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_post.json');
-const X_MIN_COOLDOWN_MS = 60 * 60 * 1000; // 60 minutes minimum between tweets
+const X_MIN_COOLDOWN_MS = 45 * 60 * 1000; // 45 minutes strictly between tweets
 
 function canPostToX(isMustPost = false) {
   if (!fs.existsSync(X_COOLDOWN_FILE)) return true;
   try {
     const data = JSON.parse(fs.readFileSync(X_COOLDOWN_FILE, 'utf8'));
     const elapsed = Date.now() - (data.lastPostedAt || 0);
-    // Strict shadowban protection: even 10/10 breaking news requires at least 45 minutes spacing
-    const requiredCooldown = isMustPost ? 45 * 60 * 1000 : X_MIN_COOLDOWN_MS;
-    if (elapsed < requiredCooldown) {
-      const remainingMins = Math.ceil((requiredCooldown - elapsed) / 60000);
-      console.log(`⏳ [Shadowban Protection] Strict cooldown active (${remainingMins} mins remaining until next X tweet). Skipping auto-post this cycle.`);
+    // Strict shadowban protection: zero bypasses allowed, 45 minutes strictly enforced
+    if (elapsed < X_MIN_COOLDOWN_MS) {
+      const remainingMins = Math.ceil((X_MIN_COOLDOWN_MS - elapsed) / 60000);
+      console.log(`⏳ [Shadowban Protection] Strict 45m cooldown active (${remainingMins} mins remaining until next X tweet). Skipping auto-post this cycle.`);
       return false;
     }
   } catch (e) {}
@@ -218,9 +217,9 @@ function recordXPost(headline, url) {
   } catch (e) {}
 }
 
-// Comment Rate Limiter & Recency Filter (10-15 mins cadence, strictly targets posts 15m - 2h old)
+// Comment Rate Limiter & Recency Filter (8-10 mins cadence, strictly targets posts 15m - 2h old)
 const X_COMMENT_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_comment.json');
-const X_MIN_COMMENT_COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes (allows comment every 15m cycle)
+const X_MIN_COMMENT_COOLDOWN_MS = 8 * 60 * 1000; // 8 minutes (allows comments every 15m cycle)
 const COMMENTED_TWEETS_FILE = path.resolve(__dirname, 'commented_tweets.json');
 
 function canCommentOnX() {

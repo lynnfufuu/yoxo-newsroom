@@ -22,18 +22,27 @@ async function getChromeExecutable() {
 }
 
 async function dismissCookieBanner(page) {
-  try {
-    await page.evaluate(() => {
-      const all = Array.from(document.querySelectorAll('button, div[role="button"], span'));
-      for (const el of all) {
-        if (el.innerText && (el.innerText.includes('Accept all cookies') || el.innerText.includes('Refuse non-essential'))) {
-          el.click();
-          break;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const dismissed = await page.evaluate(() => {
+        const all = Array.from(document.querySelectorAll('button, div[role="button"], span'));
+        for (const el of all) {
+          if (el.innerText && (el.innerText.includes('Accept all cookies') || el.innerText.includes('Refuse non-essential'))) {
+            el.click();
+            return true;
+          }
         }
+        return false;
+      });
+      if (dismissed) {
+        console.log('✅ Dismissed X cookie banner.');
+        await new Promise(r => setTimeout(r, 1500));
+        return true;
       }
-    });
-    await new Promise(r => setTimeout(r, 1000));
-  } catch (e) {}
+    } catch (e) {}
+    await new Promise(r => setTimeout(r, 1200));
+  }
+  return false;
 }
 
 async function insertTweetText(page, selector, text) {
