@@ -176,8 +176,22 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
     await page.goto(tweetUrl, { waitUntil: 'domcontentloaded', timeout: 35000 });
     await dismissCookieBanner(page);
 
-    // Find the inline reply box under the tweet and insert text cleanly
+    // Find the inline reply box or trigger modal composer if needed
     const replySelector = 'div[data-testid="tweetTextarea_0"], div[role="textbox"]';
+    try {
+      await page.waitForSelector(replySelector, { timeout: 5000 });
+    } catch (e) {
+      console.log('Inline reply box not immediately visible, clicking reply icon on tweet...');
+      const replyIcon = 'article[data-testid="tweet"] div[data-testid="reply"], button[data-testid="reply"]';
+      try {
+        await page.waitForSelector(replyIcon, { timeout: 6000 });
+        await page.click(replyIcon);
+        await new Promise(r => setTimeout(r, 1000));
+      } catch (iconErr) {
+        console.warn('Could not click reply icon:', iconErr.message);
+      }
+    }
+
     await insertTweetText(page, replySelector, replyText);
 
     // Attach 1080p visual card if present
@@ -191,9 +205,9 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
       } catch (e) {}
     }
 
-    // Click the inline Reply button
+    // Click the Reply button (inline or modal)
     console.log('🚀 Dispatching Top Reply comment...');
-    const replyButton = 'div[data-testid="tweetButtonInline"], button[data-testid="tweetButtonInline"]';
+    const replyButton = 'div[data-testid="tweetButtonInline"], button[data-testid="tweetButtonInline"], button[data-testid="tweetButton"], div[data-testid="tweetButton"]';
     await page.waitForSelector(replyButton, { timeout: 10000 });
     await page.click(replyButton);
 
