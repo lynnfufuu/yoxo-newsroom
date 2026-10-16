@@ -140,7 +140,7 @@ function saveHeadline(headline) {
 }
 function isDuplicateStory(newHeadline) {
   const list = loadHeadlines();
-  const getWords = (s) => (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 3);
+  const getWords = (s) => (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
   const newWords = new Set(getWords(newHeadline));
   if (newWords.size === 0) return false;
 
@@ -151,7 +151,7 @@ function isDuplicateStory(newHeadline) {
       if (newWords.has(w)) common++;
     }
     const similarity = common / Math.min(newWords.size, existingWords.length);
-    if (similarity >= 0.65) {
+    if (similarity >= 0.45) {
       console.log(`⚠️ Duplicate detected: "${newHeadline}" is similar to previously covered "${item.text}" (${Math.round(similarity*100)}% match)`);
       return true;
     }
@@ -169,6 +169,23 @@ function getNextCardStyle() {
   const nextStyle = lastStyle === 'magazine' ? 'opinion' : 'magazine';
   fs.writeFileSync(STYLE_FILE, nextStyle, 'utf8');
   return nextStyle;
+}
+
+function getChromeExecutable() {
+  const candidates = [
+    process.env.PUPPETEER_EXECUTABLE_PATH,
+    process.env.CHROME_BIN,
+    '/usr/bin/google-chrome',
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/chromium',
+    '/usr/bin/chromium-browser',
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+  ].filter(Boolean);
+
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 }
 
 // X Cooldown & Anti-Shadowban Rate Limiter (Protects @YoXo_Station from automated spam flags)
@@ -470,7 +487,16 @@ async function analyzeNewsWithGemini(newsText, deskName = 'Web3 & Crypto') {
    - "photo_primary": The primary, specific subject that DIRECTLY MATCHES the central context of this exact news story (e.g. if story is about an AI tool cloning Photoshop/Figma -> "Adobe Photoshop" or "Figma"; if about Donald Trump -> "Donald Trump"; if about Solana -> "Solana cryptocurrency"; if about GTA 6 -> "Grand Theft Auto VI"; if about Boeing -> "Boeing aircraft"; if about a specific film/anime -> the official film title or director; if about a disaster/wildfire -> specific volcano, wildfire location, or storm satellite). Focus on what the story is ACTUALLY about!
    - "photo_fallback": The broader contextual setting or related industry anchor (e.g. "Software developer workspace", "New York Stock Exchange", "White House", "PlayStation 5 console", "Wildfire smoke aerial", "Emergency rescue responders").`;
 
+  const recentHeadlines = loadHeadlines().slice(-20).map(h => h.text);
+  const dupCheckPrompt = recentHeadlines.length > 0 ? `
+CRITICAL DEDUPLICATION MANDATE:
+Here are our recently published stories:
+${recentHeadlines.map(h => `- "${h}"`).join('\n')}
+If the incoming breaking news covers the EXACT SAME event, milestone, corporate announcement, or subject as ANY of the above stories (even if reported by another outlet or with different words), you MUST return "is_duplicate": true and "score": 0!
+` : '';
+
   const prompt = `You are ${roleDesc} writing for @YoXo_Station on X (Twitter).
+${dupCheckPrompt}
 
 CRITICAL INSTRUCTIONS FOR HEADLINES, BODY, DEBATE & REAL PHOTOGRAPHY:
 1. HEADLINE FOR GRAPHIC CARD (2-5 WORDS MAX, ALL CAPS):
@@ -506,9 +532,10 @@ ${newsText}
 """
 
 Instructions:
-1. Rate interestingness (1-10). ${scoreGuide}
-2. "is_must_post": true ONLY IF this is a rare, mega-hyped 9.5-10/10 global blockbuster story that gets millions of people furiously talking worldwide right now.
-3. If score >= 8:
+1. If "is_duplicate": true, set score: 0 and do not generate card fields.
+2. Rate interestingness (1-10). ${scoreGuide}
+3. "is_must_post": true ONLY IF this is a rare, mega-hyped 9.5-10/10 global blockbuster story that gets millions of people furiously talking worldwide right now.
+4. If score >= 8:
    - "category_pill": 2-3 words uppercase category (e.g. "GAMING INTEL", "LABOR POLICY", "MACRO LIQUIDITY", "DISASTER ALERT", "MEGA EVENT")
    - "photo_primary": Central person, game title, or subject for real photography.
    - "photo_fallback": Central institution or setting for real photography.
@@ -518,6 +545,7 @@ Instructions:
 
 Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
 {
+  "is_duplicate": false,
   "is_interesting": true,
   "score": 9,
   "is_must_post": false,
@@ -926,23 +954,6 @@ async function renderCard({ style, badge, headline, subdeck, photoBase64, source
 </html>`;
   }
 
-  function getChromeExecutable() {
-    const candidates = [
-      process.env.PUPPETEER_EXECUTABLE_PATH,
-      process.env.CHROME_BIN,
-      '/usr/bin/google-chrome',
-      '/usr/bin/google-chrome-stable',
-      '/usr/bin/chromium',
-      '/usr/bin/chromium-browser',
-      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-    ].filter(Boolean);
-
-    for (const c of candidates) {
-      if (fs.existsSync(c)) return c;
-    }
-    return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-  }
-
   const browser = await puppeteer.launch({
     executablePath: getChromeExecutable(),
     headless: 'new',
@@ -1124,6 +1135,11 @@ async function runCycle() {
         // Mark as seen so we never re-evaluate
         history.push(post.postId);
         saveHistory(history);
+
+        if (analysis.is_duplicate) {
+          console.log(`⏩ Skipping duplicate story detected by AI: "${post.text.slice(0, 50)}..."`);
+          continue;
+        }
 
         if (analysis.is_interesting && analysis.score >= 8) {
           console.log(`🚨 BREAKING STORY DETECTED FOR [${desk.name}]! Preparing graphic & draft...`);
@@ -1352,6 +1368,113 @@ STRICT RULES:
         console.error('Error on story:', err.message);
       }
     }
+  }
+
+  // Autonomous Multi-Source X Comment Explorer (Explores all top news sources on X every 15-20 mins)
+  try {
+    if (canCommentOnX()) {
+      await discoverAndCommentOnX();
+    }
+  } catch (err) {
+    console.warn('X Comment Explorer notice:', err.message);
+  }
+}
+
+async function discoverAndCommentOnX() {
+  const SESSION_FILE = path.resolve(__dirname, 'x_session.json');
+  if (!fs.existsSync(SESSION_FILE)) return;
+  console.log('🌐 [X Explorer] Scanning unified live breaking feed across top news sources...');
+
+  const cookies = JSON.parse(fs.readFileSync(SESSION_FILE, 'utf8'));
+  const executablePath = getChromeExecutable();
+
+  const browser = await puppeteer.launch({
+    executablePath,
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1280,1000']
+  });
+
+  try {
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 1000 });
+    await page.setCookie(...cookies);
+
+    const searchUrl = 'https://x.com/search?q=(from:WatcherGuru OR from:disclosetv OR from:unusual_whales OR from:DeItaone OR from:Cointelegraph OR from:TechCrunch OR from:IGN OR from:DiscussingFilm OR from:BNONews OR from:TheVerge OR from:CultureCrave OR from:PopBase OR from:Reuters OR from:AP)&f=live';
+    await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 35000 });
+
+    // Dismiss cookie modal if present
+    try {
+      await page.evaluate(() => {
+        const btns = Array.from(document.querySelectorAll('button'));
+        for (const b of btns) {
+          if (b.innerText && b.innerText.includes('Accept all cookies')) {
+            b.click();
+            break;
+          }
+        }
+      });
+      await new Promise(r => setTimeout(r, 1500));
+    } catch(e) {}
+
+    await page.waitForSelector('article[data-testid="tweet"]', { timeout: 20000 });
+    const tweets = await page.evaluate(() => {
+      const articles = Array.from(document.querySelectorAll('article[data-testid="tweet"]'));
+      return articles.slice(0, 10).map(a => {
+        const link = a.querySelector('a[href*="/status/"]');
+        const text = a.querySelector('div[data-testid="tweetText"]')?.innerText.trim() || '';
+        const user = a.querySelector('div[data-testid="User-Name"]')?.innerText.replace(/\n/g, ' ') || '';
+        const time = a.querySelector('time')?.getAttribute('datetime');
+        return {
+          user: user.slice(0, 35),
+          url: link ? 'https://x.com' + link.getAttribute('href').split('?')[0] : null,
+          text,
+          time
+        };
+      });
+    });
+
+    await browser.close();
+
+    // Find the best fresh tweet (15m - 2h old) not already commented on
+    let candidate = null;
+    for (const tw of tweets) {
+      if (!tw.url || !tw.text || tw.text.length < 30 || hasAlreadyCommented(tw.url)) continue;
+      if (tw.time) {
+        const ageMins = (Date.now() - new Date(tw.time).getTime()) / 60000;
+        if (ageMins >= 10 && ageMins <= 120) {
+          candidate = tw;
+          break;
+        }
+      } else {
+        candidate = tw;
+        break;
+      }
+    }
+
+    if (!candidate) {
+      console.log('🌐 [X Explorer] No new candidate tweet found in 15m–2h window this cycle.');
+      return;
+    }
+
+    console.log(`🎯 [X Explorer] Selected target from ${candidate.user}: ${candidate.url}`);
+    console.log(`Original Text: "${candidate.text.slice(0, 80)}..."`);
+
+    const humanComment = await generateHumanReply(candidate.text);
+    if (!humanComment) return;
+
+    console.log(`💬 [X Explorer] Generated Comment: "${humanComment}"`);
+    const replyRes = await replyToTweetOnX({
+      tweetUrl: candidate.url,
+      replyText: humanComment
+    });
+
+    if (replyRes && replyRes.ok) {
+      recordXComment(candidate.url, humanComment);
+      console.log('✅ [X Explorer] Successfully placed top comment on live breaking post!');
+    }
+  } catch (err) {
+    console.warn('X Explorer notice:', err.message);
+    try { await browser.close(); } catch(e) {}
   }
 }
 
