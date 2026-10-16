@@ -25,43 +25,24 @@ async function insertTweetText(page, selector, text) {
   await page.waitForSelector(selector, { timeout: 20000 });
   await page.click(selector);
 
-  // Clean empty character
-  await page.keyboard.sendCharacter('');
+  // Clear any existing draft text
+  await page.keyboard.down('Control');
+  await page.keyboard.press('KeyA');
+  await page.keyboard.up('Control');
+  await page.keyboard.press('Backspace');
+  await new Promise(r => setTimeout(r, 300));
 
-  // Use clipboard DataTransfer event in the browser first (most native, preserves all formatting)
-  const success = await page.evaluate((sel, content) => {
-    const el = document.querySelector(sel);
-    if (!el) return false;
-    el.focus();
-    try {
-      const dt = new DataTransfer();
-      dt.setData('text/plain', content);
-      const ev = new ClipboardEvent('paste', {
-        clipboardData: dt,
-        bubbles: true,
-        cancelable: true
-      });
-      el.dispatchEvent(ev);
-      const current = el.innerText || el.textContent || '';
-      return current.trim().length >= 10;
-    } catch (e) {
-      return false;
+  // Type line-by-line using Shift+Enter for clean paragraph formatting without duplicate paste bugs
+  console.log('⌨️ Typing clean formatted copy...');
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].length > 0) {
+      await page.keyboard.type(lines[i], { delay: 5 });
     }
-  }, selector, text);
-
-  // Fallback if clipboard paste didn't populate: type line by line with Shift+Enter
-  if (!success) {
-    console.log('⌨️ Typing formatted tweet copy line-by-line...');
-    const lines = text.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].length > 0) {
-        await page.keyboard.type(lines[i], { delay: 5 });
-      }
-      if (i < lines.length - 1) {
-        await page.keyboard.down('Shift');
-        await page.keyboard.press('Enter');
-        await page.keyboard.up('Shift');
-      }
+    if (i < lines.length - 1) {
+      await page.keyboard.down('Shift');
+      await page.keyboard.press('Enter');
+      await page.keyboard.up('Shift');
     }
   }
 }

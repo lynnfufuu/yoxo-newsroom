@@ -200,6 +200,63 @@ function recordXPost(headline, url) {
   } catch (e) {}
 }
 
+// Comment Rate Limiter & Recency Filter (10-15 mins gap, strictly targets posts 15m - 2h old)
+const X_COMMENT_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_comment.json');
+const X_MIN_COMMENT_COOLDOWN_MS = 12 * 60 * 1000; // 12 minutes (within the 10-15 min window)
+const COMMENTED_TWEETS_FILE = path.resolve(__dirname, 'commented_tweets.json');
+
+function canCommentOnX() {
+  if (!fs.existsSync(X_COMMENT_COOLDOWN_FILE)) return true;
+  try {
+    const data = JSON.parse(fs.readFileSync(X_COMMENT_COOLDOWN_FILE, 'utf8'));
+    const elapsed = Date.now() - (data.lastCommentedAt || 0);
+    if (elapsed < X_MIN_COMMENT_COOLDOWN_MS) {
+      const remainingMins = Math.ceil((X_MIN_COMMENT_COOLDOWN_MS - elapsed) / 60000);
+      console.log(`⏳ [Comment Cadence] Cooldown active (${remainingMins} mins remaining). Skipping reply this cycle.`);
+      return false;
+    }
+  } catch (e) {}
+  return true;
+}
+
+function hasAlreadyCommented(tweetUrl) {
+  if (!fs.existsSync(COMMENTED_TWEETS_FILE)) return false;
+  try {
+    const list = JSON.parse(fs.readFileSync(COMMENTED_TWEETS_FILE, 'utf8'));
+    return Array.isArray(list) && list.includes(tweetUrl);
+  } catch (e) {
+    return false;
+  }
+}
+
+function recordXComment(tweetUrl, text) {
+  try {
+    fs.writeFileSync(X_COMMENT_COOLDOWN_FILE, JSON.stringify({
+      lastCommentedAt: Date.now(),
+      tweetUrl,
+      text
+    }, null, 2), 'utf8');
+
+    let list = [];
+    if (fs.existsSync(COMMENTED_TWEETS_FILE)) {
+      try { list = JSON.parse(fs.readFileSync(COMMENTED_TWEETS_FILE, 'utf8')); } catch (e) {}
+    }
+    if (!list.includes(tweetUrl)) list.push(tweetUrl);
+    fs.writeFileSync(COMMENTED_TWEETS_FILE, JSON.stringify(list.slice(-200), null, 2), 'utf8');
+  } catch (e) {}
+}
+
+function isWithinCommentRecencyWindow(publishedAt) {
+  if (!publishedAt) return true;
+  const ageMs = Date.now() - new Date(publishedAt).getTime();
+  const ageMins = ageMs / 60000;
+  if (ageMins > 120) {
+    console.log(`⏳ Tweet is too old for top-reply snipe (${Math.round(ageMins / 60)}h old). Must be under 2 hours.`);
+    return false;
+  }
+  return true;
+}
+
 // Logo
 const logoPath = path.resolve(__dirname, 'assets', 'logo.jpg');
 const logoBase64 = `data:image/jpeg;base64,${fs.readFileSync(logoPath).toString('base64')}`;
@@ -1267,13 +1324,17 @@ STRICT RULES:
 }
 
                     // Top-Reply Sniper: If story originated from a viral X post, place an organic, human insider comment
-                    if (quoteUrl) {
+                    if (quoteUrl && canCommentOnX() && !hasAlreadyCommented(quoteUrl) && isWithinCommentRecencyWindow(post.publishedAt)) {
                       console.log(`🎯 [AUTOPILOT] Crafting organic human reply for viral tweet: ${quoteUrl}...`);
                       const humanComment = await generateHumanReply(post.text) || cleanHeadline;
-                      await replyToTweetOnX({
+                      const replyRes = await replyToTweetOnX({
                         tweetUrl: quoteUrl,
                         replyText: humanComment
                       });
+                      if (replyRes && replyRes.ok) {
+                        recordXComment(quoteUrl, humanComment);
+                        console.log(`✅ [AUTOPILOT] Successfully placed organic comment on viral tweet!`);
+                      }
                     }
                   } catch (e) {
                     console.error('X auto-publish error:', e.message);
