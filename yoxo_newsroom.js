@@ -1232,13 +1232,47 @@ async function runCycle() {
                       console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
                     }
 
-                    // Top-Reply Sniper: If story originated from a viral X post, place a visual comment under it too!
+async function generateHumanReply(tweetText) {
+  try {
+    const prompt = `You are a sharp, seasoned human industry insider on X (Twitter).
+Read this viral tweet:
+"""
+${tweetText}
+"""
+
+Task: Write a single, short, human reply comment (1 to 2 sentences max, under 30 words).
+
+STRICT RULES:
+- STRICTLY ZERO EMOJIS.
+- ZERO AI CLICHES or generic commentary (NEVER write "Interesting development", "Only time will tell", "It's worth noting", "A step in the right direction", "Fascinating", "Huge implications", "Thoughts?").
+- Do NOT summarize or repeat the tweet facts.
+- Sound like an authentic industry native making a sharp, memorable observation or pointing out an irony.
+- Write purely as the reply text, no quotes, no extra formatting.`;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_KEY}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      }),
+      timeout: 15000
+    });
+    const data = await res.json();
+    let text = data.candidates[0].content.parts[0].text.trim();
+    return text.replace(/^["']|["']$/g, '').trim();
+  } catch (e) {
+    return null;
+  }
+}
+
+                    // Top-Reply Sniper: If story originated from a viral X post, place an organic, human insider comment
                     if (quoteUrl) {
-                      console.log(`🎯 [AUTOPILOT] Sniping top reply comment on viral tweet: ${quoteUrl}...`);
+                      console.log(`🎯 [AUTOPILOT] Crafting organic human reply for viral tweet: ${quoteUrl}...`);
+                      const humanComment = await generateHumanReply(post.text) || cleanHeadline;
                       await replyToTweetOnX({
                         tweetUrl: quoteUrl,
-                        imagePath,
-                        replyText: cleanTweet
+                        replyText: humanComment
                       });
                     }
                   } catch (e) {
