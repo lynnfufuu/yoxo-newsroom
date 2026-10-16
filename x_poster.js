@@ -21,6 +21,51 @@ async function getChromeExecutable() {
   return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 }
 
+async function insertTweetText(page, selector, text) {
+  await page.waitForSelector(selector, { timeout: 20000 });
+  await page.click(selector);
+
+  // Clean empty character
+  await page.keyboard.sendCharacter('');
+
+  // Use clipboard DataTransfer event in the browser first (most native, preserves all formatting)
+  const success = await page.evaluate((sel, content) => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+    el.focus();
+    try {
+      const dt = new DataTransfer();
+      dt.setData('text/plain', content);
+      const ev = new ClipboardEvent('paste', {
+        clipboardData: dt,
+        bubbles: true,
+        cancelable: true
+      });
+      el.dispatchEvent(ev);
+      const current = el.innerText || el.textContent || '';
+      return current.trim().length >= 10;
+    } catch (e) {
+      return false;
+    }
+  }, selector, text);
+
+  // Fallback if clipboard paste didn't populate: type line by line with Shift+Enter
+  if (!success) {
+    console.log('⌨️ Typing formatted tweet copy line-by-line...');
+    const lines = text.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].length > 0) {
+        await page.keyboard.type(lines[i], { delay: 5 });
+      }
+      if (i < lines.length - 1) {
+        await page.keyboard.down('Shift');
+        await page.keyboard.press('Enter');
+        await page.keyboard.up('Shift');
+      }
+    }
+  }
+}
+
 // 1. Post Standalone Tweet or Quote Tweet (QRT)
 async function postToX({ imagePath, text, quoteUrl }) {
   if (!fs.existsSync(SESSION_FILE)) {
@@ -43,7 +88,7 @@ async function postToX({ imagePath, text, quoteUrl }) {
     await page.setViewport({ width: 1280, height: 900 });
     await page.setCookie(...cookies);
 
-    // If quoteUrl provided, navigate to compose with embedded quote URL or append to text
+    // If quoteUrl provided, navigate to compose with embedded quote URL
     let targetUrl = 'https://x.com/compose/post';
     let fullText = text;
     if (quoteUrl && (quoteUrl.includes('x.com/') || quoteUrl.includes('twitter.com/'))) {
@@ -61,20 +106,9 @@ async function postToX({ imagePath, text, quoteUrl }) {
       return { ok: false, error: 'X session expired. Please re-login.' };
     }
 
-    // Wait for text input
+    // Insert full formatted copy with newlines & bullet points
     const textSelector = 'div[data-testid="tweetTextarea_0"], div[role="textbox"]';
-    await page.waitForSelector(textSelector, { timeout: 20000 });
-    await page.click(textSelector);
-    
-    // Type tweet copy cleanly
-    await page.keyboard.sendCharacter('');
-    await page.evaluate((selector, tweetText) => {
-      const el = document.querySelector(selector);
-      if (el) {
-        el.focus();
-        document.execCommand('insertText', false, tweetText);
-      }
-    }, textSelector, fullText);
+    await insertTweetText(page, textSelector, fullText);
 
     // Attach image if provided
     if (imagePath && fs.existsSync(imagePath)) {
@@ -133,19 +167,9 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
 
     await page.goto(tweetUrl, { waitUntil: 'domcontentloaded', timeout: 35000 });
 
-    // Find the inline reply box under the tweet
+    // Find the inline reply box under the tweet and insert text cleanly
     const replySelector = 'div[data-testid="tweetTextarea_0"], div[role="textbox"]';
-    await page.waitForSelector(replySelector, { timeout: 20000 });
-    await page.click(replySelector);
-
-    // Type the sharp reply comment
-    await page.evaluate((selector, comment) => {
-      const el = document.querySelector(selector);
-      if (el) {
-        el.focus();
-        document.execCommand('insertText', false, comment);
-      }
-    }, replySelector, replyText);
+    await insertTweetText(page, replySelector, replyText);
 
     // Attach 1080p visual card if present
     if (imagePath && fs.existsSync(imagePath)) {

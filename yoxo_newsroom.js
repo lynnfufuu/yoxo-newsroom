@@ -171,6 +171,35 @@ function getNextCardStyle() {
   return nextStyle;
 }
 
+// X Cooldown & Anti-Shadowban Rate Limiter (Protects @YoXo_Station from automated spam flags)
+const X_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_post.json');
+const X_MIN_COOLDOWN_MS = 45 * 60 * 1000; // 45 minutes minimum between tweets
+
+function canPostToX(isMustPost = false) {
+  if (isMustPost) return true; // Rare 10/10 emergency breaking news can bypass cooldown
+  if (!fs.existsSync(X_COOLDOWN_FILE)) return true;
+  try {
+    const data = JSON.parse(fs.readFileSync(X_COOLDOWN_FILE, 'utf8'));
+    const elapsed = Date.now() - (data.lastPostedAt || 0);
+    if (elapsed < X_MIN_COOLDOWN_MS) {
+      const remainingMins = Math.ceil((X_MIN_COOLDOWN_MS - elapsed) / 60000);
+      console.log(`⏳ [Shadowban Protection] Cooldown active (${remainingMins} mins remaining until next X tweet). Skipping auto-post this cycle.`);
+      return false;
+    }
+  } catch (e) {}
+  return true;
+}
+
+function recordXPost(headline, url) {
+  try {
+    fs.writeFileSync(X_COOLDOWN_FILE, JSON.stringify({
+      lastPostedAt: Date.now(),
+      headline,
+      url
+    }, null, 2), 'utf8');
+  } catch (e) {}
+}
+
 // Logo
 const logoPath = path.resolve(__dirname, 'assets', 'logo.jpg');
 const logoBase64 = `data:image/jpeg;base64,${fs.readFileSync(logoPath).toString('base64')}`;
@@ -1167,47 +1196,54 @@ async function runCycle() {
 
             // 100% Autopilot Publishing to X and Telegram Channel for top viral stories (score >= 9 or MUST POST)
             if (!autoPostedXThisCycle && (analysis.score >= 9 || analysis.is_must_post)) {
-              autoPostedXThisCycle = true;
+              if (canPostToX(analysis.is_must_post)) {
+                autoPostedXThisCycle = true;
 
-              // 1. Auto-publish directly to Telegram Channel @yoxo_station
-              try {
-                console.log(`📢 [AUTOPILOT] Auto-publishing breaking story to Telegram Channel [@yoxo_station]...`);
-                const form = new FormData();
-                form.append('chat_id', CHANNEL_ID);
-                form.append('photo', fs.createReadStream(imagePath));
-                form.append('caption', cleanTweet);
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: form });
-                console.log(`✅ [AUTOPILOT] Published to Telegram Channel!`);
-              } catch (e) {
-                console.error('Channel auto-publish error:', e.message);
-              }
-
-              // 2. Auto-publish directly to X (@YoXo_Station) via authenticated session
-              if (fs.existsSync(path.resolve(__dirname, 'x_session.json'))) {
+                // 1. Auto-publish directly to Telegram Channel @yoxo_station
                 try {
-                  console.log(`🚀 [AUTOPILOT] Auto-publishing breaking story to X (@YoXo_Station)...`);
-                  let quoteUrl = null;
-                  if (post.url && (post.url.includes('x.com/') || post.url.includes('twitter.com/'))) {
-                    quoteUrl = post.url;
-                  }
-                  const xRes = await postToX({ imagePath, text: cleanTweet, quoteUrl });
-                  if (xRes && xRes.ok) {
-                    console.log(`✅ [AUTOPILOT] Successfully published to X (@YoXo_Station)! ${xRes.isQrt ? '(Quote Tweet ⚡)' : ''}`);
-                  } else {
-                    console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
-                  }
-
-                  // Top-Reply Sniper: If story originated from a viral X post, place a visual comment under it too!
-                  if (quoteUrl) {
-                    console.log(`🎯 [AUTOPILOT] Sniping top reply comment on viral tweet: ${quoteUrl}...`);
-                    await replyToTweetOnX({
-                      tweetUrl: quoteUrl,
-                      imagePath,
-                      replyText: cleanTweet
-                    });
-                  }
+                  console.log(`📢 [AUTOPILOT] Auto-publishing breaking story to Telegram Channel [@yoxo_station]...`);
+                  const form = new FormData();
+                  form.append('chat_id', CHANNEL_ID);
+                  form.append('photo', fs.createReadStream(imagePath));
+                  form.append('caption', cleanTweet);
+                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: form });
+                  console.log(`✅ [AUTOPILOT] Published to Telegram Channel!`);
                 } catch (e) {
-                  console.error('X auto-publish error:', e.message);
+                  console.error('Channel auto-publish error:', e.message);
+                }
+
+                // 2. Auto-publish directly to X (@YoXo_Station) via authenticated session
+                if (fs.existsSync(path.resolve(__dirname, 'x_session.json'))) {
+                  try {
+                    console.log(`🚀 [AUTOPILOT] Auto-publishing breaking story to X (@YoXo_Station)...`);
+                    let quoteUrl = null;
+                    const searchStr = `${post.url || ''} ${post.text || ''}`;
+                    const xMatch = searchStr.match(/https?:\/\/(?:x|twitter)\.com\/([a-zA-Z0-9_]+)\/status\/(\d+)/i);
+                    if (xMatch) {
+                      quoteUrl = xMatch[0];
+                      console.log(`🎯 [QRT & Sniper] Detected viral source tweet: ${quoteUrl}`);
+                    }
+
+                    const xRes = await postToX({ imagePath, text: cleanTweet, quoteUrl });
+                    if (xRes && xRes.ok) {
+                      console.log(`✅ [AUTOPILOT] Successfully published to X (@YoXo_Station)! ${xRes.isQrt ? '(Quote Tweet ⚡)' : ''}`);
+                      recordXPost(cleanHeadline, post.url);
+                    } else {
+                      console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
+                    }
+
+                    // Top-Reply Sniper: If story originated from a viral X post, place a visual comment under it too!
+                    if (quoteUrl) {
+                      console.log(`🎯 [AUTOPILOT] Sniping top reply comment on viral tweet: ${quoteUrl}...`);
+                      await replyToTweetOnX({
+                        tweetUrl: quoteUrl,
+                        imagePath,
+                        replyText: cleanTweet
+                      });
+                    }
+                  } catch (e) {
+                    console.error('X auto-publish error:', e.message);
+                  }
                 }
               }
             }
