@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer-core');
 const FormData = require('form-data');
 const fetch = require('node-fetch');
 const embeddedFontsCss = require('./embedded_fonts.js');
-const { postToX, replyToTweetOnX } = require('./x_poster.js');
+const { postToX, replyToTweetOnX, dismissCookieBanner } = require('./x_poster.js');
 
 // Load .env if present
 const envPath = path.resolve(__dirname, '.env');
@@ -190,17 +190,18 @@ function getChromeExecutable() {
 
 // X Cooldown & Anti-Shadowban Rate Limiter (Protects @YoXo_Station from automated spam flags)
 const X_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_post.json');
-const X_MIN_COOLDOWN_MS = 45 * 60 * 1000; // 45 minutes minimum between tweets
+const X_MIN_COOLDOWN_MS = 60 * 60 * 1000; // 60 minutes minimum between tweets
 
 function canPostToX(isMustPost = false) {
-  if (isMustPost) return true; // Rare 10/10 emergency breaking news can bypass cooldown
   if (!fs.existsSync(X_COOLDOWN_FILE)) return true;
   try {
     const data = JSON.parse(fs.readFileSync(X_COOLDOWN_FILE, 'utf8'));
     const elapsed = Date.now() - (data.lastPostedAt || 0);
-    if (elapsed < X_MIN_COOLDOWN_MS) {
-      const remainingMins = Math.ceil((X_MIN_COOLDOWN_MS - elapsed) / 60000);
-      console.log(`⏳ [Shadowban Protection] Cooldown active (${remainingMins} mins remaining until next X tweet). Skipping auto-post this cycle.`);
+    // Strict shadowban protection: even 10/10 breaking news requires at least 45 minutes spacing
+    const requiredCooldown = isMustPost ? 45 * 60 * 1000 : X_MIN_COOLDOWN_MS;
+    if (elapsed < requiredCooldown) {
+      const remainingMins = Math.ceil((requiredCooldown - elapsed) / 60000);
+      console.log(`⏳ [Shadowban Protection] Strict cooldown active (${remainingMins} mins remaining until next X tweet). Skipping auto-post this cycle.`);
       return false;
     }
   } catch (e) {}
@@ -217,16 +218,17 @@ function recordXPost(headline, url) {
   } catch (e) {}
 }
 
-// Comment Rate Limiter & Recency Filter (10-15 mins gap, strictly targets posts 15m - 2h old)
+// Comment Rate Limiter & Recency Filter (10-15 mins cadence, strictly targets posts 15m - 2h old)
 const X_COMMENT_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_comment.json');
-const X_MIN_COMMENT_COOLDOWN_MS = 12 * 60 * 1000; // 12 minutes (within the 10-15 min window)
+const X_MIN_COMMENT_COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes (allows comment every 15m cycle)
 const COMMENTED_TWEETS_FILE = path.resolve(__dirname, 'commented_tweets.json');
 
 function canCommentOnX() {
   if (!fs.existsSync(X_COMMENT_COOLDOWN_FILE)) return true;
   try {
     const data = JSON.parse(fs.readFileSync(X_COMMENT_COOLDOWN_FILE, 'utf8'));
-    const elapsed = Date.now() - (data.lastCommentedAt || 0);
+    const lastTime = data.lastCommentedAt || data.timestamp || 0;
+    const elapsed = Date.now() - lastTime;
     if (elapsed < X_MIN_COMMENT_COOLDOWN_MS) {
       const remainingMins = Math.ceil((X_MIN_COMMENT_COOLDOWN_MS - elapsed) / 60000);
       console.log(`⏳ [Comment Cadence] Cooldown active (${remainingMins} mins remaining). Skipping reply this cycle.`);
@@ -272,6 +274,40 @@ function isWithinCommentRecencyWindow(publishedAt) {
     return false;
   }
   return true;
+}
+
+async function generateHumanReply(tweetText) {
+  try {
+    const prompt = `You are a sharp, seasoned human industry insider on X (Twitter).
+Read this viral tweet:
+"""
+${tweetText}
+"""
+
+Task: Write a single, short, human reply comment (1 to 2 sentences max, under 30 words).
+
+STRICT RULES:
+- STRICTLY ZERO EMOJIS.
+- ZERO AI CLICHES or generic commentary (NEVER write "Interesting development", "Only time will tell", "It's worth noting", "A step in the right direction", "Fascinating", "Huge implications", "Thoughts?").
+- Do NOT summarize or repeat the tweet facts.
+- Sound like an authentic industry native making a sharp, memorable observation or pointing out an irony.
+- Write purely as the reply text, no quotes, no extra formatting.`;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_KEY}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      }),
+      timeout: 15000
+    });
+    const data = await res.json();
+    let text = data.candidates[0].content.parts[0].text.trim();
+    return text.replace(/^["']|["']$/g, '').trim();
+  } catch (e) {
+    return null;
+  }
 }
 
 // Logo
@@ -1305,40 +1341,6 @@ async function runCycle() {
                       console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
                     }
 
-async function generateHumanReply(tweetText) {
-  try {
-    const prompt = `You are a sharp, seasoned human industry insider on X (Twitter).
-Read this viral tweet:
-"""
-${tweetText}
-"""
-
-Task: Write a single, short, human reply comment (1 to 2 sentences max, under 30 words).
-
-STRICT RULES:
-- STRICTLY ZERO EMOJIS.
-- ZERO AI CLICHES or generic commentary (NEVER write "Interesting development", "Only time will tell", "It's worth noting", "A step in the right direction", "Fascinating", "Huge implications", "Thoughts?").
-- Do NOT summarize or repeat the tweet facts.
-- Sound like an authentic industry native making a sharp, memorable observation or pointing out an irony.
-- Write purely as the reply text, no quotes, no extra formatting.`;
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_KEY}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      }),
-      timeout: 15000
-    });
-    const data = await res.json();
-    let text = data.candidates[0].content.parts[0].text.trim();
-    return text.replace(/^["']|["']$/g, '').trim();
-  } catch (e) {
-    return null;
-  }
-}
-
                     // Top-Reply Sniper: If story originated from a viral X post, place an organic, human insider comment
                     if (quoteUrl && canCommentOnX() && !hasAlreadyCommented(quoteUrl) && isWithinCommentRecencyWindow(post.publishedAt)) {
                       console.log(`🎯 [AUTOPILOT] Crafting organic human reply for viral tweet: ${quoteUrl}...`);
@@ -1383,7 +1385,7 @@ STRICT RULES:
 async function discoverAndCommentOnX() {
   const SESSION_FILE = path.resolve(__dirname, 'x_session.json');
   if (!fs.existsSync(SESSION_FILE)) return;
-  console.log('🌐 [X Explorer] Scanning unified live breaking feed across top news sources...');
+  console.log('🌐 [X Explorer] Scanning live breaking feeds across top news sources...');
 
   const cookies = JSON.parse(fs.readFileSync(SESSION_FILE, 'utf8'));
   const executablePath = getChromeExecutable();
@@ -1399,39 +1401,63 @@ async function discoverAndCommentOnX() {
     await page.setViewport({ width: 1280, height: 1000 });
     await page.setCookie(...cookies);
 
-    const searchUrl = 'https://x.com/search?q=(from:WatcherGuru OR from:disclosetv OR from:unusual_whales OR from:DeItaone OR from:Cointelegraph OR from:TechCrunch OR from:IGN OR from:DiscussingFilm OR from:BNONews OR from:TheVerge OR from:CultureCrave OR from:PopBase OR from:Reuters OR from:AP)&f=live';
+    const queryPools = [
+      '(from:WatcherGuru OR from:disclosetv OR from:Cointelegraph) -filter:replies',
+      '(from:unusual_whales OR from:DeItaone OR from:BNONews) -filter:replies',
+      '(from:DiscussingFilm OR from:CultureCrave OR from:TechCrunch) -filter:replies'
+    ];
+    const selectedQuery = queryPools[Math.floor(Math.random() * queryPools.length)];
+    const searchUrl = `https://x.com/search?q=${encodeURIComponent(selectedQuery)}&f=live`;
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 35000 });
+    await new Promise(r => setTimeout(r, 3000));
+    await dismissCookieBanner(page);
 
-    // Dismiss cookie modal if present
+    let tweets = [];
     try {
-      await page.evaluate(() => {
-        const btns = Array.from(document.querySelectorAll('button'));
-        for (const b of btns) {
-          if (b.innerText && b.innerText.includes('Accept all cookies')) {
-            b.click();
-            break;
-          }
-        }
+      await page.waitForSelector('article[data-testid="tweet"]', { timeout: 15000 });
+      tweets = await page.evaluate(() => {
+        const articles = Array.from(document.querySelectorAll('article[data-testid="tweet"]'));
+        return articles.slice(0, 10).map(a => {
+          const link = a.querySelector('a[href*="/status/"]');
+          const text = a.querySelector('div[data-testid="tweetText"]')?.innerText.trim() || '';
+          const user = a.querySelector('div[data-testid="User-Name"]')?.innerText.replace(/\n/g, ' ') || '';
+          const time = a.querySelector('time')?.getAttribute('datetime');
+          return {
+            user: user.slice(0, 35),
+            url: link ? 'https://x.com' + link.getAttribute('href').split('?')[0] : null,
+            text,
+            time
+          };
+        });
       });
-      await new Promise(r => setTimeout(r, 1500));
-    } catch(e) {}
+    } catch (e) {
+      console.log('Search timeline took too long or was empty, engaging direct source fallback...');
+    }
 
-    await page.waitForSelector('article[data-testid="tweet"]', { timeout: 20000 });
-    const tweets = await page.evaluate(() => {
-      const articles = Array.from(document.querySelectorAll('article[data-testid="tweet"]'));
-      return articles.slice(0, 10).map(a => {
-        const link = a.querySelector('a[href*="/status/"]');
-        const text = a.querySelector('div[data-testid="tweetText"]')?.innerText.trim() || '';
-        const user = a.querySelector('div[data-testid="User-Name"]')?.innerText.replace(/\n/g, ' ') || '';
-        const time = a.querySelector('time')?.getAttribute('datetime');
-        return {
-          user: user.slice(0, 35),
-          url: link ? 'https://x.com' + link.getAttribute('href').split('?')[0] : null,
-          text,
-          time
-        };
+    // Direct outlet fallback if search query returns 0 tweets
+    if (!tweets || tweets.length === 0) {
+      const topOutlets = ['WatcherGuru', 'Cointelegraph', 'disclosetv', 'unusual_whales', 'BNONews', 'TechCrunch'];
+      const targetUser = topOutlets[Math.floor(Math.random() * topOutlets.length)];
+      console.log(`🌐 [X Explorer Fallback] Checking @${targetUser} profile timeline...`);
+      await page.goto(`https://x.com/${targetUser}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await dismissCookieBanner(page);
+      await page.waitForSelector('article[data-testid="tweet"]', { timeout: 15000 });
+      tweets = await page.evaluate(() => {
+        const articles = Array.from(document.querySelectorAll('article[data-testid="tweet"]'));
+        return articles.slice(0, 8).map(a => {
+          const link = a.querySelector('a[href*="/status/"]');
+          const text = a.querySelector('div[data-testid="tweetText"]')?.innerText.trim() || '';
+          const user = a.querySelector('div[data-testid="User-Name"]')?.innerText.replace(/\n/g, ' ') || '';
+          const time = a.querySelector('time')?.getAttribute('datetime');
+          return {
+            user: user.slice(0, 35),
+            url: link ? 'https://x.com' + link.getAttribute('href').split('?')[0] : null,
+            text,
+            time
+          };
+        });
       });
-    });
+    }
 
     await browser.close();
 
@@ -1441,7 +1467,7 @@ async function discoverAndCommentOnX() {
       if (!tw.url || !tw.text || tw.text.length < 30 || hasAlreadyCommented(tw.url)) continue;
       if (tw.time) {
         const ageMins = (Date.now() - new Date(tw.time).getTime()) / 60000;
-        if (ageMins >= 10 && ageMins <= 120) {
+        if (ageMins >= 12 && ageMins <= 120) {
           candidate = tw;
           break;
         }
@@ -1451,8 +1477,22 @@ async function discoverAndCommentOnX() {
       }
     }
 
+    // If no candidate between 12m-120m, accept any recent unreplied tweet under 3 hours
     if (!candidate) {
-      console.log('🌐 [X Explorer] No new candidate tweet found in 15m–2h window this cycle.');
+      for (const tw of tweets) {
+        if (!tw.url || !tw.text || tw.text.length < 30 || hasAlreadyCommented(tw.url)) continue;
+        if (tw.time) {
+          const ageMins = (Date.now() - new Date(tw.time).getTime()) / 60000;
+          if (ageMins <= 180) {
+            candidate = tw;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!candidate) {
+      console.log('🌐 [X Explorer] No new candidate tweet found in recency window this cycle.');
       return;
     }
 
@@ -1667,30 +1707,46 @@ async function handleCallbackQuery(cq) {
 }
 
 // 7. Keep-alive HTTP Server for Cloud Hosting (Render / Koyeb)
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ status: 'active', newsroom: 'YoXo Station', uptime: process.uptime() }));
-});
-server.listen(PORT, () => {
-  console.log(`🌐 YoXo Keep-alive server listening on port ${PORT}`);
-});
-
-// Run single cycle or continuous autonomous daemon
-if (process.argv.includes('--daemon')) {
-  console.log('🚀 YoXo Autonomous Newsroom Daemon started! Monitoring all 7 desks every 15 minutes.');
-  startTelegramCallbackListener();
-  runCycle().catch(console.error);
-  setInterval(() => {
-    runCycle().catch(console.error);
-  }, 15 * 60 * 1000);
-} else {
-  // Single cycle mode (used by GitHub Actions cron) - runs once and exits cleanly
-  runCycle().then(() => {
-    console.log('🏁 Single cycle finished successfully.');
-    server.close();
-    process.exit(0);
-  }).catch(err => {
-    console.error('Fatal cycle error:', err);
-    process.exit(1);
+let server = null;
+function startServer() {
+  server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'active', newsroom: 'YoXo Station', uptime: process.uptime() }));
+  });
+  server.listen(PORT, () => {
+    console.log(`🌐 YoXo Keep-alive server listening on port ${PORT}`);
   });
 }
+
+// Run single cycle or continuous autonomous daemon
+if (require.main === module) {
+  startServer();
+  if (process.argv.includes('--daemon')) {
+    console.log('🚀 YoXo Autonomous Newsroom Daemon started! Monitoring all 7 desks every 15 minutes.');
+    startTelegramCallbackListener();
+    runCycle().catch(console.error);
+    setInterval(() => {
+      runCycle().catch(console.error);
+    }, 15 * 60 * 1000);
+  } else {
+    // Single cycle mode (used by GitHub Actions cron) - runs once and exits cleanly
+    runCycle().then(() => {
+      console.log('🏁 Single cycle finished successfully.');
+      if (server) server.close();
+      process.exit(0);
+    }).catch(err => {
+      console.error('Fatal cycle error:', err);
+      process.exit(1);
+    });
+  }
+}
+
+module.exports = {
+  runCycle,
+  discoverAndCommentOnX,
+  generateHumanReply,
+  canPostToX,
+  canCommentOnX,
+  recordXPost,
+  recordXComment
+};

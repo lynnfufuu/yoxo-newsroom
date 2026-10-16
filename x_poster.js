@@ -21,28 +21,45 @@ async function getChromeExecutable() {
   return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 }
 
+async function dismissCookieBanner(page) {
+  try {
+    await page.evaluate(() => {
+      const all = Array.from(document.querySelectorAll('button, div[role="button"], span'));
+      for (const el of all) {
+        if (el.innerText && (el.innerText.includes('Accept all cookies') || el.innerText.includes('Refuse non-essential'))) {
+          el.click();
+          break;
+        }
+      }
+    });
+    await new Promise(r => setTimeout(r, 1000));
+  } catch (e) {}
+}
+
 async function insertTweetText(page, selector, text) {
   await page.waitForSelector(selector, { timeout: 20000 });
   await page.click(selector);
+  await new Promise(r => setTimeout(r, 600));
 
   // Clear any existing draft text
   await page.keyboard.down('Control');
   await page.keyboard.press('KeyA');
   await page.keyboard.up('Control');
   await page.keyboard.press('Backspace');
-  await new Promise(r => setTimeout(r, 300));
+  await new Promise(r => setTimeout(r, 600));
 
   // Type line-by-line using Shift+Enter for clean paragraph formatting without duplicate paste bugs
   console.log('⌨️ Typing clean formatted copy...');
   const lines = text.split('\n');
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].length > 0) {
-      await page.keyboard.type(lines[i], { delay: 5 });
+      await page.keyboard.type(lines[i], { delay: 10 });
     }
     if (i < lines.length - 1) {
       await page.keyboard.down('Shift');
       await page.keyboard.press('Enter');
       await page.keyboard.up('Shift');
+      await new Promise(r => setTimeout(r, 100));
     }
   }
 }
@@ -79,6 +96,7 @@ async function postToX({ imagePath, text, quoteUrl }) {
 
     console.log('🐦 Opening X composer...');
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await dismissCookieBanner(page);
 
     // Verify logged in
     if (page.url().includes('/i/flow/login') || page.url().includes('/login')) {
@@ -147,6 +165,7 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
     await page.setCookie(...cookies);
 
     await page.goto(tweetUrl, { waitUntil: 'domcontentloaded', timeout: 35000 });
+    await dismissCookieBanner(page);
 
     // Find the inline reply box under the tweet and insert text cleanly
     const replySelector = 'div[data-testid="tweetTextarea_0"], div[role="textbox"]';
@@ -169,7 +188,7 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
     await page.waitForSelector(replyButton, { timeout: 10000 });
     await page.click(replyButton);
 
-    await new Promise(r => setTimeout(r, 4000));
+    await new Promise(r => setTimeout(r, 4500));
     console.log('✅ Successfully placed Top Reply on viral thread!');
 
     await browser.close();
@@ -181,4 +200,4 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
   }
 }
 
-module.exports = { postToX, replyToTweetOnX };
+module.exports = { postToX, replyToTweetOnX, getChromeExecutable, dismissCookieBanner };
