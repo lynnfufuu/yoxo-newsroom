@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer-core');
 const FormData = require('form-data');
 const fetch = require('node-fetch');
 const embeddedFontsCss = require('./embedded_fonts.js');
-const { postToX } = require('./x_poster.js');
+const { postToX, replyToTweetOnX } = require('./x_poster.js');
 
 // Load .env if present
 const envPath = path.resolve(__dirname, '.env');
@@ -1186,11 +1186,25 @@ async function runCycle() {
               if (fs.existsSync(path.resolve(__dirname, 'x_session.json'))) {
                 try {
                   console.log(`🚀 [AUTOPILOT] Auto-publishing breaking story to X (@YoXo_Station)...`);
-                  const xRes = await postToX({ imagePath, text: cleanTweet });
+                  let quoteUrl = null;
+                  if (post.url && (post.url.includes('x.com/') || post.url.includes('twitter.com/'))) {
+                    quoteUrl = post.url;
+                  }
+                  const xRes = await postToX({ imagePath, text: cleanTweet, quoteUrl });
                   if (xRes && xRes.ok) {
-                    console.log(`✅ [AUTOPILOT] Successfully published to X (@YoXo_Station)!`);
+                    console.log(`✅ [AUTOPILOT] Successfully published to X (@YoXo_Station)! ${xRes.isQrt ? '(Quote Tweet ⚡)' : ''}`);
                   } else {
                     console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
+                  }
+
+                  // Top-Reply Sniper: If story originated from a viral X post, place a visual comment under it too!
+                  if (quoteUrl) {
+                    console.log(`🎯 [AUTOPILOT] Sniping top reply comment on viral tweet: ${quoteUrl}...`);
+                    await replyToTweetOnX({
+                      tweetUrl: quoteUrl,
+                      imagePath,
+                      replyText: cleanTweet
+                    });
                   }
                 } catch (e) {
                   console.error('X auto-publish error:', e.message);
