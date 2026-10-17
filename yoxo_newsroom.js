@@ -1539,11 +1539,11 @@ async function discoverAndCommentOnX(maxComments = 1) {
     const candidates = validTweets.map(tw => ({
       ...tw,
       ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-    })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 1440)
+    })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 120) // Strictly within the last 2 hours (under 120m)
       .sort((a, b) => a.ageMins - b.ageMins);
 
     if (!candidates || candidates.length === 0) {
-      console.log('🌐 [X Explorer] No candidate tweet found in recency window this cycle.');
+      console.log('🌐 [X Explorer] No candidate tweet found under 2 hours old this cycle.');
       return 0;
     }
 
@@ -1568,8 +1568,8 @@ async function discoverAndCommentOnX(maxComments = 1) {
         placed++;
         console.log(`✅ [X Explorer] Successfully placed top comment (${placed}/${maxComments}) under post!`);
         if (placed < maxComments) {
-          const waitMins = 3.5 + Math.random() * 1; // 3.5 to 4.5 mins wait
-          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (3.5-4.5m pacing) before engaging with next outlet...`);
+          const waitMins = 3 + Math.random() * 2; // Strict 3 to 5 mins wait
+          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (3-5m pacing) before engaging with next post...`);
           await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
         }
       } else {
@@ -1668,14 +1668,14 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       let ageMins = 30;
       if (t.time) {
         ageMins = (now - new Date(t.time).getTime()) / 60000;
-        if (ageMins < 1 || ageMins > 1440) return false; // 1m to 24h fallback, prioritized freshest first
+        if (ageMins < 1 || ageMins > 120) return false; // Strictly max 2 hours (120m) old
       }
       t.ageMins = Math.round(ageMins);
       return true;
     });
 
     if (!candidates || candidates.length === 0) {
-      console.log('🌐 [Feed Explorer] No unreplied candidate found directly on home feed.');
+      console.log('🌐 [Feed Explorer] No unreplied candidate found under 2 hours old directly on home feed.');
       return 0;
     }
 
@@ -1707,8 +1707,8 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
         console.log(`✅ [Feed Explorer] Successfully placed Reply under post (${commentsPlaced}/${targetCommentsCount})!`);
         
         if (commentsPlaced < targetCommentsCount) {
-          const waitMins = 3.5 + Math.random() * 1; // 3.5 to 4.5 mins wait
-          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (3.5-4.5m pacing) before engaging with next post...`);
+          const waitMins = 3 + Math.random() * 2; // Strict 3 to 5 mins wait
+          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (3-5m pacing) before engaging with next post...`);
           await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
         }
       } else {
@@ -1727,8 +1727,8 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  const TARGET_TOTAL_COMMENTS = 2; // Active 4-5 min rhythm (2 thoughtful comments per 10m cycle)
-  console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies (3.5-4.5m wait)...`);
+  const TARGET_TOTAL_COMMENTS = 2; // Active 3-5 min rhythm (2 thoughtful comments per 10m cycle)
+  console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies (3-5m wait, max 2h old)...`);
 
   // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following creators across all fields)
   let feedCount = 0;
@@ -1742,11 +1742,11 @@ async function autoCommentOnXFeedOrOutlets() {
   const remainingNeeded = TARGET_TOTAL_COMMENTS - (feedCount || 0);
   if (remainingNeeded > 0) {
     if (feedCount > 0) {
-      const waitMins = 3.5 + Math.random() * 1;
+      const waitMins = 3 + Math.random() * 2; // Strict 3 to 5 mins wait
       console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes before scanning external outlets...`);
       await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
     }
-    console.log(`🔄 Engaging diversified breaking outlets for ${remainingNeeded} reply/replies with 3.5-4.5 min pacing...`);
+    console.log(`🔄 Engaging diversified breaking outlets for ${remainingNeeded} reply/replies with 3-5 min pacing...`);
     await discoverAndCommentOnX(remainingNeeded);
   }
 }
