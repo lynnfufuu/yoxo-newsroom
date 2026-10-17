@@ -1447,13 +1447,24 @@ const OUTLETS_TO_SCAN = [
   'CultureCrave',
   'DiscussingFilm',
   'IGN',
+  'GameSpot',
+  'Kotaku',
+  'Dexerto',
+  'PopBase',
+  'PopCrave',
+  'ScreenRant',
+  'Variety',
+  'DEADLINE',
   'WuBlockchain',
-  'BBCWorld',
   'CoinDesk',
   'unusual_whales',
   'WatcherGuru',
   'TechCrunch',
   'TheVerge',
+  'WIRED',
+  'BBCWorld',
+  'Reuters',
+  'AP',
   'BitcoinMagazine'
 ];
 
@@ -1505,7 +1516,7 @@ async function discoverAndCommentOnX(maxComments = 1) {
     for (const acc of outletsToScan) {
       // Scan multiple diversified outlets until we have plenty of fresh unreplied candidate tweets
       const freshPool = allTweets.filter(tw => tw.url && !hasAlreadyCommented(tw.url) && !tw.text.startsWith('RT @'));
-      if (freshPool.length >= 8 && scannedCount >= 4) break;
+      if (freshPool.length >= 10 && scannedCount >= 6) break;
 
       const list = await fetchUserTweetsViaSyndication(acc);
       if (list && list.length > 0) {
@@ -1516,10 +1527,10 @@ async function discoverAndCommentOnX(maxComments = 1) {
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
-    // Find the freshest tweets (2m - 12h fallback, sorted freshest first)
+    // Find the freshest tweets (1m - 24h fallback, sorted freshest first)
     const now = Date.now();
     const validTweets = allTweets.filter(tw => {
-      if (!tw.url || !tw.text || tw.text.length < 20) return false;
+      if (!tw.url || !tw.text || tw.text.length < 10) return false;
       if (tw.text.startsWith('RT @')) return false;
       if (hasAlreadyCommented(tw.url)) return false;
       return true;
@@ -1528,7 +1539,7 @@ async function discoverAndCommentOnX(maxComments = 1) {
     const candidates = validTweets.map(tw => ({
       ...tw,
       ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-    })).filter(tw => tw.ageMins >= 2 && tw.ageMins <= 720)
+    })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 1440)
       .sort((a, b) => a.ageMins - b.ageMins);
 
     if (!candidates || candidates.length === 0) {
@@ -1649,7 +1660,7 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     const now = Date.now();
     const candidates = rawTweets.filter(t => {
-      if (!t.url || !t.text || t.text.length < 20) return false;
+      if (!t.url || !t.text || t.text.length < 10) return false;
       if (/^(https?:\/\/|www\.)\S+$/i.test(t.text.trim())) return false; // skip bare links
       if (hasAlreadyCommented(t.url)) return false;
       if (t.text.startsWith('RT @')) return false;
@@ -1657,7 +1668,7 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       let ageMins = 30;
       if (t.time) {
         ageMins = (now - new Date(t.time).getTime()) / 60000;
-        if (ageMins < 2 || ageMins > 720) return false; // 2m to 12h fallback, prioritized freshest first
+        if (ageMins < 1 || ageMins > 1440) return false; // 1m to 24h fallback, prioritized freshest first
       }
       t.ageMins = Math.round(ageMins);
       return true;
