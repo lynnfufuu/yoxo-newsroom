@@ -1484,6 +1484,11 @@ const OUTLETS_TO_SCAN = [
   'Dexerto',
   'PopBase',
   'PopCrave',
+  'Complex',
+  'Cointelegraph',
+  'nypost',
+  'CNN',
+  'rare_remarks',
   'ScreenRant',
   'Variety',
   'DEADLINE',
@@ -1644,23 +1649,30 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 1000 });
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
-    await page.evaluateOnNewDocument(() => {
-      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-    });
     await page.setCookie(...cookies);
 
-    await page.goto('https://x.com/home', { waitUntil: 'load', timeout: 35000 }).catch(e => console.log('Feed goto notice:', e.message));
+    console.log('🌐 [Feed Explorer] Loading x.com/home...');
+    await page.goto('https://x.com/home', { waitUntil: 'domcontentloaded', timeout: 35000 }).catch(e => console.log('Feed goto notice:', e.message));
     await dismissCookieBanner(page);
     
-    // Explicitly wait for timeline tweets to mount and render
+    // Dismiss any modal dialogs (notifications, popups, etc.)
+    await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button, div[role="button"]'));
+      for (const b of buttons) {
+        if (b.innerText && (b.innerText === 'Not now' || b.innerText === 'Dismiss' || b.innerText === 'Maybe later' || b.innerText === 'Got it')) {
+          b.click();
+        }
+      }
+    });
+
+    // Wait for timeline tweets to mount and render
     try {
       await page.waitForSelector('article[data-testid="tweet"]', { timeout: 15000 });
       console.log('✅ [Feed Explorer] Timeline tweets rendered successfully!');
     } catch (e) {
       console.log('Feed timeline wait note:', e.message);
     }
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 1500));
 
     // Click "See new posts" pill if visible to reveal latest timeline posts
     await page.evaluate(() => {
@@ -1668,40 +1680,56 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       if (btn) btn.click();
     });
 
-    // Deep scroll timeline to load 40-50+ fresh posts from your feed
-    console.log('📜 [Feed Explorer] Deep scrolling your timeline (8 scrolls) to load 40+ creator & news posts...');
-    for (let s = 0; s < 8; s++) {
-      await page.evaluate(() => window.scrollBy(0, 1000));
-      await new Promise(r => setTimeout(r, 1000));
+    // Incremental scroll & scrape: capture tweets at each scroll step before virtualizer unmounts them
+    console.log('📜 [Feed Explorer] Incrementally scrolling timeline to capture all creator & news posts...');
+    const tweetMap = new Map();
+
+    async function scrapeVisibleTweets() {
+      const visible = await page.evaluate(() => {
+        const articles = Array.from(document.querySelectorAll('article[data-testid="tweet"]'));
+        return articles.map(a => {
+          const linkElem = a.querySelector('a[href*="/status/"]');
+          const textElem = a.querySelector('div[data-testid="tweetText"]');
+          const userElem = a.querySelector('div[data-testid="User-Name"]');
+          const timeElem = a.querySelector('time');
+
+          let rawUrl = linkElem ? linkElem.getAttribute('href') : null;
+          if (rawUrl) {
+            rawUrl = rawUrl.split('?')[0].replace(/\/analytics$/, '');
+            if (!rawUrl.startsWith('http')) rawUrl = 'https://x.com' + rawUrl;
+          }
+
+          return {
+            user: userElem?.innerText.replace(/\n/g, ' ') || '',
+            text: textElem?.innerText.trim() || '',
+            url: rawUrl,
+            time: timeElem?.getAttribute('datetime')
+          };
+        });
+      });
+
+      for (const t of visible) {
+        if (t.url && !tweetMap.has(t.url)) {
+          tweetMap.set(t.url, t);
+        }
+      }
     }
 
-    const rawTweets = await page.evaluate(() => {
-      const articles = Array.from(document.querySelectorAll('article[data-testid="tweet"]'));
-      return articles.map(a => {
-        const linkElem = a.querySelector('a[href*="/status/"]');
-        const textElem = a.querySelector('div[data-testid="tweetText"]');
-        const userElem = a.querySelector('div[data-testid="User-Name"]');
-        const timeElem = a.querySelector('time');
+    // Capture initial visible posts
+    await scrapeVisibleTweets();
 
-        let rawUrl = linkElem ? linkElem.getAttribute('href') : null;
-        if (rawUrl) {
-          rawUrl = rawUrl.split('?')[0].replace(/\/analytics$/, '');
-          if (!rawUrl.startsWith('http')) rawUrl = 'https://x.com' + rawUrl;
-        }
-
-        return {
-          user: userElem?.innerText.replace(/\n/g, ' ') || '',
-          text: textElem?.innerText.trim() || '',
-          url: rawUrl,
-          time: timeElem?.getAttribute('datetime')
-        };
-      });
-    });
+    // Scroll 10 times, capturing new posts as they appear
+    for (let s = 0; s < 10; s++) {
+      await page.evaluate(() => window.scrollBy(0, 800));
+      await new Promise(r => setTimeout(r, 700));
+      await scrapeVisibleTweets();
+    }
 
     await browser.close();
     browser = null;
 
-    console.log(`📊 [Feed Explorer] Extracted ${rawTweets.length} tweets from your feed.`);
+    const rawTweets = Array.from(tweetMap.values());
+    console.log(`📊 [Feed Explorer] Extracted ${rawTweets.length} unique tweets directly from your live feed.`);
 
     const now = Date.now();
     const candidates = rawTweets.filter(t => {
@@ -1710,12 +1738,12 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       if (hasAlreadyCommented(t.url)) return false;
       if (t.text.startsWith('RT @')) return false;
 
-      let ageMins = 30;
+      let ageMins = 15;
       if (t.time) {
         ageMins = (now - new Date(t.time).getTime()) / 60000;
-        if (ageMins < 1 || ageMins > 120) return false; // Strictly max 2 hours (120m) old
+        if (ageMins > 120 || ageMins < -10) return false; // Strictly max 2 hours (120m) old, allowing brand-new posts
       }
-      t.ageMins = Math.round(ageMins);
+      t.ageMins = Math.max(0, Math.round(ageMins));
       return true;
     });
 
