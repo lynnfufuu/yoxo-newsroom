@@ -1457,24 +1457,16 @@ async function runCycle() {
 }
 
 const OUTLETS_TO_SCAN = [
-  'DiscussingFilm',
   'CultureCrave',
-  'TheVerge',
-  'TechCrunch',
+  'DiscussingFilm',
+  'CoinDesk',
   'unusual_whales',
   'WatcherGuru',
-  'CoinDesk',
-  'BitcoinMagazine',
-  'Polygon',
-  'GameSpot',
+  'TechCrunch',
+  'TheVerge',
   'IGN',
-  'BBCWorld',
-  'Reuters',
-  'Bloomberg',
-  'arstechnica',
   'WuBlockchain',
-  'VitalikButerin',
-  'rektcapital'
+  'BitcoinMagazine'
 ];
 
 async function fetchUserTweetsViaSyndication(username) {
@@ -1517,19 +1509,17 @@ async function discoverAndCommentOnX(maxComments = 1) {
 
   try {
     // Filter out over-commented outlets FIRST to guarantee diversity across diverse niches
-    const eligibleOutlets = OUTLETS_TO_SCAN
-      .filter(acc => !isAuthorOverCommented(acc))
-      .sort(() => 0.5 - Math.random());
+    const eligibleOutlets = OUTLETS_TO_SCAN.filter(acc => !isAuthorOverCommented(acc));
+    console.log(`🌐 [X Explorer] Eligible outlets for scanning: ${eligibleOutlets.join(', ')}...`);
 
-    console.log(`🌐 [X Explorer] Scanning up to 6 diverse eligible outlets (${eligibleOutlets.slice(0, 6).join(', ')})...`);
     let allTweets = [];
-    for (const acc of eligibleOutlets.slice(0, 6)) {
+    for (const acc of eligibleOutlets) {
       if (allTweets.length >= 25) break; // Have plenty of fresh candidates, avoid rate limits
       const list = await fetchUserTweetsViaSyndication(acc);
       if (list && list.length > 0) {
         allTweets = allTweets.concat(list);
       }
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 1200));
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
@@ -1623,22 +1613,19 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     await page.goto('https://x.com/home', { waitUntil: 'load', timeout: 35000 }).catch(e => console.log('Feed goto notice:', e.message));
     await dismissCookieBanner(page);
-    try {
-      console.log('⏳ Waiting for timeline tweets to load...');
-      await page.waitForSelector('article[data-testid="tweet"]', { timeout: 18000 });
-      console.log('✅ Timeline tweets detected on screen.');
-    } catch (e) {
-      console.log('Initial tweet selector notice, scrolling slightly to trigger render...');
-      await page.evaluate(() => window.scrollBy(0, 500));
-      await new Promise(r => setTimeout(r, 2000));
-      await page.waitForSelector('article[data-testid="tweet"]', { timeout: 10000 }).catch(() => {});
-    }
+    await new Promise(r => setTimeout(r, 2000));
+
+    // Click "See new posts" pill if visible to reveal latest timeline posts
+    await page.evaluate(() => {
+      const btn = Array.from(document.querySelectorAll('div[role="button"], span, button')).find(el => el.innerText && el.innerText.includes('See new posts'));
+      if (btn) btn.click();
+    });
 
     // Deep scroll timeline to load 40-50+ fresh posts from your feed
     console.log('📜 [Feed Explorer] Deep scrolling your timeline (8 scrolls) to load 40+ creator & news posts...');
     for (let s = 0; s < 8; s++) {
-      await page.evaluate(() => window.scrollBy(0, 1200));
-      await new Promise(r => setTimeout(r, 1200));
+      await page.evaluate(() => window.scrollBy(0, 1000));
+      await new Promise(r => setTimeout(r, 1000));
     }
 
     const rawTweets = await page.evaluate(() => {
