@@ -687,17 +687,48 @@ async function searchWebPhotos(query) {
     });
     if (!res.ok) return null;
     const html = await res.text();
-    const matches = [...html.matchAll(/murl&quot;:&quot;(https?:\/\/[^&"]+)&quot;/g)];
-    if (!matches || matches.length === 0) return null;
 
-    console.log(`🌐 Found ${matches.length} live internet photo candidates for "${query}". Testing downloads...`);
+    // Parse structured Bing image search items (iusc metadata) to get direct organic results with titles
+    const regex = /class="iusc"[^>]*m="([^"]+)"/g;
+    let match;
+    const candidates = [];
+    while ((match = regex.exec(html)) !== null && candidates.length < 20) {
+      try {
+        const decoded = match[1].replace(/&quot;/g, '"');
+        const data = JSON.parse(decoded);
+        if (data && data.murl) {
+          candidates.push({ murl: data.murl, title: data.t || '' });
+        }
+      } catch (e) {}
+    }
 
-    // Try candidates until a high quality real photo downloads successfully
-    for (let i = 0; i < Math.min(6, matches.length); i++) {
-      const imgUrl = matches[i][1];
-      // Skip unwanted asset types
-      if (imgUrl.endsWith('.svg') || imgUrl.includes('.svg?') || imgUrl.includes('logo') || imgUrl.includes('icon') || imgUrl.includes('avatar') || imgUrl.includes('favicon')) {
+    if (candidates.length === 0) return null;
+    console.log(`🌐 Found ${candidates.length} organic internet photo candidates for "${query}". Testing relevance & downloads...`);
+
+    // Significant query words (min 4 chars) to verify relevance
+    const queryWords = query.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length >= 4);
+
+    for (const item of candidates) {
+      const imgUrl = item.murl;
+      const lowerUrl = imgUrl.toLowerCase();
+      const lowerTitle = item.title.toLowerCase();
+
+      // Strictly blacklist social video thumbnails, sports highlights, and clickbait video platforms
+      if (lowerUrl.includes('ytimg.com') || lowerUrl.includes('youtube.com') || lowerUrl.includes('tiktok.com') || lowerUrl.includes('fbcdn.net') || lowerUrl.includes('pinterest.com')) {
         continue;
+      }
+
+      // Skip icons, avatars, tiny svgs, favicons
+      if (lowerUrl.endsWith('.svg') || lowerUrl.includes('.svg?') || lowerUrl.includes('favicon') || lowerUrl.includes('avatar') || lowerUrl.includes('/icon/')) {
+        continue;
+      }
+
+      // Relevance check: ensure the image title or URL actually matches at least one keyword from the story query!
+      if (queryWords.length > 0) {
+        const hasKeyword = queryWords.some(kw => lowerUrl.includes(kw) || lowerTitle.includes(kw));
+        if (!hasKeyword) {
+          continue; // Skip unrelated images (e.g. sports/cricket thumbnails appearing in sidebars)
+        }
       }
 
       try {
@@ -716,13 +747,13 @@ async function searchWebPhotos(query) {
           if (buf.length > 20000) {
             const contentType = imgRes.headers.get('content-type')?.split(';')[0] || 'image/jpeg';
             if (contentType.startsWith('image/')) {
-              console.log(`✅ [Live Web Image Grabbed] ${imgUrl.slice(0, 80)}... (${Math.round(buf.length/1024)} KB)`);
+              console.log(`✅ [Live Web Image Grabbed] "${item.title.slice(0, 50)}" -> ${imgUrl.slice(0, 70)}... (${Math.round(buf.length/1024)} KB)`);
               return `data:${contentType};base64,${buf.toString('base64')}`;
             }
           }
         }
       } catch (err) {
-        // Continue to next candidate if one host is slow or blocks hotlinking
+        // Continue to next candidate if host is slow or blocks hotlinking
       }
     }
   } catch (e) {
