@@ -1516,16 +1516,20 @@ async function discoverAndCommentOnX(maxComments = 1) {
   console.log(`🌐 [X Explorer] Scanning live feeds across diverse gaming, culture, tech & crypto outlets (Target: ${maxComments} replies)...`);
 
   try {
-    // Shuffle outlets across diverse niches so scanning order varies each cycle
-    const shuffledOutlets = [...OUTLETS_TO_SCAN].sort(() => 0.5 - Math.random());
+    // Filter out over-commented outlets FIRST to guarantee diversity across diverse niches
+    const eligibleOutlets = OUTLETS_TO_SCAN
+      .filter(acc => !isAuthorOverCommented(acc))
+      .sort(() => 0.5 - Math.random());
+
+    console.log(`🌐 [X Explorer] Scanning up to 6 diverse eligible outlets (${eligibleOutlets.slice(0, 6).join(', ')})...`);
     let allTweets = [];
-    for (const acc of shuffledOutlets) {
+    for (const acc of eligibleOutlets.slice(0, 6)) {
       if (allTweets.length >= 25) break; // Have plenty of fresh candidates, avoid rate limits
       const list = await fetchUserTweetsViaSyndication(acc);
       if (list && list.length > 0) {
         allTweets = allTweets.concat(list);
       }
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 800));
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
@@ -1619,7 +1623,16 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     await page.goto('https://x.com/home', { waitUntil: 'load', timeout: 35000 }).catch(e => console.log('Feed goto notice:', e.message));
     await dismissCookieBanner(page);
-    await new Promise(r => setTimeout(r, 3000));
+    try {
+      console.log('⏳ Waiting for timeline tweets to load...');
+      await page.waitForSelector('article[data-testid="tweet"]', { timeout: 18000 });
+      console.log('✅ Timeline tweets detected on screen.');
+    } catch (e) {
+      console.log('Initial tweet selector notice, scrolling slightly to trigger render...');
+      await page.evaluate(() => window.scrollBy(0, 500));
+      await new Promise(r => setTimeout(r, 2000));
+      await page.waitForSelector('article[data-testid="tweet"]', { timeout: 10000 }).catch(() => {});
+    }
 
     // Deep scroll timeline to load 40-50+ fresh posts from your feed
     console.log('📜 [Feed Explorer] Deep scrolling your timeline (8 scrolls) to load 40+ creator & news posts...');
