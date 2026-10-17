@@ -1501,31 +1501,34 @@ async function discoverAndCommentOnX(maxComments = 1) {
     console.log(`🌐 [X Explorer] Outlets for scanning: ${outletsToScan.join(', ')}...`);
 
     let allTweets = [];
+    let scannedCount = 0;
     for (const acc of outletsToScan) {
-      if (allTweets.length >= 25) break; // Have plenty of fresh candidates, avoid rate limits
+      // Scan multiple diversified outlets until we have plenty of fresh unreplied candidate tweets
+      const freshPool = allTweets.filter(tw => tw.url && !hasAlreadyCommented(tw.url) && !tw.text.startsWith('RT @'));
+      if (freshPool.length >= 8 && scannedCount >= 4) break;
+
       const list = await fetchUserTweetsViaSyndication(acc);
       if (list && list.length > 0) {
         allTweets = allTweets.concat(list);
       }
-      await new Promise(r => setTimeout(r, 1200));
+      scannedCount++;
+      await new Promise(r => setTimeout(r, 600));
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
-    // Find the freshest tweets (5m - 4h fallback, sorted freshest first)
+    // Find the freshest tweets (2m - 12h fallback, sorted freshest first)
     const now = Date.now();
     const validTweets = allTweets.filter(tw => {
       if (!tw.url || !tw.text || tw.text.length < 20) return false;
       if (tw.text.startsWith('RT @')) return false;
       if (hasAlreadyCommented(tw.url)) return false;
-      const author = tw.user || (tw.url.match(/https?:\/\/(?:x|twitter)\.com\/([^\/]+)\/status/i)?.[1]);
-      if (author && isAuthorOverCommented(author)) return false;
       return true;
     });
 
     const candidates = validTweets.map(tw => ({
       ...tw,
       ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-    })).filter(tw => tw.ageMins >= 5 && tw.ageMins <= 240)
+    })).filter(tw => tw.ageMins >= 2 && tw.ageMins <= 720)
       .sort((a, b) => a.ageMins - b.ageMins);
 
     if (!candidates || candidates.length === 0) {
@@ -1554,8 +1557,8 @@ async function discoverAndCommentOnX(maxComments = 1) {
         placed++;
         console.log(`✅ [X Explorer] Successfully placed top comment (${placed}/${maxComments}) under post!`);
         if (placed < maxComments) {
-          const waitMins = 4 + Math.random() * 1; // 4 to 5 mins wait
-          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (4-5m pacing) before engaging with next outlet...`);
+          const waitMins = 3.5 + Math.random() * 1; // 3.5 to 4.5 mins wait
+          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (3.5-4.5m pacing) before engaging with next outlet...`);
           await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
         }
       } else {
@@ -1646,22 +1649,15 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     const now = Date.now();
     const candidates = rawTweets.filter(t => {
-      if (!t.url || !t.text || t.text.length < 35) return false;
+      if (!t.url || !t.text || t.text.length < 20) return false;
       if (/^(https?:\/\/|www\.)\S+$/i.test(t.text.trim())) return false; // skip bare links
       if (hasAlreadyCommented(t.url)) return false;
       if (t.text.startsWith('RT @')) return false;
 
-      // Extract author handle from URL and enforce de-clustering
-      const authorMatch = t.url.match(/https?:\/\/(?:x|twitter)\.com\/([^\/]+)\/status/i);
-      const author = authorMatch ? authorMatch[1].toLowerCase() : null;
-      if (author && isAuthorOverCommented(author)) {
-        return false;
-      }
-
       let ageMins = 30;
       if (t.time) {
         ageMins = (now - new Date(t.time).getTime()) / 60000;
-        if (ageMins < 5 || ageMins > 240) return false; // Up to 4 hours fallback, prioritized freshest first
+        if (ageMins < 2 || ageMins > 720) return false; // 2m to 12h fallback, prioritized freshest first
       }
       t.ageMins = Math.round(ageMins);
       return true;
@@ -1672,18 +1668,12 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       return 0;
     }
 
-    // Prioritize freshest posts (5-30m) first for maximum reply visibility
+    // Prioritize freshest posts first for maximum reply visibility
     const prioritizedCandidates = candidates.sort((a, b) => a.ageMins - b.ageMins);
     let commentsPlaced = 0;
 
     for (const target of prioritizedCandidates) {
       if (commentsPlaced >= targetCommentsCount) break;
-
-      const authorMatch = target.url.match(/https?:\/\/(?:x|twitter)\.com\/([^\/]+)\/status/i);
-      const author = authorMatch ? authorMatch[1].toLowerCase() : null;
-      if (author && isAuthorOverCommented(author)) {
-        continue;
-      }
 
       console.log(`🎯 [Feed Explorer] Selected feed post from ${target.user}: ${target.url}`);
       console.log(`Original Text: "${target.text.slice(0, 80)}..."`);
@@ -1706,8 +1696,8 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
         console.log(`✅ [Feed Explorer] Successfully placed Reply under post (${commentsPlaced}/${targetCommentsCount})!`);
         
         if (commentsPlaced < targetCommentsCount) {
-          const waitMins = 4 + Math.random() * 1; // 4 to 5 mins wait
-          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (4-5m pacing) before engaging with next post...`);
+          const waitMins = 3.5 + Math.random() * 1; // 3.5 to 4.5 mins wait
+          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (3.5-4.5m pacing) before engaging with next post...`);
           await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
         }
       } else {
@@ -1726,21 +1716,26 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  const TARGET_TOTAL_COMMENTS = 2; // Active 4-5 min rhythm (2 thoughtful comments per 15m cycle)
-  console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies (4-5m wait)...`);
+  const TARGET_TOTAL_COMMENTS = 2; // Active 4-5 min rhythm (2 thoughtful comments per 10m cycle)
+  console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies (3.5-4.5m wait)...`);
 
   // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following creators across all fields)
-  const feedCount = await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
+  let feedCount = 0;
+  try {
+    feedCount = await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
+  } catch (e) {
+    console.warn('Feed Explorer error:', e.message);
+  }
   
   // Priority 2: Syndication Scan across diversified Outlets (Gaming, Culture, Tech, Macro, Crypto, News)
   const remainingNeeded = TARGET_TOTAL_COMMENTS - (feedCount || 0);
   if (remainingNeeded > 0) {
     if (feedCount > 0) {
-      const waitMins = 4 + Math.random() * 1;
+      const waitMins = 3.5 + Math.random() * 1;
       console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes before scanning external outlets...`);
       await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
     }
-    console.log(`🔄 Engaging diversified breaking outlets for ${remainingNeeded} reply/replies with 4-5 min pacing...`);
+    console.log(`🔄 Engaging diversified breaking outlets for ${remainingNeeded} reply/replies with 3.5-4.5 min pacing...`);
     await discoverAndCommentOnX(remainingNeeded);
   }
 }
