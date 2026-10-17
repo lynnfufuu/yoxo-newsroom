@@ -144,14 +144,17 @@ function isDuplicateStory(newHeadline) {
   const newWords = new Set(getWords(newHeadline));
   if (newWords.size === 0) return false;
 
-  for (const item of list) {
+  const now = Date.now();
+  const recentList = list.filter(item => !item.time || (now - item.time < 24 * 60 * 60 * 1000));
+
+  for (const item of recentList) {
     const existingWords = getWords(item.text);
     let common = 0;
     for (const w of existingWords) {
       if (newWords.has(w)) common++;
     }
     const similarity = common / Math.min(newWords.size, existingWords.length);
-    if (similarity >= 0.45) {
+    if (similarity >= 0.65 && common >= 3) {
       console.log(`⚠️ Duplicate detected: "${newHeadline}" is similar to previously covered "${item.text}" (${Math.round(similarity*100)}% match)`);
       return true;
     }
@@ -188,19 +191,18 @@ function getChromeExecutable() {
   return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 }
 
-// X Cooldown & Anti-Shadowban Rate Limiter (Strict 45-minute minimum spacing between standalone tweets)
+// X Cooldown & Anti-Shadowban Rate Limiter (28-minute minimum spacing between standalone tweets)
 const X_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_post.json');
-const X_MIN_COOLDOWN_MS = 45 * 60 * 1000; // 45 minutes strictly between tweets
+const X_MIN_COOLDOWN_MS = 28 * 60 * 1000; // ~28 minutes between standalone tweets
 
 function canPostToX(isMustPost = false) {
   if (!fs.existsSync(X_COOLDOWN_FILE)) return true;
   try {
     const data = JSON.parse(fs.readFileSync(X_COOLDOWN_FILE, 'utf8'));
     const elapsed = Date.now() - (data.lastPostedAt || 0);
-    // Strict shadowban protection: zero bypasses allowed, 45 minutes strictly enforced
     if (elapsed < X_MIN_COOLDOWN_MS) {
       const remainingMins = Math.ceil((X_MIN_COOLDOWN_MS - elapsed) / 60000);
-      console.log(`⏳ [Shadowban Protection] Strict 45m cooldown active (${remainingMins} mins remaining until next X tweet). Skipping auto-post this cycle.`);
+      console.log(`⏳ [Cooldown Active] ${remainingMins} mins remaining until next standalone X tweet.`);
       return false;
     }
   } catch (e) {}
@@ -264,26 +266,82 @@ function isWithinCommentRecencyWindow(publishedAt) {
   return true;
 }
 
+// Author De-clustering Tracker: Prevents over-commenting on IGN, WuBlockchain, or any single account
+function getRecentlyCommentedAuthors(limit = 10) {
+  if (!fs.existsSync(COMMENTED_TWEETS_FILE)) return [];
+  try {
+    const list = JSON.parse(fs.readFileSync(COMMENTED_TWEETS_FILE, 'utf8'));
+    if (!Array.isArray(list)) return [];
+    const authors = [];
+    for (let i = list.length - 1; i >= 0 && authors.length < limit; i--) {
+      const match = list[i].match(/https?:\/\/(?:x|twitter)\.com\/([^\/]+)\/status/i);
+      if (match && match[1]) {
+        authors.push(match[1].toLowerCase());
+      }
+    }
+    return authors;
+  } catch (e) {
+    return [];
+  }
+}
 
+function isAuthorOverCommented(authorHandle) {
+  if (!authorHandle) return false;
+  const target = authorHandle.toLowerCase().replace('@', '').trim();
+  const recentAuthors = getRecentlyCommentedAuthors(8); // Check last 8 comments
+  
+  // Strict de-clustering: never comment on the same creator in consecutive comments (last 2)
+  if (recentAuthors.slice(0, 2).includes(target)) {
+    console.log(`🛡️ [Author Diversity] Skipping @${target}: commented on them in the last 2 replies.`);
+    return true;
+  }
+  // Cap at max 2 comments in the last 8 across all outlets
+  const count = recentAuthors.filter(a => a === target).length;
+  if (count >= 2) {
+    console.log(`🛡️ [Author Diversity] Skipping @${target}: already has ${count} recent comments in last 8.`);
+    return true;
+  }
+  return false;
+}
 
 async function generateHumanReply(tweetText) {
   try {
-    const prompt = `You are an authentic, sharp human on X (Twitter).
+    const prompt = `You are @YoXo_Station on X (Twitter), an authentic, insightful human peer.
 Read this post very carefully:
 """
 ${tweetText}
 """
 
-Goal: Write a single, insightful, human reply comment under 25 words that fits naturally into the conversation.
+Goal: Write a single, highly contextual, human reply comment under 25 words that fits naturally into the conversation.
 
-HOW TO READ & REPLY CAREFULLY:
-1. Identify the exact subject matter, specific names, assets, or core tension being discussed.
-2. Directly respond to that specific topic with a natural observation, witty irony, or realistic perspective. Never make vague or generalized claims that could apply to any random post.
-3. Keep the exact tone: sharp, insider, intelligent, concise, grounded in reality.
-4. STRICT RULES:
-- STRICTLY ZERO EMOJIS.
-- ZERO AI CLICHES or platitudes (never use "Only time will tell", "Interesting development", "Fascinating", "Step in the right direction", "Thoughts?").
-- Do NOT summarize, rephrase, or parrot what the post already stated.
+CONTEXT & TONE ADAPTATION (READ THE ROOM):
+1. TRAGIC / SOLEMN NEWS (Deaths, Fatal Accidents, Natural Disasters, War Casualties, Bombing Victims):
+   - STRICT MANDATE: SHOW SINCERE HUMAN EMPATHY, REVERENCE, AND COMPASSION.
+   - NEVER be sarcastic, witty, snarky, cynical, or flippant on death, accidents, or human suffering.
+   - Speak with dignity, warmth, and heartfelt condolences.
+
+2. GAMING & POP-CULTURE (e.g. IGN, DiscussingFilm, video game / movie news):
+   - READ THE ROOM CAREFULLY before taking a stance.
+   - Speak like an authentic insider gamer or cinephile who understands the community, developer realities, and franchise history.
+   - Avoid tone-deaf, reactionary, or contrarian hot takes that alienate fans.
+
+3. CORPORATE GREED & CAPITALISM:
+   - When corporate giants announce layoffs alongside record profits, anti-consumer gouging, or unchecked monopoly power: apply sharp, smart critique holding capital and executives accountable.
+
+4. TECH, MARKETS & GENERAL:
+   - Sharp, witty, intelligent insider peer. Grounded in reality, zero fluff.
+
+CORE EDITORIAL VALUES & ETHICAL GUARDRAILS (ABSOLUTE):
+- Anti-Far-Right / Anti-MAGA: Do NOT support, flatter, or normalize Donald Trump, MAGA, or far-right politics.
+- Anti-War Crimes & Anti-Violence: Firmly oppose military atrocities, bombing innocent civilians and children, war crimes, and authoritarian violence (oppose Netanyahu / war criminality). Sincere support for world peace and civilian safety.
+- Zero Tolerance: Absolute zero tolerance for racism, homophobia, transphobia, misogyny, rapists, or pedophiles. Always champion equal rights, LGBTQ+ equality, and gender equality.
+- Sensitive Topics: Tread with emotional intelligence, care, and human decency.
+
+STRICT WRITING RULES:
+- STRICTLY ZERO EMOJIS (none at all).
+- STRICTLY ZERO AI CLICHES (never use "Only time will tell", "Interesting development", "Fascinating", "Step in the right direction", "Thoughts?", "Stay tuned").
+- Do NOT parrot, rephrase, or summarize what the tweet already said.
+- Directly respond to the specific subject, names, or core tension.
 - Output purely the reply text with no quotation marks.`;
 
     // Try available active models with full quotas
@@ -597,7 +655,7 @@ Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
   "tweet_copy": "BREAKING: Brazil's Congress has approved comprehensive legislation to reduce the national workweek framework.\\n\\nThe milestone reform caps weekly labor hours while providing targeted transition tax offsets for corporate employers.\\n\\n• Phased implementation scheduled across next 18 months\\n• Manufacturing and service sectors granted structured compliance timelines\\n• Employer federations warn of operational productivity challenges\\n\\nCan Brazilian productivity survive 32-hour limits?"
 }`;
 
-  for (const model of ['gemini-3.8-flash', 'gemini-3.5-flash-lite']) {
+  for (const model of ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash']) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
       const res = await fetch(url, {
@@ -1312,8 +1370,8 @@ async function runCycle() {
             console.log(`✅ Sent successfully to [${desk.name}]!`);
             saveHeadline(cleanHeadline);
 
-            // 100% Autopilot Publishing to X and Telegram Channel for top viral stories (score >= 9 or MUST POST)
-            if (!autoPostedXThisCycle && (analysis.score >= 9 || analysis.is_must_post)) {
+            // 100% Autopilot Publishing to X and Telegram Channel for top breaking stories (score >= 8 or MUST POST)
+            if (!autoPostedXThisCycle && (analysis.score >= 8 || analysis.is_must_post)) {
               if (canPostToX(analysis.is_must_post)) {
                 autoPostedXThisCycle = true;
 
@@ -1392,23 +1450,24 @@ async function runCycle() {
 }
 
 const OUTLETS_TO_SCAN = [
-  'BitcoinMagazine',
-  'CoinDesk',
-  'WatcherGuru',
-  'WuBlockchain',
-  'Cointelegraph',
-  'TechCrunch',
-  'DocumentingBTC',
-  'saylor',
-  'VitalikButerin',
-  'rektcapital',
-  'binance',
-  'cz_binance',
-  'brian_armstrong',
-  'APompliano',
   'DiscussingFilm',
   'CultureCrave',
-  'IGN'
+  'TheVerge',
+  'TechCrunch',
+  'unusual_whales',
+  'WatcherGuru',
+  'CoinDesk',
+  'BitcoinMagazine',
+  'Polygon',
+  'GameSpot',
+  'IGN',
+  'BBCWorld',
+  'Reuters',
+  'Bloomberg',
+  'arstechnica',
+  'WuBlockchain',
+  'VitalikButerin',
+  'rektcapital'
 ];
 
 async function fetchUserTweetsViaSyndication(username) {
@@ -1447,12 +1506,13 @@ async function fetchUserTweetsViaSyndication(username) {
 async function discoverAndCommentOnX(maxComments = 1) {
   const SESSION_FILE = path.resolve(__dirname, 'x_session.json');
   if (!fs.existsSync(SESSION_FILE)) return 0;
-  console.log(`🌐 [X Explorer] Scanning live breaking feeds across crypto & top news sources (Target: ${maxComments} replies)...`);
+  console.log(`🌐 [X Explorer] Scanning live feeds across diverse gaming, culture, tech & crypto outlets (Target: ${maxComments} replies)...`);
 
   try {
-    // Scan top outlets via high-speed syndication stream (instant, 0% failure rate)
+    // Shuffle outlets across diverse niches so scanning order varies each cycle
+    const shuffledOutlets = [...OUTLETS_TO_SCAN].sort(() => 0.5 - Math.random());
     let allTweets = [];
-    for (const acc of OUTLETS_TO_SCAN) {
+    for (const acc of shuffledOutlets) {
       const list = await fetchUserTweetsViaSyndication(acc);
       if (list && list.length > 0) {
         allTweets = allTweets.concat(list);
@@ -1461,12 +1521,14 @@ async function discoverAndCommentOnX(maxComments = 1) {
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
-    // Find the best fresh tweets (10m - 4h old) not already commented on
+    // Find the best fresh tweets (8m - 5h old) not already commented on and not over-commented authors
     const now = Date.now();
     const validTweets = allTweets.filter(tw => {
       if (!tw.url || !tw.text || tw.text.length < 20) return false;
       if (tw.text.startsWith('RT @')) return false;
       if (hasAlreadyCommented(tw.url)) return false;
+      const author = tw.user || (tw.url.match(/https?:\/\/(?:x|twitter)\.com\/([^\/]+)\/status/i)?.[1]);
+      if (author && isAuthorOverCommented(author)) return false;
       return true;
     });
 
@@ -1500,10 +1562,10 @@ async function discoverAndCommentOnX(maxComments = 1) {
       if (replyRes && replyRes.ok) {
         recordXComment(candidate.url, humanComment);
         placed++;
-        console.log(`✅ [X Explorer] Successfully placed top comment (${placed}/${maxComments}) under breaking post!`);
+        console.log(`✅ [X Explorer] Successfully placed top comment (${placed}/${maxComments}) under post!`);
         if (placed < maxComments) {
-          const waitMins = 3.5;
-          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins} minutes before engaging with next outlet...`);
+          const waitMins = 5 + Math.random() * 2; // 5 to 7 mins wait
+          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (5-7m pacing) before engaging with next outlet...`);
           await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
         }
       } else {
@@ -1593,6 +1655,13 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       if (hasAlreadyCommented(t.url)) return false;
       if (t.text.startsWith('RT @')) return false;
 
+      // Extract author handle from URL and enforce de-clustering
+      const authorMatch = t.url.match(/https?:\/\/(?:x|twitter)\.com\/([^\/]+)\/status/i);
+      const author = authorMatch ? authorMatch[1].toLowerCase() : null;
+      if (author && isAuthorOverCommented(author)) {
+        return false;
+      }
+
       if (t.time) {
         const ageMins = (now - new Date(t.time).getTime()) / 60000;
         if (ageMins < 5 || ageMins > 360) return false;
@@ -1605,10 +1674,18 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       return false;
     }
 
+    // Shuffle candidates to give equal exposure to diverse creators down the timeline
+    const shuffledCandidates = candidates.sort(() => 0.5 - Math.random());
     let commentsPlaced = 0;
 
-    for (const target of candidates) {
+    for (const target of shuffledCandidates) {
       if (commentsPlaced >= targetCommentsCount) break;
+
+      const authorMatch = target.url.match(/https?:\/\/(?:x|twitter)\.com\/([^\/]+)\/status/i);
+      const author = authorMatch ? authorMatch[1].toLowerCase() : null;
+      if (author && isAuthorOverCommented(author)) {
+        continue;
+      }
 
       console.log(`🎯 [Feed Explorer] Selected feed post from ${target.user}: ${target.url}`);
       console.log(`Original Text: "${target.text.slice(0, 80)}..."`);
@@ -1631,8 +1708,8 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
         console.log(`✅ [Feed Explorer] Successfully placed Reply under post (${commentsPlaced}/${targetCommentsCount})!`);
         
         if (commentsPlaced < targetCommentsCount) {
-          const waitMins = 3.5;
-          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins} minutes before engaging with next post...`);
+          const waitMins = 5 + Math.random() * 2; // 5 to 7 mins wait
+          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (5-7m pacing) before engaging with next post...`);
           await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
         }
       } else {
@@ -1651,16 +1728,21 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  const TARGET_TOTAL_COMMENTS = 2; // Relaxed 3-5 min rhythm (2 thoughtful comments per 15m cycle)
-  console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting ${TARGET_TOTAL_COMMENTS} thoughtful replies...`);
+  const TARGET_TOTAL_COMMENTS = 2; // Relaxed 5-7 min rhythm (up to 2 thoughtful comments per 15m cycle)
+  console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies (5-7m wait)...`);
 
-  // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following CT creators)
+  // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following creators across all fields)
   const feedCount = await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
   
-  // Priority 2: Syndication Scan across top 15+ Crypto & News Outlets
+  // Priority 2: Syndication Scan across diversified Outlets (Gaming, Culture, Tech, Macro, Crypto, News)
   const remainingNeeded = TARGET_TOTAL_COMMENTS - (feedCount || 0);
   if (remainingNeeded > 0) {
-    console.log(`🔄 Engaging breaking crypto outlets for ${remainingNeeded} reply/replies with 3-5 min pacing...`);
+    if (feedCount > 0) {
+      const waitMins = 5 + Math.random() * 2;
+      console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes before scanning external outlets...`);
+      await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
+    }
+    console.log(`🔄 Engaging diversified breaking outlets for ${remainingNeeded} reply/replies with 5-7 min pacing...`);
     await discoverAndCommentOnX(remainingNeeded);
   }
 }
