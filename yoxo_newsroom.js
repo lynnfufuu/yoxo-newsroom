@@ -286,21 +286,8 @@ function getRecentlyCommentedAuthors(limit = 10) {
 }
 
 function isAuthorOverCommented(authorHandle) {
-  if (!authorHandle) return false;
-  const target = authorHandle.toLowerCase().replace('@', '').trim();
-  const recentAuthors = getRecentlyCommentedAuthors(8); // Check last 8 comments
-  
-  // Strict de-clustering: never comment on the same creator in consecutive comments (last 2)
-  if (recentAuthors.slice(0, 2).includes(target)) {
-    console.log(`🛡️ [Author Diversity] Skipping @${target}: commented on them in the last 2 replies.`);
-    return true;
-  }
-  // Cap at max 2 comments in the last 8 across all outlets
-  const count = recentAuthors.filter(a => a === target).length;
-  if (count >= 2) {
-    console.log(`🛡️ [Author Diversity] Skipping @${target}: already has ${count} recent comments in last 8.`);
-    return true;
-  }
+  // Unrestricted: never skip IGN, WuBlockchain, BBCWorld or any creator
+  // Comment on whatever valid post is discovered across the feed or outlets
   return false;
 }
 
@@ -1459,13 +1446,14 @@ async function runCycle() {
 const OUTLETS_TO_SCAN = [
   'CultureCrave',
   'DiscussingFilm',
+  'IGN',
+  'WuBlockchain',
+  'BBCWorld',
   'CoinDesk',
   'unusual_whales',
   'WatcherGuru',
   'TechCrunch',
   'TheVerge',
-  'IGN',
-  'WuBlockchain',
   'BitcoinMagazine'
 ];
 
@@ -1508,12 +1496,12 @@ async function discoverAndCommentOnX(maxComments = 1) {
   console.log(`🌐 [X Explorer] Scanning live feeds across diverse gaming, culture, tech & crypto outlets (Target: ${maxComments} replies)...`);
 
   try {
-    // Filter out over-commented outlets FIRST to guarantee diversity across diverse niches
-    const eligibleOutlets = OUTLETS_TO_SCAN.filter(acc => !isAuthorOverCommented(acc));
-    console.log(`🌐 [X Explorer] Eligible outlets for scanning: ${eligibleOutlets.join(', ')}...`);
+    // Unrestricted outlet rotation across gaming, culture, tech, macro, crypto, world news
+    const outletsToScan = [...OUTLETS_TO_SCAN].sort(() => 0.5 - Math.random());
+    console.log(`🌐 [X Explorer] Outlets for scanning: ${outletsToScan.join(', ')}...`);
 
     let allTweets = [];
-    for (const acc of eligibleOutlets) {
+    for (const acc of outletsToScan) {
       if (allTweets.length >= 25) break; // Have plenty of fresh candidates, avoid rate limits
       const list = await fetchUserTweetsViaSyndication(acc);
       if (list && list.length > 0) {
