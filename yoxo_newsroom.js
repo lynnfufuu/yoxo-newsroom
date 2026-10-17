@@ -1660,10 +1660,14 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 1000 });
+    const rawUa = await page.evaluate(() => navigator.userAgent);
+    const cleanUa = rawUa.replace('HeadlessChrome', 'Chrome');
+    await page.setUserAgent(cleanUa);
     await page.setCookie(...cookies);
 
     console.log('🌐 [Feed Explorer] Loading x.com/home...');
     await page.goto('https://x.com/home', { waitUntil: 'domcontentloaded', timeout: 35000 }).catch(e => console.log('Feed goto notice:', e.message));
+    console.log(`🌐 [Feed Explorer] Landed on: ${page.url()} | Title: ${await page.title()}`);
     await dismissCookieBanner(page);
     
     // Dismiss any modal dialogs (notifications, popups, etc.)
@@ -1812,13 +1816,26 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
 async function autoCommentOnXFeedOrOutlets() {
   const TARGET_TOTAL_COMMENTS = 3; // Active continuous 3-5 min rhythm (3 thoughtful comments per cycle)
-  console.log(`🎯 [Feed-Only Pacing Rhythm] Commencing live timeline feed scroll (targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies, max 2h old)...`);
+  console.log(`🎯 [Pacing Rhythm] Commencing commenting cycle (targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies, max 2h old)...`);
 
-  // Exclusively browse and scroll the user's live home timeline (creators, news, culture, finance)
+  // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following creators across all fields)
+  let feedCount = 0;
   try {
-    await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
+    feedCount = await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
   } catch (e) {
     console.warn('Feed Explorer error:', e.message);
+  }
+
+  // Priority 2: If feed had fewer than target comments, immediately fulfill remaining comments so there is NEVER a gap!
+  const remainingNeeded = TARGET_TOTAL_COMMENTS - (feedCount || 0);
+  if (remainingNeeded > 0) {
+    if (feedCount > 0) {
+      const waitMins = 3 + Math.random() * 2; // Strict 3 to 5 mins wait
+      console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes before engaging next post...`);
+      await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
+    }
+    console.log(`🔄 Engaging diversified live posts for ${remainingNeeded} reply/replies with 3-5 min pacing...`);
+    await discoverAndCommentOnX(remainingNeeded);
   }
 }
 
