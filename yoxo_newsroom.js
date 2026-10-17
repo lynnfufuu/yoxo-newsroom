@@ -611,17 +611,23 @@ ${photoGuidance}
    - Rich with hard data: exact dollar amounts, percentages, timelines, official quotes, and verified facts.
    - Zero AI slop, zero fluff, clean bullet points (•) where appropriate.
 
-4. FINAL CLOSING LINE (100% UNIQUE & STORY-SPECIFIC ONE-LINER):
-   - CRITICAL MANDATE: Craft a sharp, memorable closing line specifically tailored to the unique dilemma, key personality, or core stakes of THIS exact story.
-   - STRICTLY FORBIDDEN REPETITIVE CLICHES (NEVER USE ANY OF THESE):
-     * NEVER write lazy, generic questions like: "Would you support this?", "Is this the right move?", "What do you think?", "Where do you stand?", "Massive win or huge mistake?", "Are you buying day one?", "Will this succeed?", or "Thoughts?".
-   - WHAT TO WRITE INSTEAD: Write a unique, provocative thought, prediction, or dilemma naming the specific entities:
-     * Politics: "Nine justices or fifteen?" or "The Senate confirmation battle begins."
-     * Gaming: "Can the Switch surpass the PS2 before next-gen lands?" or "Rockstar's most ambitious launch yet."
-     * Cinema: "Can Flanagan resurrect the legendary horror franchise?" or "A24 bet big on Zendaya."
-     * Tech/Crypto: "Wall Street is officially done waiting on regulators." or "Cold storage just became a daily driver."
-     * Disasters: "Can containment lines survive tomorrow's winds?"
-   - FORMAT: Exactly ONE single line, under 10 words. Must be 100% unique to this story.
+4. FINAL CLOSING LINE (HIGH-ENGAGEMENT CONVERSATIONAL HOOK - 54X REPLY MULTIPLIER):
+   - CRITICAL ALGORITHM MANDATE: In X's algorithm, replies have a 54x multiplier over likes. Every tweet MUST conclude with a sharp, polarizing, conversation-starting debate question or dilemma that compels readers to stop scrolling and drop their take in the comments.
+   - Strictly tailor the debate hook to the subject:
+     * Gaming & Entertainment:
+       - "W or L move by [Studio/Company]?"
+       - "Are you seated opening weekend or waiting for streaming?"
+       - "Is this actually peak [Franchise] or pure nostalgia bait?"
+       - "Genuinely hyped or another overpromised disaster? Drop your take."
+     * Web3, Crypto & Tech:
+       - "Bullish structural milestone or exit liquidity for insiders?"
+       - "Will [Entity] actually deliver, or is this peak corporate AI hype?"
+       - "Are you holding through this volatility or taking profits here?"
+     * Geopolitics, Labor & Corporate Policy:
+       - "A genuine breakthrough for workers or corporate damage control?"
+       - "Where do you stand: overdue intervention or dangerous overreach?"
+   - FORMAT: Exactly one punchy closing sentence (under 16 words) separated by an empty line from the bullets.
+   - ZERO EMOJIS anywhere.
 
 5. CORE EDITORIAL VALUES & ETHICAL MANDATES (ABSOLUTE):
    - ANTI-WAR CRIMES & CIVILIAN PROTECTION: Strictly oppose military atrocities, war crimes, and the bombing and killing of innocent civilians and children. Firmly oppose Benjamin Netanyahu and Israeli military aggression. Report from the perspective of human rights, international law, and world peace.
@@ -644,7 +650,7 @@ Instructions:
    - "photo_fallback": Central institution or setting for real photography.
    - "card_headline": "2-5 WORDS MAX" in ALL CAPS (pure title without 'BREAKING:' or 'JUST IN:').
    - "card_subdeck": 1-2 sentence sharp journalistic summary.
-   - "tweet_copy": The complete, publication-grade tweet (STRICTLY NO EMOJIS) starting with "BREAKING:" or "JUST IN:" and ending with a 100% UNIQUE, story-specific one-liner (under 10 words).
+   - "tweet_copy": The complete, publication-grade tweet (STRICTLY NO EMOJIS) starting with "BREAKING:" or "JUST IN:" and ending with a high-engagement conversational debate hook to spark replies.
 
 Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
 {
@@ -1202,6 +1208,41 @@ async function sendDraftToTelegram({ imagePath, tweetCopy, channel, threadId, sc
   return await res.json();
 }
 
+async function findViralSourceTweetForQRT(headline, photoPrimary, deskName) {
+  try {
+    const rawTerms = [photoPrimary, headline].filter(Boolean).join(' ')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length >= 4 && !['breaking', 'just', 'with', 'from', 'this', 'that', 'about', 'after', 'will', 'have', 'were'].includes(w));
+
+    const terms = Array.from(new Set(rawTerms)).slice(0, 5);
+    if (terms.length === 0) return null;
+
+    let targetOutlets = ['IGN', 'Dexerto', 'PopBase', 'Complex', 'CultureCrave', 'DiscussingFilm', 'Variety'];
+    if (deskName && deskName.toLowerCase().includes('crypto')) {
+      targetOutlets = ['Cointelegraph', 'WatcherGuru', 'CoinDesk', 'WuBlockchain', 'BitcoinMagazine'];
+    } else if (deskName && deskName.toLowerCase().includes('politic')) {
+      targetOutlets = ['rare_remarks', 'nypost', 'CNN', 'Reuters', 'BBCWorld', 'AP'];
+    }
+
+    for (const outlet of targetOutlets) {
+      const tweets = await fetchUserTweetsViaSyndication(outlet);
+      for (const tw of tweets) {
+        const text = (tw.text || '').toLowerCase();
+        const matches = terms.filter(t => text.includes(t));
+        if (matches.length >= 1) {
+          console.log(`🎯 [QRT Prioritizer] Matched viral source tweet from @${outlet} (terms: ${matches.join(', ')}): ${tw.url}`);
+          return tw.url;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('findViralSourceTweetForQRT notice:', e.message);
+  }
+  return null;
+}
+
 // 5. Main Execution Cycle across all 3 Categorized Desks
 async function runCycle() {
   console.log(`[${new Date().toLocaleTimeString()}] Scanning sources across all 3 News Desks...`);
@@ -1434,7 +1475,13 @@ async function runCycle() {
                     const xMatch = searchStr.match(/https?:\/\/(?:x|twitter)\.com\/([a-zA-Z0-9_]+)\/status\/(\d+)/i);
                     if (xMatch) {
                       quoteUrl = xMatch[0];
-                      console.log(`🎯 [QRT & Sniper] Detected viral source tweet: ${quoteUrl}`);
+                      console.log(`🎯 [QRT & Sniper] Detected viral source tweet from post: ${quoteUrl}`);
+                    } else {
+                      // Prioritize QRT: Actively match viral tweet from top verified outlets on X
+                      quoteUrl = await findViralSourceTweetForQRT(cleanHeadline, analysis.photo_primary, desk.name);
+                      if (quoteUrl) {
+                        console.log(`⚡ [QRT Prioritization] Matched viral outlet tweet to quote on X: ${quoteUrl}`);
+                      }
                     }
 
                     const xRes = await postToX({ imagePath, text: cleanTweet, quoteUrl });
