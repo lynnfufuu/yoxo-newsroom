@@ -1759,7 +1759,7 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  const TARGET_TOTAL_COMMENTS = 2; // Active 3-5 min rhythm (2 thoughtful comments per 10m cycle)
+  const TARGET_TOTAL_COMMENTS = 3; // Active continuous 3-5 min rhythm (3 thoughtful comments per cycle)
   console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies (3-5m wait, max 2h old)...`);
 
   // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following creators across all fields)
