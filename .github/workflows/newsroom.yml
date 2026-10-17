@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: newsroom-exclusive-lock
+  cancel-in-progress: true
+
 jobs:
   newsroom-cycle:
     runs-on: ubuntu-latest

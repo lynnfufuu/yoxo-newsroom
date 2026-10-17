@@ -228,11 +228,20 @@ function canCommentOnX() {
   return true; // No time limit restriction on comments
 }
 
+function getTweetIdFromUrl(url) {
+  if (!url) return null;
+  const match = String(url).match(/status\/(\d+)/);
+  return match ? match[1] : null;
+}
+
 function hasAlreadyCommented(tweetUrl) {
   if (!fs.existsSync(COMMENTED_TWEETS_FILE)) return false;
   try {
     const list = JSON.parse(fs.readFileSync(COMMENTED_TWEETS_FILE, 'utf8'));
-    return Array.isArray(list) && list.includes(tweetUrl);
+    if (!Array.isArray(list)) return false;
+    const targetId = getTweetIdFromUrl(tweetUrl);
+    if (!targetId) return list.includes(tweetUrl);
+    return list.some(item => getTweetIdFromUrl(item) === targetId || item === tweetUrl);
   } catch (e) {
     return false;
   }
@@ -250,8 +259,10 @@ function recordXComment(tweetUrl, text) {
     if (fs.existsSync(COMMENTED_TWEETS_FILE)) {
       try { list = JSON.parse(fs.readFileSync(COMMENTED_TWEETS_FILE, 'utf8')); } catch (e) {}
     }
-    if (!list.includes(tweetUrl)) list.push(tweetUrl);
-    fs.writeFileSync(COMMENTED_TWEETS_FILE, JSON.stringify(list.slice(-200), null, 2), 'utf8');
+    const targetId = getTweetIdFromUrl(tweetUrl);
+    const already = list.some(item => (targetId && getTweetIdFromUrl(item) === targetId) || item === tweetUrl);
+    if (!already) list.push(tweetUrl);
+    fs.writeFileSync(COMMENTED_TWEETS_FILE, JSON.stringify(list.slice(-300), null, 2), 'utf8');
   } catch (e) {}
 }
 
@@ -1718,8 +1729,8 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
     // Capture initial visible posts
     await scrapeVisibleTweets();
 
-    // Scroll 10 times, capturing new posts as they appear
-    for (let s = 0; s < 10; s++) {
+    // Scroll 14 times, capturing new posts as they appear
+    for (let s = 0; s < 14; s++) {
       await page.evaluate(() => window.scrollBy(0, 800));
       await new Promise(r => setTimeout(r, 700));
       await scrapeVisibleTweets();
@@ -1801,26 +1812,13 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
 async function autoCommentOnXFeedOrOutlets() {
   const TARGET_TOTAL_COMMENTS = 3; // Active continuous 3-5 min rhythm (3 thoughtful comments per cycle)
-  console.log(`🎯 [Human Pacing Rhythm] Commencing cycle targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies (3-5m wait, max 2h old)...`);
+  console.log(`🎯 [Feed-Only Pacing Rhythm] Commencing live timeline feed scroll (targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies, max 2h old)...`);
 
-  // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following creators across all fields)
-  let feedCount = 0;
+  // Exclusively browse and scroll the user's live home timeline (creators, news, culture, finance)
   try {
-    feedCount = await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
+    await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
   } catch (e) {
     console.warn('Feed Explorer error:', e.message);
-  }
-  
-  // Priority 2: Syndication Scan across diversified Outlets (Gaming, Culture, Tech, Macro, Crypto, News)
-  const remainingNeeded = TARGET_TOTAL_COMMENTS - (feedCount || 0);
-  if (remainingNeeded > 0) {
-    if (feedCount > 0) {
-      const waitMins = 3 + Math.random() * 2; // Strict 3 to 5 mins wait
-      console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes before scanning external outlets...`);
-      await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
-    }
-    console.log(`🔄 Engaging diversified breaking outlets for ${remainingNeeded} reply/replies with 3-5 min pacing...`);
-    await discoverAndCommentOnX(remainingNeeded);
   }
 }
 

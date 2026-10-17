@@ -180,6 +180,21 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
     await page.waitForSelector('article[data-testid="tweet"]', { timeout: 20000 }).catch(e => console.log('Wait tweet note:', e.message));
     await new Promise(r => setTimeout(r, 1500));
 
+    // Live safety check: verify @YoXo_Station hasn't already replied to this tweet thread
+    const alreadyRepliedLive = await page.evaluate(() => {
+      const articles = Array.from(document.querySelectorAll('article[data-testid="tweet"]'));
+      return articles.some(a => {
+        const text = (a.innerText || '').toLowerCase();
+        return text.includes('@yoxo_station') || text.includes('yoxo station');
+      });
+    });
+
+    if (alreadyRepliedLive) {
+      console.warn(`⚠️ [Duplicate Guard] @YoXo_Station already has a live reply on ${tweetUrl}. Aborting to prevent duplicate comments!`);
+      await browser.close();
+      return { ok: false, error: 'Already replied on live post' };
+    }
+
     // Determine if inline composer is available or open modal reply dialog
     let replyTextarea = null;
     let replySubmitBtn = null;
