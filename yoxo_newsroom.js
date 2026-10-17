@@ -1546,16 +1546,21 @@ async function discoverAndCommentOnX(maxComments = 1) {
     let allTweets = [];
     let scannedCount = 0;
     for (const acc of outletsToScan) {
-      // Scan multiple diversified outlets until we have plenty of fresh unreplied candidate tweets
-      const freshPool = allTweets.filter(tw => tw.url && !hasAlreadyCommented(tw.url) && !tw.text.startsWith('RT @'));
-      if (freshPool.length >= 10 && scannedCount >= 6) break;
-
       const list = await fetchUserTweetsViaSyndication(acc);
       if (list && list.length > 0) {
         allTweets = allTweets.concat(list);
       }
       scannedCount++;
-      await new Promise(r => setTimeout(r, 600));
+
+      // Only stop scanning early if we actually have enough candidate tweets under 2 hours old!
+      const freshUnder2h = allTweets.filter(tw => {
+        if (!tw.url || hasAlreadyCommented(tw.url) || tw.text.startsWith('RT @')) return false;
+        const ageMins = (Date.now() - new Date(tw.createdAt).getTime()) / 60000;
+        return ageMins >= 1 && ageMins <= 120;
+      });
+      if (freshUnder2h.length >= 5 && scannedCount >= 8) break;
+
+      await new Promise(r => setTimeout(r, 400));
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
