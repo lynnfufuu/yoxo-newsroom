@@ -290,14 +290,14 @@ function isAuthorOverCommented(authorHandle) {
   const target = authorHandle.toLowerCase().replace('@', '').trim();
   const recentAuthors = getRecentlyCommentedAuthors(8); // Check last 8 comments
   
-  // Never comment on the exact same creator twice in a row
-  if (recentAuthors.slice(0, 1).includes(target)) {
-    console.log(`🛡️ [Author Diversity] Skipping @${target}: just commented on them in the previous reply.`);
+  // Strict de-clustering: never comment on the same creator in consecutive comments (last 2)
+  if (recentAuthors.slice(0, 2).includes(target)) {
+    console.log(`🛡️ [Author Diversity] Skipping @${target}: commented on them in the last 2 replies.`);
     return true;
   }
-  // Cap at max 3 comments in the last 8 across all outlets
+  // Cap at max 2 comments in the last 8 across all outlets
   const count = recentAuthors.filter(a => a === target).length;
-  if (count >= 3) {
+  if (count >= 2) {
     console.log(`🛡️ [Author Diversity] Skipping @${target}: already has ${count} recent comments in last 8.`);
     return true;
   }
