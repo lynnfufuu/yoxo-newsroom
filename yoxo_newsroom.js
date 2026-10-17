@@ -1466,27 +1466,15 @@ async function runCycle() {
                   console.error('Channel auto-publish error:', e.message);
                 }
 
-                // 2. Auto-publish directly to X (@YoXo_Station) via authenticated session
+                // 2. Auto-publish directly to X (@YoXo_Station) via authenticated session (Clean standalone post)
                 if (fs.existsSync(path.resolve(__dirname, 'x_session.json'))) {
                   try {
                     console.log(`🚀 [AUTOPILOT] Auto-publishing breaking story to X (@YoXo_Station)...`);
-                    let quoteUrl = null;
-                    const searchStr = `${post.url || ''} ${post.text || ''}`;
-                    const xMatch = searchStr.match(/https?:\/\/(?:x|twitter)\.com\/([a-zA-Z0-9_]+)\/status\/(\d+)/i);
-                    if (xMatch) {
-                      quoteUrl = xMatch[0];
-                      console.log(`🎯 [QRT & Sniper] Detected viral source tweet from post: ${quoteUrl}`);
-                    } else {
-                      // Prioritize QRT: Actively match viral tweet from top verified outlets on X
-                      quoteUrl = await findViralSourceTweetForQRT(cleanHeadline, analysis.photo_primary, desk.name);
-                      if (quoteUrl) {
-                        console.log(`⚡ [QRT Prioritization] Matched viral outlet tweet to quote on X: ${quoteUrl}`);
-                      }
-                    }
+                    const quoteUrl = null; // Strictly no quote tweets as requested
 
                     const xRes = await postToX({ imagePath, text: cleanTweet, quoteUrl });
                     if (xRes && xRes.ok) {
-                      console.log(`✅ [AUTOPILOT] Successfully published to X (@YoXo_Station)! ${xRes.isQrt ? '(Quote Tweet ⚡)' : ''}`);
+                      console.log(`✅ [AUTOPILOT] Successfully published standalone post to X (@YoXo_Station)!`);
                       recordXPost(cleanHeadline, post.url);
                     } else {
                       console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
