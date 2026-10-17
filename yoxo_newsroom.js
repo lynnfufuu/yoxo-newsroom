@@ -1647,6 +1647,14 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     await page.goto('https://x.com/home', { waitUntil: 'load', timeout: 35000 }).catch(e => console.log('Feed goto notice:', e.message));
     await dismissCookieBanner(page);
+    
+    // Explicitly wait for timeline tweets to mount and render
+    try {
+      await page.waitForSelector('article[data-testid="tweet"]', { timeout: 15000 });
+      console.log('✅ [Feed Explorer] Timeline tweets rendered successfully!');
+    } catch (e) {
+      console.log('Feed timeline wait note:', e.message);
+    }
     await new Promise(r => setTimeout(r, 2000));
 
     // Click "See new posts" pill if visible to reveal latest timeline posts

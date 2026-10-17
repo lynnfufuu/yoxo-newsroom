@@ -173,8 +173,12 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
     await page.setViewport({ width: 1280, height: 900 });
     await page.setCookie(...cookies);
 
-    await page.goto(tweetUrl, { waitUntil: 'domcontentloaded', timeout: 35000 });
+    await page.goto(tweetUrl, { waitUntil: 'load', timeout: 45000 }).catch(e => console.log('Goto note:', e.message));
     await dismissCookieBanner(page);
+
+    // Wait for the tweet article to render
+    await page.waitForSelector('article[data-testid="tweet"]', { timeout: 20000 }).catch(e => console.log('Wait tweet note:', e.message));
+    await new Promise(r => setTimeout(r, 1500));
 
     // Determine if inline composer is available or open modal reply dialog
     let replyTextarea = null;
@@ -190,13 +194,13 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
       replySubmitBtn = '[data-testid="tweetButtonInline"]';
     } else {
       console.log('Inline composer not ready, opening modal reply dialog via tweet reply button...');
-      const replyIcon = 'article[data-testid="tweet"] [data-testid="reply"]';
-      await page.waitForSelector(replyIcon, { timeout: 10000 });
+      const replyIcon = 'article[data-testid="tweet"] [data-testid="reply"], [data-testid="reply"]';
+      await page.waitForSelector(replyIcon, { timeout: 15000 });
       await page.click(replyIcon);
-      await new Promise(r => setTimeout(r, 1200));
+      await new Promise(r => setTimeout(r, 1500));
 
       // Wait for modal dialog
-      await page.waitForSelector('div[role="dialog"] div[data-testid="tweetTextarea_0"]', { timeout: 10000 });
+      await page.waitForSelector('div[role="dialog"] div[data-testid="tweetTextarea_0"]', { timeout: 15000 });
       replyTextarea = 'div[role="dialog"] div[data-testid="tweetTextarea_0"]';
       replySubmitBtn = 'div[role="dialog"] [data-testid="tweetButton"]';
     }
