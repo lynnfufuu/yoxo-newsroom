@@ -299,7 +299,12 @@ Read this post very carefully:
 ${tweetText}
 """
 
-Goal: Write a single, highly contextual, human reply comment under 25 words that fits naturally into the conversation.
+Goal: Write a single, highly engaging, authentic human reply comment under 25 words that fits naturally into the conversation.
+
+ENGAGEMENT STYLES (AIM FOR ONE OF THESE DEPENDING ON THE POST):
+- FUNNY & WITTY: Dry, relatable observational humor or a witty one-liner that makes readers chuckle and hit like.
+- HIGHLY AGREEABLE: Calling out the undeniable truth or community sentiment that everyone is thinking ("too real", instant nods).
+- DELIGHTFULLY ARGUABLE: A clever, thought-provoking angle or mildly spicy take that sparks conversation and makes people want to jump in and debate.
 
 CONTEXT & TONE ADAPTATION (READ THE ROOM):
 1. TRAGIC / SOLEMN NEWS (Deaths, Fatal Accidents, Natural Disasters, War Casualties, Bombing Victims):
@@ -308,8 +313,9 @@ CONTEXT & TONE ADAPTATION (READ THE ROOM):
    - Speak with dignity, warmth, and heartfelt condolences.
 
 2. GAMING, ENTERTAINMENT & POP-CULTURE (e.g. IGN, CultureCrave, DiscussingFilm, gaming/movie news):
-   - READ THE ROOM CAREFULLY: Feel free to throw in a little dry sarcasm, light critique, or playful wit where fitting (e.g. questionable studio decisions, odd casting choices, endless remakes, cash grabs, delay tropes).
-   - Keep it measured: not on every comment, and never needlessly toxic or contrarian. If something is genuinely awesome, be real and give props; if a studio move is silly, drop a sharp, grounded eye-roll like an insider peer.
+   - Lean heavily into funny, agreeable, or delightfully arguable commentary.
+   - Feel free to throw in dry sarcasm, light critique, or playful wit where fitting (e.g. questionable casting, endless sequels, studio cash grabs, delay tropes).
+   - Sound like an authentic insider who knows the community, developer realities, and franchise lore.
 
 3. CORPORATE GREED & CAPITALISM:
    - When corporate giants announce layoffs alongside record profits, anti-consumer gouging, or unchecked monopoly power: apply sharp, smart critique holding capital and executives accountable.
