@@ -1528,7 +1528,7 @@ async function discoverAndCommentOnX(maxComments = 1) {
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
-    // Find the best fresh tweets (8m - 5h old) not already commented on and not over-commented authors
+    // Find the freshest tweets (5m - 90m old, strictly under 1.5-2 hours) not already commented on
     const now = Date.now();
     const validTweets = allTweets.filter(tw => {
       if (!tw.url || !tw.text || tw.text.length < 20) return false;
@@ -1542,11 +1542,11 @@ async function discoverAndCommentOnX(maxComments = 1) {
     const candidates = validTweets.map(tw => ({
       ...tw,
       ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-    })).filter(tw => tw.ageMins >= 8 && tw.ageMins <= 300)
+    })).filter(tw => tw.ageMins >= 5 && tw.ageMins <= 90)
       .sort((a, b) => a.ageMins - b.ageMins);
 
     if (!candidates || candidates.length === 0) {
-      console.log('🌐 [X Explorer] No new candidate tweet found in recency window this cycle.');
+      console.log('🌐 [X Explorer] No fresh candidate tweet found under 1-2 hours this cycle.');
       return 0;
     }
 
@@ -1669,23 +1669,25 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
         return false;
       }
 
+      let ageMins = 30;
       if (t.time) {
-        const ageMins = (now - new Date(t.time).getTime()) / 60000;
-        if (ageMins < 5 || ageMins > 360) return false;
+        ageMins = (now - new Date(t.time).getTime()) / 60000;
+        if (ageMins < 5 || ageMins > 90) return false; // Strictly under 1.5 - 2 hours
       }
+      t.ageMins = Math.round(ageMins);
       return true;
     });
 
     if (!candidates || candidates.length === 0) {
-      console.log('🌐 [Feed Explorer] No fresh unreplied candidate found directly on home feed.');
+      console.log('🌐 [Feed Explorer] No fresh candidate found directly on home feed under 1-2 hours.');
       return false;
     }
 
-    // Shuffle candidates to give equal exposure to diverse creators down the timeline
-    const shuffledCandidates = candidates.sort(() => 0.5 - Math.random());
+    // Prioritize freshest posts (5-30m) first for maximum reply visibility
+    const prioritizedCandidates = candidates.sort((a, b) => a.ageMins - b.ageMins);
     let commentsPlaced = 0;
 
-    for (const target of shuffledCandidates) {
+    for (const target of prioritizedCandidates) {
       if (commentsPlaced >= targetCommentsCount) break;
 
       const authorMatch = target.url.match(/https?:\/\/(?:x|twitter)\.com\/([^\/]+)\/status/i);
