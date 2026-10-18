@@ -401,11 +401,9 @@ function isBlockedAuthorOrContent(user = '', text = '') {
   return false;
 }
 
-// Author De-clustering Tracker: Prevents over-commenting on NYPost, Variety, IGN, or any single account
-function isAuthorOverCommented(authorHandle, recentWindow = 15) {
-  if (!authorHandle) return false;
-  const recentAuthors = getRecentlyCommentedAuthors(recentWindow);
-  return recentAuthors.map(a => a.toLowerCase()).includes(authorHandle.toLowerCase());
+// Never block the user's favorite news outlets or any creator
+function isAuthorOverCommented(authorHandle) {
+  return false;
 }
 
 async function generateHumanReply(tweetText) {
@@ -1777,21 +1775,27 @@ const OUTLETS_BY_CATEGORY = {
 // Flattened master list of all 90+ outlets covering every field
 const OUTLETS_TO_SCAN = Object.values(OUTLETS_BY_CATEGORY).flat();
 
+const USUAL_VIRAL_OUTLETS = ['nypost', 'Variety', 'IGN', 'CultureCrave', 'Dexerto'];
+
 function getBalancedOutletsToScan() {
-  const recentAuthors = new Set(getRecentlyCommentedAuthors(20).map(a => a.toLowerCase()));
-  const categories = Object.keys(OUTLETS_BY_CATEGORY).sort(() => 0.5 - Math.random());
-  const selected = [];
-  // Sample 2 accounts from each category, actively deprioritizing recently commented accounts
-  for (const cat of categories) {
-    const list = [...OUTLETS_BY_CATEGORY[cat]].sort((a, b) => {
-      const aRecent = recentAuthors.has(a.toLowerCase()) ? 1 : 0;
-      const bRecent = recentAuthors.has(b.toLowerCase()) ? 1 : 0;
-      if (aRecent !== bRecent) return aRecent - bRecent;
-      return 0.5 - Math.random();
-    });
-    selected.push(...list.slice(0, 2));
+  const selected = new Set();
+  
+  // 1. ALWAYS include 2-3 of the primary favorite viral news handles (NYPost, Variety, IGN, etc.)
+  const shuffledUsual = [...USUAL_VIRAL_OUTLETS].sort(() => 0.5 - Math.random());
+  for (const acc of shuffledUsual.slice(0, 3)) {
+    selected.add(acc);
   }
-  return selected.sort(() => 0.5 - Math.random());
+
+  // 2. Also sample 1-2 accounts from each of the other diverse categories
+  const categories = Object.keys(OUTLETS_BY_CATEGORY).sort(() => 0.5 - Math.random());
+  for (const cat of categories) {
+    const list = [...OUTLETS_BY_CATEGORY[cat]].sort(() => 0.5 - Math.random());
+    for (const acc of list.slice(0, 2)) {
+      selected.add(acc);
+    }
+  }
+
+  return Array.from(selected).sort(() => 0.5 - Math.random());
 }
 
 async function fetchUserTweetsViaSyndication(username) {
@@ -1901,16 +1905,8 @@ async function discoverAndCommentOnX(maxComments = 1) {
       return 0;
     }
 
-    // STRICT AUTHOR DIVERSITY ENGINE:
-    // 1. Bias candidates so authors NOT in getRecentlyCommentedAuthors(15) come FIRST!
-    // 2. Tie-break by freshness (ageMins)
-    const recentAuthors = new Set(getRecentlyCommentedAuthors(15).map(a => a.toLowerCase()));
-    candidates.sort((a, b) => {
-      const aRecent = recentAuthors.has((a.user || '').toLowerCase()) ? 1 : 0;
-      const bRecent = recentAuthors.has((b.user || '').toLowerCase()) ? 1 : 0;
-      if (aRecent !== bRecent) return aRecent - bRecent;
-      return a.ageMins - b.ageMins;
-    });
+    // Sort candidates by pure freshness so breaking viral tweets get top priority!
+    candidates.sort((a, b) => a.ageMins - b.ageMins);
 
     const cycleAuthors = new Set();
     let placed = 0;
@@ -2131,14 +2127,8 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       return 0;
     }
 
-    // Prioritize authors NOT in recent history, then freshest posts
-    const recentAuthors = new Set(getRecentlyCommentedAuthors(15).map(a => a.toLowerCase()));
-    const prioritizedCandidates = candidates.sort((a, b) => {
-      const aRecent = recentAuthors.has((a.user || '').toLowerCase()) ? 1 : 0;
-      const bRecent = recentAuthors.has((b.user || '').toLowerCase()) ? 1 : 0;
-      if (aRecent !== bRecent) return aRecent - bRecent;
-      return a.ageMins - b.ageMins;
-    });
+    // Prioritize freshest posts first for maximum reply visibility
+    const prioritizedCandidates = candidates.sort((a, b) => a.ageMins - b.ageMins);
 
     const feedCycleAuthors = new Set();
     let commentsPlaced = 0;
