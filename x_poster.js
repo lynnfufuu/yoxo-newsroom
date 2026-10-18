@@ -120,7 +120,11 @@ async function postToX({ imagePath, text, quoteUrl }) {
 
     // Attach image if provided
     if (imagePath && fs.existsSync(imagePath)) {
-      console.log('📸 Attaching editorial graphic to tweet...');
+      const imgSize = fs.statSync(imagePath).size;
+      console.log(`📸 Attaching editorial graphic to tweet (${Math.round(imgSize / 1024)} KB)...`);
+      if (imgSize < 200000) {
+        console.warn(`⚠️ [Photo Guard Warning] Card size is only ${imgSize} bytes! Possible empty/black card.`);
+      }
       try {
         await page.waitForSelector('input[type="file"][data-testid="fileInput"]', { timeout: 8000 });
         const fileInput = await page.$('input[type="file"][data-testid="fileInput"]');

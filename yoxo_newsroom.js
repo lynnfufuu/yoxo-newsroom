@@ -1052,6 +1052,19 @@ async function fetchSmartPhoto(query) {
 async function renderCard({ style, badge, headline, subdeck, photoBase64, sourceName }) {
   let html = '';
 
+  // 1. Strict Photo Guard: Guarantee that photoBase64 is a valid, non-empty base64 image data URL
+  let validPhotoBase64 = photoBase64;
+  if (!validPhotoBase64 || typeof validPhotoBase64 !== 'string' || !validPhotoBase64.startsWith('data:image/') || validPhotoBase64.length < 1000) {
+    console.warn(`⚠️ [Photo Guard] renderCard received empty or invalid photoBase64! Falling back to verified editorial asset...`);
+    const fallbackPath = path.resolve(__dirname, 'assets', 'entertainments', 'red_carpet.jpg');
+    if (fs.existsSync(fallbackPath)) {
+      validPhotoBase64 = `data:image/jpeg;base64,${fs.readFileSync(fallbackPath).toString('base64')}`;
+    } else {
+      const execPath = path.resolve(__dirname, 'assets', 'executive_suit.jpg');
+      validPhotoBase64 = `data:image/jpeg;base64,${fs.readFileSync(execPath).toString('base64')}`;
+    }
+  }
+
   if (style === 'magazine') {
     // Archetype 2: The Magazine Hero (Anton font, mint accents, full photo)
     html = `<!DOCTYPE html>
@@ -1073,7 +1086,7 @@ async function renderCard({ style, badge, headline, subdeck, photoBase64, source
     position: absolute;
     top: 0; left: 0;
     width: 1080px; height: 740px;
-    background-image: url('${photoBase64}');
+    background-image: url('${validPhotoBase64}');
     background-size: cover;
     background-position: center 20%;
     filter: contrast(1.06) brightness(0.98);
@@ -1194,7 +1207,7 @@ async function renderCard({ style, badge, headline, subdeck, photoBase64, source
     position: absolute;
     top: 0; left: 0;
     width: 1080px; height: 1080px;
-    background-image: url('${photoBase64}');
+    background-image: url('${validPhotoBase64}');
     background-size: cover;
     background-position: center top;
     filter: contrast(1.15) brightness(0.92);
@@ -1324,6 +1337,14 @@ async function renderCard({ style, badge, headline, subdeck, photoBase64, source
   const outputPath = path.resolve(__dirname, 'latest_yoxo_card.png');
   await page.screenshot({ path: outputPath, type: 'png' });
   await browser.close();
+
+  // 2. Strict Visual Safety Check: A rendered card with an image is ~1MB-3.8MB; black/empty cards are < 200KB
+  const cardSize = fs.existsSync(outputPath) ? fs.statSync(outputPath).size : 0;
+  if (cardSize < 250000) {
+    console.warn(`⚠️ [Photo Guard Warning] Rendered card size is only ${cardSize} bytes! Possible dark photo.`);
+  } else {
+    console.log(`✅ [Photo Guard] Rendered vibrant card successfully (${Math.round(cardSize / 1024)} KB)!`);
+  }
   return outputPath;
 }
 
@@ -1587,7 +1608,7 @@ async function runCycle() {
           }
 
           // Priority 5: Relevant Desk Fallback Asset (Strictly Desk-Isolated)
-          if (!photoBase64) {
+          if (!photoBase64 || !photoBase64.startsWith('data:image/') || photoBase64.length < 1000) {
             console.log(`🖼️ [Photo Fallback] Loading dedicated asset library for [${desk.name}]...`);
             let deskFolder = 'politics';
             if (desk.name === 'Web3 & Crypto') deskFolder = 'crypto';
@@ -1595,7 +1616,22 @@ async function runCycle() {
             else if (desk.name === 'Gaming') deskFolder = 'gaming';
             else if (desk.name === 'Films and anime') deskFolder = 'films';
             else if (desk.name === 'Entertainments') deskFolder = 'entertainments';
-            else if (desk.name === 'MUST POST') deskFolder = 'politics';
+            else if (desk.name === 'MUST POST') {
+              const fullStory = `${cleanHeadline} ${post.text}`.toLowerCase();
+              if (fullStory.match(/game|gaming|gta|playstation|xbox|nintendo|steam|esports/)) {
+                deskFolder = 'gaming';
+              } else if (fullStory.match(/film|movie|actor|series|hollywood|cinema|director|trailer|peacock|netflix|disney|marvel|avatar|sequel/)) {
+                deskFolder = 'films';
+              } else if (fullStory.match(/crypto|bitcoin|btc|ethereum|eth|token|web3|solana/)) {
+                deskFolder = 'crypto';
+              } else if (fullStory.match(/disaster|quake|storm|hurricane|flood|wildfire/)) {
+                deskFolder = 'disasters';
+              } else if (fullStory.match(/music|concert|album|grammy|gala|red carpet|celebrity|singer/)) {
+                deskFolder = 'entertainments';
+              } else {
+                deskFolder = 'politics';
+              }
+            }
 
             const dir = path.resolve(__dirname, 'assets', deskFolder);
             const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.jpg') || f.endsWith('.png')) : [];
@@ -1615,12 +1651,19 @@ async function runCycle() {
                 }
               }
               const fullPath = path.resolve(dir, chosenFile);
-              console.log(`✅ Selected dedicated [${desk.name}] fallback photo: ${chosenFile}`);
+              console.log(`✅ Selected dedicated [${deskFolder}] fallback photo: ${chosenFile}`);
               photoBase64 = `data:image/jpeg;base64,${fs.readFileSync(fullPath).toString('base64')}`;
             } else {
-              const fallback = path.resolve(__dirname, 'assets', 'executive_suit.jpg');
+              const fallback = path.resolve(__dirname, 'assets', 'entertainments', 'red_carpet.jpg');
               photoBase64 = `data:image/jpeg;base64,${fs.readFileSync(fallback).toString('base64')}`;
             }
+          }
+
+          // Final pre-render guard to guarantee non-empty photoBase64
+          if (!photoBase64 || !photoBase64.startsWith('data:image/') || photoBase64.length < 1000) {
+            console.warn(`⚠️ [Photo Guard] Final safety fallback loaded.`);
+            const fallback = path.resolve(__dirname, 'assets', 'entertainments', 'red_carpet.jpg');
+            photoBase64 = `data:image/jpeg;base64,${fs.readFileSync(fallback).toString('base64')}`;
           }
 
           // Alternate graphic style strictly between Magazine and Opinion
