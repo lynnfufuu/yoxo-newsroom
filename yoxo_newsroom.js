@@ -60,7 +60,7 @@ const DESKS = [
     threadId: 4,
     sources: [
       { type: 'rss', name: 'Variety', url: 'https://variety.com/feed/' },
-      { type: 'rss', name: 'DailyMail', url: 'https://www.dailymail.co.uk/news/index.rss' }
+      { type: 'rss', name: 'Hollywood Reporter', url: 'https://www.hollywoodreporter.com/c/lifestyle/lifestyle-news/feed/' }
     ]
   },
   {
@@ -330,18 +330,25 @@ CONTEXT & TONE ADAPTATION (READ THE ROOM):
 4. TECH, MARKETS & GENERAL:
    - Sharp, grounded, intelligent insider peer. Clear, substantive, zero fluff.
 
-CORE EDITORIAL VALUES & ETHICAL GUARDRAILS (ABSOLUTE):
+CORE EDITORIAL VALUES & ETHICAL GUARDRAILS (ABSOLUTE & UNCOMPROMISING):
+- STRICT ZERO TOLERANCE FOR MISOGYNY & TRANSPHOBIA:
+  * ABSOLUTELY ZERO MISOGYNY, sexism, female objectification, derogatory remarks toward women, or dismissal of women's rights/safety.
+  * ABSOLUTELY ZERO TRANSPHOBIA, misgendering, deadnaming, anti-trans rhetoric, queerphobia, or mockery of transgender, non-binary, or LGBTQ+ individuals.
+  * NEVER make jokes, witty remarks, sarcastic quips, or play 'devil's advocate' about gender identity, trans people, sexual harassment, abuse, or violence against women.
+  * NEVER flatter, defend, or agree with misogynistic, transphobic, or anti-LGBTQ+ talking points or figures.
+  * ALWAYS firmly and unequivocally stand for LGBTQ+ equality, transgender dignity, women's autonomy, and equal human rights.
 - Explicitly Anti-Trump / Anti-MAGA / Anti-Far-Right: Never endorse, normalize, or flatter Donald Trump, MAGA, or far-right agendas.
-- Explicitly Anti-Netanyahu & Anti-Israel Military Aggression: We are firmly against Benjamin Netanyahu, the Israeli government/military violence, war criminals, and the bombing and killing of innocent civilians and kids. Stand firmly for world peace, international law, and civilian life.
+- Explicitly Anti-Netanyahu & Anti-Israel Military Aggression: Firmly oppose Benjamin Netanyahu, Israeli military violence, war criminals, and the bombing and killing of innocent civilians and kids. Stand firmly for world peace, international law, and civilian life.
 - Anti-Capitalism & Corporate Greed: Strongly critique exploitation, corporate greed, mass layoffs for profit, and unchecked monopolies.
-- Zero Tolerance: Absolute zero tolerance for racism, homophobia, transphobia, misogyny, rapists, or pedophiles. Always champion equal rights, LGBTQ+ equality, and gender equality.
-- Sensitive Topics: Tread with emotional intelligence, care, and human decency.
+- ZERO TOLERANCE: Absolute zero tolerance for racism, homophobia, transphobia, misogyny, rapists, abusers, or pedophiles.
+- Sensitive Topics: Tread with emotional intelligence, solemn care, and human decency. If a post touches on identity, gender, trans rights, or marginalized groups, treat it with respect or output SKIP.
 
 STRICT WRITING RULES:
 - STRICTLY ZERO EMOJIS (none at all).
 - STRICTLY ZERO AI CLICHES (never use "Only time will tell", "Interesting development", "Fascinating", "Step in the right direction", "Thoughts?", "Stay tuned").
 - Do NOT parrot, rephrase, or summarize what the tweet already said.
 - Directly respond to the specific subject, names, or core tension.
+- If you cannot generate a comment that is 100% compliant with these ethical standards, respond ONLY with "SKIP".
 - Output purely the reply text with no quotation marks.`;
 
     // Try available active models with full quotas
@@ -358,8 +365,12 @@ STRICT WRITING RULES:
         });
         const data = await res.json();
         if (data && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-          let text = data.candidates[0].content.parts[0].text.trim();
-          return text.replace(/^["']|["']$/g, '').trim();
+          let text = data.candidates[0].content.parts[0].text.trim().replace(/^["']|["']$/g, '').trim();
+          if (text.toUpperCase() === 'SKIP' || text.toUpperCase().startsWith('SKIP')) {
+            console.log('🛡️ Ethical guard triggered: Gemini chose to SKIP this post.');
+            return null;
+          }
+          return text;
         }
       } catch (me) {}
     }
@@ -629,11 +640,17 @@ ${photoGuidance}
    - FORMAT: Exactly one punchy closing sentence (under 16 words) separated by an empty line from the bullets.
    - ZERO EMOJIS anywhere.
 
-5. CORE EDITORIAL VALUES & ETHICAL MANDATES (ABSOLUTE):
+5. CORE EDITORIAL VALUES & ETHICAL MANDATES (ABSOLUTE & UNCOMPROMISING):
+   - STRICT ZERO TOLERANCE FOR MISOGYNY & TRANSPHOBIA:
+     * ABSOLUTELY ZERO MISOGYNY, sexism, female objectification, derogatory remarks toward women, or dismissal of women's rights/safety.
+     * ABSOLUTELY ZERO TRANSPHOBIA, misgendering, deadnaming, anti-trans rhetoric, queerphobia, or mockery of transgender, non-binary, or LGBTQ+ individuals.
+     * NEVER make jokes, witty remarks, sarcastic quips, or play 'devil's advocate' about gender identity, trans people, sexual harassment, abuse, or violence against women.
+     * NEVER flatter, defend, or agree with misogynistic, transphobic, or anti-LGBTQ+ talking points or figures.
+     * ALWAYS firmly and unequivocally stand for LGBTQ+ equality, transgender dignity, women's autonomy, and equal human rights.
    - ANTI-WAR CRIMES & CIVILIAN PROTECTION: Strictly oppose military atrocities, war crimes, and the bombing and killing of innocent civilians and children. Firmly oppose Benjamin Netanyahu and Israeli military aggression. Report from the perspective of human rights, international law, and world peace.
    - ANTI-MAGA & ANTI-FAR-RIGHT: Zero endorsement, normalization, or flattering of Donald Trump, MAGA, or far-right politics.
    - ANTI-CAPITALISM & ANTI-GREED: Hold corporate executives, monopolists, and Wall Street accountable when workers and consumers are exploited.
-   - ZERO TOLERANCE: Absolute zero tolerance for racism, homophobia, transphobia, misogyny, rapists, or pedophiles. Always uphold equal rights and gender equality.
+   - ZERO TOLERANCE: Absolute zero tolerance for racism, homophobia, transphobia, misogyny, rapists, abusers, or pedophiles. Always champion equal rights, LGBTQ+ equality, and gender equality.
 
 Input breaking news:
 """
@@ -1532,7 +1549,6 @@ const OUTLETS_TO_SCAN = [
   'PopCrave',
   'Complex',
   'Cointelegraph',
-  'nypost',
   'CNN',
   'rare_remarks',
   'ScreenRant',
