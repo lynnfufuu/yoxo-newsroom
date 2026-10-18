@@ -65,7 +65,10 @@ const DESKS = [
       { type: 'telegram', channel: 'disclosetv' },
       { type: 'telegram', channel: 'insiderpaper' },
       { type: 'rss', name: 'Politico', url: 'https://rss.politico.com/politics-news.xml' },
-      { type: 'rss', name: 'BBCWorld', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' }
+      { type: 'rss', name: 'BBCWorld', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
+      { type: 'rss', name: 'Democracy Now (Protests & Human Rights)', url: 'https://www.democracynow.org/democracynow.rss' },
+      { type: 'rss', name: 'The Intercept (Investigations & Whistleblowers)', url: 'https://theintercept.com/feed/?lang=en' },
+      { type: 'rss', name: 'Al Jazeera (World Geopolitics)', url: 'https://www.aljazeera.com/xml/rss/all.xml' }
     ]
   },
   {
@@ -110,6 +113,8 @@ const DESKS = [
       { type: 'rss', name: 'Guardian Disasters', url: 'https://www.theguardian.com/world/natural-disasters/rss' },
       { type: 'rss', name: 'GDACS Disasters', url: 'https://www.gdacs.org/xml/rss.xml' },
       { type: 'rss', name: 'BBC World News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
+      { type: 'rss', name: 'CIDRAP Infectious Disease', url: 'https://www.cidrap.umn.edu/rss/news' },
+      { type: 'rss', name: 'USGS Earthquakes', url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.atom' },
       { type: 'telegram', channel: 'insiderpaper' },
       { type: 'telegram', channel: 'disclosetv' }
     ]
@@ -668,8 +673,8 @@ async function analyzeNewsWithGemini(newsText, deskName = 'Web3 & Crypto') {
   let scoreGuide = 'Only score >= 8 for genuine breaking crypto news, major institutional flows, regulatory bombs, macro shifts, or high-stakes CT drama.';
   
   if (deskName === 'Politics') {
-    roleDesc = 'a senior geopolitical & policy reporter';
-    scoreGuide = 'Only score >= 8 for major legislative votes, executive orders, national economic policies, geopolitical shifts, or high-level government realignments.';
+    roleDesc = 'a senior investigative geopolitical, human rights & labor reporter';
+    scoreGuide = 'Prioritize (score >= 8): Mass protests, worker strikes, rebellions against corrupt regimes, human rights investigations, war crime accountability, government corruption/trials, whistleblowers, and landmark geopolitical shifts. Hold state power accountable and champion working-class democracy.';
   } else if (deskName === 'Gaming') {
     roleDesc = 'a leading video game and gaming industry reporter';
     scoreGuide = `STRICT EDITORIAL MANDATE FOR "Gaming":
@@ -1699,20 +1704,60 @@ async function runCycle() {
   }
 }
 
-const OUTLETS_TO_SCAN = [
-  // 1. Entertainment, Movies & Pop Culture
-  'CultureCrave', 'DiscussingFilm', 'Variety', 'DEADLINE', 'ScreenRant', 'PopBase', 'PopCrave', 'Complex', 'FilmUpdates', 'RollingStone', 'A24', 'Pitchfork',
-  // 2. Gaming, Esports & Indie Games
-  'IGN', 'GameSpot', 'Kotaku', 'Dexerto', 'Wario64', 'shinobi602', 'GeoffKeighley', 'PlayStation', 'Xbox', 'NintendoAmerica', 'Steam', 'PCGamer', 'Polygon', 'Eurogamer',
-  // 3. Internet Culture, Viral Satire & Community
-  'theonion', 'HardDriveMag', 'kirawontmiss', 'InternetH0F', 'pubity', 'rare_remarks', 'dailyloud', 'saycheesetv',
-  // 4. Tech, AI & Startups
-  'TechCrunch', 'TheVerge', 'WIRED', 'arstechnica', 'levelsio', 'sama', 'paulg', 'karpathy', 'rowancheung', 'MKBHD',
-  // 5. Crypto, Web3 & Macro Finance
-  'CoinDesk', 'Cointelegraph', 'BitcoinMagazine', 'WatcherGuru', 'WuBlockchain', 'unusual_whales', 'ZackXBT', 'VitalikButerin',
-  // 6. Investigative, Global News & Human Rights
-  'nypost', 'CNN', 'BBCWorld', 'Reuters', 'AP', 'guardian', 'AJEnglish', 'democracynow', 'DropSiteNews', 'MorePerfectUS'
-];
+const OUTLETS_BY_CATEGORY = {
+  // 1. Protests, Strikes, Labor & Grassroots Resistance
+  protestsAndStrikes: [
+    'MorePerfectUS', 'LaborNotes', 'GrimKim', 'RedStreamNet', 'StatusCoup', 'FreedomNewsTV', 'unionspark'
+  ],
+  // 2. Human Rights, Whistleblowers & International Justice
+  humanRightsAndJustice: [
+    'Amnesty', 'hrw', 'BDSmovement', 'ACLU', 'wikileaks', 'TheIntercept', 'EuroMedHR', 'democracynow', 'DropSiteNews', 'btnewsroom'
+  ],
+  // 3. Politics, Geopolitics, Elections & Governance
+  politicsAndGeopolitics: [
+    'Reuters', 'AP', 'AJEnglish', 'guardian', 'BBCWorld', 'politico', 'axios', 'semafor', 'zeteo_news', 'mehdirhasan', 'nypost', 'CNN'
+  ],
+  // 4. Natural Disasters, Extreme Weather & Climate Emergencies
+  disastersAndClimate: [
+    'DisasterTrackHQ', 'USGS_Quakes', 'NWSSPC', 'CopernicusEU', 'zoom_earth', 'BNOFeed', 'WeatherNation'
+  ],
+  // 5. Diseases, Public Health, Pandemics & Medical Science
+  diseasesAndHealth: [
+    'WHO', 'CDCgov', 'statnews', 'HelenBranswell', 'BNOHealth', 'EricTopol', 'Nature', 'TheLancet'
+  ],
+  // 6. Crimes, Trials, Corruption, Whistleblowers & Justice
+  crimesAndCorruption: [
+    'CourthouseNews', 'InnerCityPress', 'KenKlippenstein', 'ICIJorg', 'OCCRP', 'LawCrimeNews'
+  ],
+  // 7. Web3, Crypto, Macroeconomics & Financial Accountability
+  web3AndMacro: [
+    'CoinDesk', 'Cointelegraph', 'BitcoinMagazine', 'WatcherGuru', 'WuBlockchain', 'unusual_whales', 'ZackXBT', 'VitalikButerin', 'KobeissiLetter'
+  ],
+  // 8. Tech, AI, Engineering & Silicon Valley
+  techAndAI: [
+    'TechCrunch', 'TheVerge', 'WIRED', 'arstechnica', 'levelsio', 'sama', 'paulg', 'karpathy', 'rowancheung', 'MKBHD'
+  ],
+  // 9. Culture, Media, Gaming & Entertainment Voices
+  cultureAndGaming: [
+    'CultureCrave', 'DiscussingFilm', 'Variety', 'DEADLINE', 'PopBase', 'Complex', 'A24',
+    'IGN', 'GameSpot', 'Kotaku', 'Dexerto', 'Wario64', 'PlayStation', 'Xbox',
+    'theonion', 'HardDriveMag', 'kirawontmiss', 'InternetH0F', 'pubity', 'rare_remarks', 'dailyloud'
+  ]
+};
+
+// Flattened master list of all 90+ outlets covering every field
+const OUTLETS_TO_SCAN = Object.values(OUTLETS_BY_CATEGORY).flat();
+
+function getBalancedOutletsToScan() {
+  const categories = Object.keys(OUTLETS_BY_CATEGORY).sort(() => 0.5 - Math.random());
+  const selected = [];
+  // Sample 2 random accounts from each category to guarantee 100% full-spectrum coverage every cycle
+  for (const cat of categories) {
+    const list = [...OUTLETS_BY_CATEGORY[cat]].sort(() => 0.5 - Math.random());
+    selected.push(...list.slice(0, 2));
+  }
+  return selected.sort(() => 0.5 - Math.random());
+}
 
 async function fetchUserTweetsViaSyndication(username) {
   try {
@@ -1750,12 +1795,12 @@ async function fetchUserTweetsViaSyndication(username) {
 async function discoverAndCommentOnX(maxComments = 1) {
   const SESSION_FILE = path.resolve(__dirname, 'x_session.json');
   if (!fs.existsSync(SESSION_FILE)) return 0;
-  console.log(`🌐 [X Explorer] Scanning live feeds across diverse gaming, culture, tech & crypto outlets (Target: ${maxComments} replies)...`);
+  console.log(`🌐 [X Explorer] Scanning live feeds across protests, strikes, human rights, politics, disasters, diseases, crimes, web3 & culture (Target: ${maxComments} replies)...`);
 
   try {
-    // Unrestricted outlet rotation across gaming, culture, tech, macro, crypto, world news
-    const outletsToScan = [...OUTLETS_TO_SCAN].sort(() => 0.5 - Math.random());
-    console.log(`🌐 [X Explorer] Outlets for scanning: ${outletsToScan.join(', ')}...`);
+    // Balanced multi-field rotation across all 9 critical categories
+    const outletsToScan = getBalancedOutletsToScan();
+    console.log(`🌐 [X Explorer] Outlets for scanning across all fields: ${outletsToScan.join(', ')}...`);
 
     let allTweets = [];
     let scannedCount = 0;
@@ -2047,7 +2092,7 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  console.log(`🎯 [Pacing Rhythm] Commencing dual-stream commenting cycle (Home Feed Scroll + 60+ Community Creators)...`);
+  console.log(`🎯 [Pacing Rhythm] Commencing dual-stream commenting cycle (Home Feed Scroll + 90+ Multi-Field Accounts across Protests, Human Rights, Politics, Disasters, Diseases, Crimes, Web3 & Tech)...`);
 
   // Stream 1: Direct Home Timeline / Explore Scroll (Engages posts outside the fixed lists)
   let feedCount = 0;
@@ -2057,15 +2102,15 @@ async function autoCommentOnXFeedOrOutlets() {
     console.warn('Feed Explorer error:', e.message);
   }
 
-  // Stream 2: Expanded Community Creators, Viral Commentators & Outlets (60+ diverse accounts)
+  // Stream 2: Full-Spectrum Multi-Field Accounts (90+ accounts across all domains)
   try {
     if (feedCount > 0) {
       const waitSecs = 20 + Math.random() * 10;
-      console.log(`⏳ [Pacing Rhythm] Pausing for ${waitSecs.toFixed(1)} seconds before engaging community creator accounts...`);
+      console.log(`⏳ [Pacing Rhythm] Pausing for ${waitSecs.toFixed(1)} seconds before engaging multi-field accounts...`);
       await new Promise(r => setTimeout(r, waitSecs * 1000));
     }
     const communityTarget = Math.max(2, 4 - (feedCount || 0));
-    console.log(`🔄 Engaging diversified community & creator posts (Target: ${communityTarget} replies)...`);
+    console.log(`🔄 Engaging full-spectrum multi-field accounts across all topics (Target: ${communityTarget} replies)...`);
     await discoverAndCommentOnX(communityTarget);
   } catch (e) {
     console.warn('Community discover error:', e.message);
