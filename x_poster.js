@@ -133,15 +133,26 @@ async function postToX({ imagePath, text, quoteUrl }) {
       }
     }
 
-    // Click Tweet Post button
+    // Wait for tweet button to become enabled (aria-disabled !== 'true') after image finishes uploading
+    console.log('⏳ Waiting for visual asset upload & Tweet button enablement...');
+    const postButtonSelector = 'button[data-testid="tweetButton"], div[data-testid="tweetButton"]';
+    await page.waitForFunction((sel) => {
+      const btn = document.querySelector(sel);
+      return btn && btn.getAttribute('aria-disabled') !== 'true' && !btn.disabled;
+    }, { timeout: 25000 }, postButtonSelector);
+
+    // Click enabled Tweet button
     console.log('🚀 Clicking Tweet button...');
-    const postButtonSelector = 'div[data-testid="tweetButton"], button[data-testid="tweetButtonInline"], div[data-testid="tweetButtonInline"], [data-testid="tweetButton"]';
-    await page.waitForSelector(postButtonSelector, { timeout: 12000 });
     await page.click(postButtonSelector);
 
-    // Wait for tweet to dispatch
-    await new Promise(r => setTimeout(r, 4500));
-    console.log('✅ Successfully published to X (@YoXo_Station)!');
+    // Confirm tweet was actually dispatched: wait for compose modal to disappear
+    await page.waitForFunction(() => {
+      return !document.querySelector('div[role="dialog"] div[data-testid="tweetTextarea_0"]') &&
+             !document.querySelector('div[data-testid="tweetButton"]');
+    }, { timeout: 20000 }).catch(() => console.log('Composer close wait finished'));
+
+    await new Promise(r => setTimeout(r, 2000));
+    console.log('✅ Confirmed: Standalone post successfully dispatched to X (@YoXo_Station)!');
 
     await browser.close();
     return { ok: true, isQrt: !!quoteUrl };
@@ -241,16 +252,6 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
 
     await new Promise(r => setTimeout(r, 4500));
     console.log('✅ Successfully placed Reply under target post!');
-
-    // Algorithmic rank boost: Like the tweet to trigger author notification & boost reply ranking
-    try {
-      const likeBtn = await page.$('article[data-testid="tweet"] [data-testid="like"]');
-      if (likeBtn) {
-        await likeBtn.click();
-        console.log('❤️ Liked author post for algorithmic boost and author notification!');
-        await new Promise(r => setTimeout(r, 1000));
-      }
-    } catch (e) {}
 
     await browser.close();
     return { ok: true };

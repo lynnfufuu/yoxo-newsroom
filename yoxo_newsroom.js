@@ -386,6 +386,22 @@ function getRecentlyCommentedAuthors(limit = 10) {
   }
 }
 
+const FAR_RIGHT_AND_ETHICAL_BLACKLIST = [
+  'tpaction', 'tpusa', 'turningpoint', 'charliekirk', 'maga', 'trump', 'donaldtrump', 'donaldjtrump',
+  'bannon', 'posobiec', 'rubinreport', 'prageru', 'libsoftiktok', 'dailywire', 'benshapiro',
+  'mattwalsh', 'tuckercarlson', 'laurenboebert', 'mtg', 'marjorietaylor', 'warroom', 'oann',
+  'newsmax', 'foxnews', 'breitbart', 'heritage', 'netanyahu', 'idf', 'israelipm', 'gallant',
+  'smotrich', 'bengvir', 'ben-gvir', 'aipac', 'yairnetanyahu', 'charliekirk11'
+];
+
+function isBlockedAuthorOrContent(user = '', text = '') {
+  const combined = `${user} ${text}`.toLowerCase();
+  for (const kw of FAR_RIGHT_AND_ETHICAL_BLACKLIST) {
+    if (combined.includes(kw)) return true;
+  }
+  return false;
+}
+
 function isAuthorOverCommented(authorHandle) {
   // Unrestricted: never skip IGN, WuBlockchain, BBCWorld or any creator
   // Comment on whatever valid post is discovered across the feed or outlets
@@ -394,6 +410,10 @@ function isAuthorOverCommented(authorHandle) {
 
 async function generateHumanReply(tweetText) {
   try {
+    if (isBlockedAuthorOrContent('', tweetText)) {
+      console.log('🛡️ [Ethical Blocklist] Refused to generate comment on blacklisted content.');
+      return null;
+    }
     const prompt = `You are @YoXo_Station on X (Twitter), an authentic, insightful human peer.
 Read this post very carefully:
 """
@@ -1827,6 +1847,7 @@ async function discoverAndCommentOnX(maxComments = 1) {
       // Only stop scanning early if we actually have enough candidate tweets under 2 hours old!
       const freshUnder2h = allTweets.filter(tw => {
         if (!tw.url || hasAlreadyCommented(tw.url) || tw.text.startsWith('RT @')) return false;
+        if (isBlockedAuthorOrContent(tw.user, tw.text)) return false;
         const ageMins = (Date.now() - new Date(tw.createdAt).getTime()) / 60000;
         return ageMins >= 1 && ageMins <= 120;
       });
@@ -1842,6 +1863,7 @@ async function discoverAndCommentOnX(maxComments = 1) {
       if (!tw.url || !tw.text || tw.text.length < 10) return false;
       if (tw.text.startsWith('RT @')) return false;
       if (hasAlreadyCommented(tw.url)) return false;
+      if (isBlockedAuthorOrContent(tw.user, tw.text)) return false;
       return true;
     });
 
@@ -2042,6 +2064,12 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       if (/^(https?:\/\/|www\.)\S+$/i.test(t.text.trim())) return false; // skip bare links
       if (hasAlreadyCommented(t.url)) return false;
       if (t.text.startsWith('RT @')) return false;
+
+      // Absolute Ethical Blacklist: NEVER comment under Turning Point, MAGA, Trump, far-right, or war criminal accounts!
+      if (isBlockedAuthorOrContent(t.user, t.text)) {
+        console.log(`🛡️ [Ethical Blocklist] Skipped far-right / blacklisted account post: ${t.user}`);
+        return false;
+      }
 
       let ageMins = 15;
       if (t.time) {
