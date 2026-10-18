@@ -2228,25 +2228,25 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  console.log(`🎯 [Pacing Rhythm] Commencing dual-stream commenting cycle (Home Feed Scroll + 90+ Multi-Field Accounts across Protests, Human Rights, Politics, Disasters, Diseases, Crimes, Web3 & Tech)...`);
+  console.log(`🎯 [Growth Sprint] Commencing dual-stream commenting cycle (Home Feed Scroll + 90+ Multi-Field Accounts across Protests, Human Rights, Politics, Disasters, Diseases, Crimes, Web3 & Tech)...`);
 
-  // Stream 1: Direct Home Timeline / Explore Scroll (Engages posts outside the fixed lists)
+  // Stream 1: Direct Home Timeline / Explore Scroll (Engages freshest viral posts outside the fixed lists)
   let feedCount = 0;
   try {
-    feedCount = await browseFeedAndCommentOnX(2);
+    feedCount = await browseFeedAndCommentOnX(3);
   } catch (e) {
     console.warn('Feed Explorer error:', e.message);
   }
 
-  // Stream 2: Full-Spectrum Multi-Field Accounts (90+ accounts across all domains)
+  // Stream 2: Full-Spectrum Multi-Field Accounts (90+ accounts across all breaking domains)
   try {
     if (feedCount > 0) {
-      const waitSecs = 20 + Math.random() * 10;
+      const waitSecs = 15 + Math.random() * 10;
       console.log(`⏳ [Pacing Rhythm] Pausing for ${waitSecs.toFixed(1)} seconds before engaging multi-field accounts...`);
       await new Promise(r => setTimeout(r, waitSecs * 1000));
     }
-    const communityTarget = Math.max(2, 4 - (feedCount || 0));
-    console.log(`🔄 Engaging full-spectrum multi-field accounts across all topics (Target: ${communityTarget} replies)...`);
+    const communityTarget = 4;
+    console.log(`🔄 [Growth Sprint] Engaging full-spectrum multi-field accounts across all topics (Target: ${communityTarget} replies)...`);
     await discoverAndCommentOnX(communityTarget);
   } catch (e) {
     console.warn('Community discover error:', e.message);
