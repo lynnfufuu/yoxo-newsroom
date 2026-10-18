@@ -354,7 +354,19 @@ STRICT WRITING RULES:
 - Output purely the reply text with no quotation marks.`;
 
     // Try available active models with full quotas
-    for (const model of ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash']) {
+    const activeModels = [
+      'gemini-3.7-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-flash-lite-latest',
+      'gemini-3-flash-preview',
+      'gemma-4-26b-a4b-it',
+      'gemini-3.5-flash',
+      'gemini-3.8-flash',
+      'gemini-3.6-flash',
+      'gemini-3.1-flash-lite'
+    ];
+
+    for (const model of activeModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
         const res = await fetch(url, {
@@ -373,8 +385,12 @@ STRICT WRITING RULES:
             return null;
           }
           return text;
+        } else if (data && data.error) {
+          console.warn(`⚠️ [Gemini ${model}] Quota/API Notice: ${data.error.message?.slice(0, 90)}...`);
         }
-      } catch (me) {}
+      } catch (me) {
+        console.warn(`⚠️ [Gemini ${model}] network notice: ${me.message}`);
+      }
     }
 
     return null; // Skip if no high-context reply can be generated
@@ -698,7 +714,19 @@ Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
   "tweet_copy": "BREAKING: Brazil's Congress has approved comprehensive legislation to reduce the national workweek framework.\\n\\nThe milestone reform caps weekly labor hours while providing targeted transition tax offsets for corporate employers.\\n\\n• Phased implementation scheduled across next 18 months\\n• Manufacturing and service sectors granted structured compliance timelines\\n• Employer federations warn of operational productivity challenges\\n\\nCan Brazilian productivity survive 32-hour limits?"
 }`;
 
-  for (const model of ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash']) {
+  const activeModels = [
+    'gemini-3.7-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-flash-lite-latest',
+    'gemini-3-flash-preview',
+    'gemma-4-26b-a4b-it',
+    'gemini-3.5-flash',
+    'gemini-3.8-flash',
+    'gemini-3.6-flash',
+    'gemini-3.1-flash-lite'
+  ];
+
+  for (const model of activeModels) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
       const res = await fetch(url, {
@@ -714,8 +742,12 @@ Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
       if (data && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
         const rawText = data.candidates[0].content.parts[0].text;
         return JSON.parse(rawText);
+      } else if (data && data.error) {
+        console.warn(`⚠️ [Gemini ${model}] Analysis Quota/API Notice: ${data.error.message?.slice(0, 90)}...`);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn(`⚠️ [Gemini ${model}] analysis exception: ${e.message}`);
+    }
   }
   return null;
 }
