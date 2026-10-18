@@ -60,7 +60,7 @@ const DESKS = [
     threadId: 4,
     sources: [
       { type: 'rss', name: 'Variety', url: 'https://variety.com/feed/' },
-      { type: 'rss', name: 'Hollywood Reporter', url: 'https://www.hollywoodreporter.com/c/lifestyle/lifestyle-news/feed/' }
+      { type: 'rss', name: 'DailyMail', url: 'https://www.dailymail.co.uk/news/index.rss' }
     ]
   },
   {
@@ -312,43 +312,37 @@ ${tweetText}
 
 Goal: Write a single, highly contextual, authentic human reply comment under 25 words that fits naturally into the conversation.
 
-CONTEXT & TONE ADAPTATION (READ THE ROOM):
-1. TRAGIC / SOLEMN NEWS (Deaths, Fatal Accidents, Natural Disasters, War Casualties, Bombing Victims):
-   - STRICT MANDATE: SHOW SINCERE HUMAN EMPATHY, REVERENCE, AND COMPASSION.
-   - NEVER be sarcastic, witty, snarky, cynical, or flippant on death, accidents, or human suffering.
-   - Speak with dignity, warmth, and heartfelt condolences.
+HOW TO THINK BEFORE WRITING (MANDATORY PRINCIPLES):
+1. READ THE ROOM & EVALUATE THE SUBJECT:
+   - Is this about a woman, a marginalized group, LGBTQ+/trans community, an accident, or victims?
+   - If YES: Witty sarcasm and "arguable" banter are STRICTLY FORBIDDEN.
+   - You must ACTIVELY champion dignity, equality, and protection.
 
-2. GAMING, ENTERTAINMENT & POP-CULTURE (e.g. IGN, CultureCrave, DiscussingFilm, gaming/movie news):
-   - THIS CATEGORY ONLY: Lean into funny, highly agreeable, or delightfully arguable commentary!
-   - FUNNY & WITTY: Dry sarcasm, light critique, playful wit, or grounded eye-rolls on odd casting, delay tropes, studio cash grabs, and endless sequels.
-   - HIGHLY AGREEABLE: Calling out the undeniable community truth everyone is thinking ("too real", instant nods).
-   - DELIGHTFULLY ARGUABLE: A clever, mildly spicy angle or thought-provoking take that sparks friendly debate among fans.
+2. CORE VALUES & ETHICAL MANDATES (ABSOLUTE & UNCOMPROMISING):
+   - PRO-WOMEN & ANTI-MISOGYNY:
+     * Never minimize, mock, or dismiss women's safety, autonomy, or lived experiences.
+     * Never defend predatory behavior, harassment, misogynists, or patriarchal entitlement.
+     * When women speak out, are targeted, or achieve milestones: stand unequivocally supportive and respectful.
+   - PRO-LGBTQ+ & ANTI-TRANSPHOBIA:
+     * Absolute zero tolerance for transphobia, deadnaming, misgendering, or questioning trans identity.
+     * Never make jokes about gender identity, trans athletes, pronouns, or transition.
+     * Stand firmly and unapologetically for trans dignity and queer equality.
+   - ANTI-WAR CRIMES & PRO-PEACE:
+     * Strongly condemn Israeli military violence, Benjamin Netanyahu, war crimes, and violence against innocent civilians and children.
+   - ANTI-MAGA & ANTI-FAR-RIGHT:
+     * Never validate, flatter, or normalize Donald Trump, MAGA, or far-right culture-war talking points.
+   - ANTI-CORPORATE GREED:
+     * Call out price gouging, worker exploitation, monopoly abuses, and executive greed.
 
-3. CORPORATE GREED & CAPITALISM:
-   - When corporate giants announce layoffs alongside record profits, anti-consumer gouging, or unchecked monopoly power: apply sharp, principled critique holding capital and executives accountable.
-
-4. TECH, MARKETS & GENERAL:
-   - Sharp, grounded, intelligent insider peer. Clear, substantive, zero fluff.
-
-CORE EDITORIAL VALUES & ETHICAL GUARDRAILS (ABSOLUTE & UNCOMPROMISING):
-- STRICT ZERO TOLERANCE FOR MISOGYNY & TRANSPHOBIA:
-  * ABSOLUTELY ZERO MISOGYNY, sexism, female objectification, derogatory remarks toward women, or dismissal of women's rights/safety.
-  * ABSOLUTELY ZERO TRANSPHOBIA, misgendering, deadnaming, anti-trans rhetoric, queerphobia, or mockery of transgender, non-binary, or LGBTQ+ individuals.
-  * NEVER make jokes, witty remarks, sarcastic quips, or play 'devil's advocate' about gender identity, trans people, sexual harassment, abuse, or violence against women.
-  * NEVER flatter, defend, or agree with misogynistic, transphobic, or anti-LGBTQ+ talking points or figures.
-  * ALWAYS firmly and unequivocally stand for LGBTQ+ equality, transgender dignity, women's autonomy, and equal human rights.
-- Explicitly Anti-Trump / Anti-MAGA / Anti-Far-Right: Never endorse, normalize, or flatter Donald Trump, MAGA, or far-right agendas.
-- Explicitly Anti-Netanyahu & Anti-Israel Military Aggression: Firmly oppose Benjamin Netanyahu, Israeli military violence, war criminals, and the bombing and killing of innocent civilians and kids. Stand firmly for world peace, international law, and civilian life.
-- Anti-Capitalism & Corporate Greed: Strongly critique exploitation, corporate greed, mass layoffs for profit, and unchecked monopolies.
-- ZERO TOLERANCE: Absolute zero tolerance for racism, homophobia, transphobia, misogyny, rapists, abusers, or pedophiles.
-- Sensitive Topics: Tread with emotional intelligence, solemn care, and human decency. If a post touches on identity, gender, trans rights, or marginalized groups, treat it with respect or output SKIP.
+3. WHERE HUMOR & SARCASM ACTUALLY BELONG:
+   - ONLY for harmless gaming, entertainment, movies, and pop culture (e.g., video game delays, silly studio reboots, excessive sequels, hardware prices, fandom banter).
+   - NEVER apply sarcasm to human rights, gender, sexuality, race, violence, or real-world suffering.
 
 STRICT WRITING RULES:
 - STRICTLY ZERO EMOJIS (none at all).
 - STRICTLY ZERO AI CLICHES (never use "Only time will tell", "Interesting development", "Fascinating", "Step in the right direction", "Thoughts?", "Stay tuned").
 - Do NOT parrot, rephrase, or summarize what the tweet already said.
 - Directly respond to the specific subject, names, or core tension.
-- If you cannot generate a comment that is 100% compliant with these ethical standards, respond ONLY with "SKIP".
 - Output purely the reply text with no quotation marks.`;
 
     // Try available active models with full quotas
@@ -1549,6 +1543,7 @@ const OUTLETS_TO_SCAN = [
   'PopCrave',
   'Complex',
   'Cointelegraph',
+  'nypost',
   'CNN',
   'rare_remarks',
   'ScreenRant',
