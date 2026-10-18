@@ -1697,66 +1697,67 @@ async function runCycle() {
             articleUrl: post.url || post.postId
           });
 
-          if (tgRes.ok) {
-            console.log(`✅ Sent successfully to [${desk.name}]!`);
-            saveHeadline(cleanHeadline);
+          if (tgRes && tgRes.ok) {
+            console.log(`✅ Sent successfully to [${desk.name}] Telegram topic!`);
+          } else {
+            console.warn(`Telegram draft notice:`, tgRes ? (tgRes.description || tgRes.error) : 'offline/timed out');
+          }
 
-            // 100% Autopilot Publishing to X and Telegram Channel for top breaking stories (score >= 8 or MUST POST)
-            if (autoPostedXCount < 2 && (analysis.score >= 8 || analysis.is_must_post)) {
-              if (canPostToX(cleanHeadline, analysis.is_must_post)) {
-                autoPostedXCount++;
+          saveHeadline(cleanHeadline);
 
-                // 1. Auto-publish directly to Telegram Channel @yoxo_station
+          // 100% Autopilot Publishing to X and Telegram Channel for top breaking stories (score >= 8 or MUST POST)
+          if (autoPostedXCount < 2 && (analysis.score >= 8 || analysis.is_must_post)) {
+            if (canPostToX(cleanHeadline, analysis.is_must_post)) {
+              autoPostedXCount++;
+
+              // 1. Auto-publish directly to Telegram Channel @yoxo_station
+              try {
+                console.log(`📢 [AUTOPILOT] Auto-publishing breaking story to Telegram Channel [@yoxo_station]...`);
+                const form = new FormData();
+                form.append('chat_id', CHANNEL_ID);
+                form.append('photo', fs.createReadStream(imagePath));
+                form.append('caption', cleanTweet);
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: form });
+                console.log(`✅ [AUTOPILOT] Published to Telegram Channel!`);
+              } catch (e) {
+                console.error('Channel auto-publish error:', e.message);
+              }
+
+              // 2. Auto-publish directly to X (@YoXo_Station) via authenticated session (Clean standalone post)
+              if (fs.existsSync(path.resolve(__dirname, 'x_session.json'))) {
                 try {
-                  console.log(`📢 [AUTOPILOT] Auto-publishing breaking story to Telegram Channel [@yoxo_station]...`);
-                  const form = new FormData();
-                  form.append('chat_id', CHANNEL_ID);
-                  form.append('photo', fs.createReadStream(imagePath));
-                  form.append('caption', cleanTweet);
-                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: form });
-                  console.log(`✅ [AUTOPILOT] Published to Telegram Channel!`);
-                } catch (e) {
-                  console.error('Channel auto-publish error:', e.message);
-                }
+                  console.log(`🚀 [AUTOPILOT] Auto-publishing breaking story to X (@YoXo_Station)...`);
+                  const quoteUrl = null; // Strictly no quote tweets as requested
 
-                // 2. Auto-publish directly to X (@YoXo_Station) via authenticated session (Clean standalone post)
-                if (fs.existsSync(path.resolve(__dirname, 'x_session.json'))) {
-                  try {
-                    console.log(`🚀 [AUTOPILOT] Auto-publishing breaking story to X (@YoXo_Station)...`);
-                    const quoteUrl = null; // Strictly no quote tweets as requested
-
-                    const xRes = await postToX({ imagePath, text: cleanTweet, quoteUrl });
-                    if (xRes && xRes.ok) {
-                      console.log(`✅ [AUTOPILOT] Successfully published standalone post to X (@YoXo_Station)!`);
-                      recordXPost(cleanHeadline, post.url);
-                    } else {
-                      console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
-                    }
-
-                    // Top-Reply Sniper: If story originated from a viral X post, place an organic, human insider comment
-                    if (quoteUrl && canCommentOnX() && !hasAlreadyCommented(quoteUrl) && isWithinCommentRecencyWindow(post.publishedAt)) {
-                      console.log(`🎯 [AUTOPILOT] Crafting organic human reply for viral tweet: ${quoteUrl}...`);
-                      const humanComment = await generateHumanReply(post.text) || cleanHeadline;
-                      const replyRes = await replyToTweetOnX({
-                        tweetUrl: quoteUrl,
-                        replyText: humanComment
-                      });
-                      if (replyRes && replyRes.ok) {
-                        recordXComment(quoteUrl, humanComment);
-                        console.log(`✅ [AUTOPILOT] Successfully placed organic comment on viral tweet!`);
-                      }
-                    }
-                  } catch (e) {
-                    console.error('X auto-publish error:', e.message);
+                  const xRes = await postToX({ imagePath, text: cleanTweet, quoteUrl });
+                  if (xRes && xRes.ok) {
+                    console.log(`✅ [AUTOPILOT] Successfully published standalone post to X (@YoXo_Station)!`);
+                    recordXPost(cleanHeadline, post.url);
+                  } else {
+                    console.warn(`X auto-publish note:`, xRes ? xRes.error : 'skipped');
                   }
+
+                  // Top-Reply Sniper: If story originated from a viral X post, place an organic, human insider comment
+                  if (quoteUrl && canCommentOnX() && !hasAlreadyCommented(quoteUrl) && isWithinCommentRecencyWindow(post.publishedAt)) {
+                    console.log(`🎯 [AUTOPILOT] Crafting organic human reply for viral tweet: ${quoteUrl}...`);
+                    const humanComment = await generateHumanReply(post.text) || cleanHeadline;
+                    const replyRes = await replyToTweetOnX({
+                      tweetUrl: quoteUrl,
+                      replyText: humanComment
+                    });
+                    if (replyRes && replyRes.ok) {
+                      recordXComment(quoteUrl, humanComment);
+                      console.log(`✅ [AUTOPILOT] Successfully placed organic comment on viral tweet!`);
+                    }
+                  }
+                } catch (e) {
+                  console.error('X auto-publish error:', e.message);
                 }
               }
             }
-
-            break; // Send 1 high quality story per desk per cycle
-          } else {
-            console.error(`Telegram send failed:`, tgRes);
           }
+
+          break; // Send 1 high quality story per desk per cycle
         }
       } catch (err) {
         console.error('Error on story:', err.message);
