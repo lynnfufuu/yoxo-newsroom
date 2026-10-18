@@ -61,6 +61,8 @@ const DESKS = [
     name: 'Politics',
     threadId: 8,
     sources: [
+      { type: 'rss', name: 'Google Politics Breaking', url: 'https://news.google.com/rss/headlines/section/topic/POLITICS?hl=en-US&gl=US&ceid=US:en' },
+      { type: 'rss', name: 'Google World Breaking', url: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en' },
       { type: 'telegram', channel: 'remarks' },
       { type: 'telegram', channel: 'disclosetv' },
       { type: 'telegram', channel: 'insiderpaper' },
@@ -75,6 +77,7 @@ const DESKS = [
     name: 'Entertainments',
     threadId: 4,
     sources: [
+      { type: 'rss', name: 'Google Trending Entertainment', url: 'https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=en-US&gl=US&ceid=US:en' },
       { type: 'rss', name: 'Variety', url: 'https://variety.com/feed/' },
       { type: 'rss', name: 'DiscussingFilm', url: 'https://discussingfilm.net/feed/' },
       { type: 'rss', name: 'Rolling Stone', url: 'https://www.rollingstone.com/feed/' },
@@ -85,6 +88,7 @@ const DESKS = [
     name: 'Gaming',
     threadId: 28,
     sources: [
+      { type: 'rss', name: 'Google Tech & Gaming', url: 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-US&gl=US&ceid=US:en' },
       { type: 'rss', name: 'IGN Games', url: 'http://feeds.feedburner.com/ign/games-all' },
       { type: 'rss', name: 'VGC Video Games', url: 'https://www.videogameschronicle.com/feed/' },
       { type: 'rss', name: 'Eurogamer', url: 'https://www.eurogamer.net/feed' },
@@ -112,6 +116,7 @@ const DESKS = [
     name: 'International Disasters',
     threadId: 55,
     sources: [
+      { type: 'rss', name: 'Google Science & Crisis', url: 'https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=en-US&gl=US&ceid=US:en' },
       { type: 'rss', name: 'Guardian Disasters', url: 'https://www.theguardian.com/world/natural-disasters/rss' },
       { type: 'rss', name: 'GDACS Disasters', url: 'https://www.gdacs.org/xml/rss.xml' },
       { type: 'rss', name: 'BBC World News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
@@ -125,6 +130,7 @@ const DESKS = [
     name: 'MUST POST',
     threadId: 57,
     sources: [
+      { type: 'rss', name: 'Google Worldwide Breaking', url: 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en' },
       { type: 'telegram', channel: 'WatcherGuru' },
       { type: 'telegram', channel: 'disclosetv' },
       { type: 'telegram', channel: 'insiderpaper' },
@@ -233,10 +239,10 @@ function getChromeExecutable() {
   return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 }
 
-// X Cooldown & Anti-Shadowban Rate Limiter (28-minute minimum spacing between standalone tweets)
+// X Cooldown & Rate Limiter (5-minute spacing between standalone tweets for high velocity)
 const X_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_post.json');
 const X_POSTED_HISTORY_FILE = path.resolve(__dirname, 'x_posted_history.json');
-const X_MIN_COOLDOWN_MS = 28 * 60 * 1000; // ~28 minutes between standalone tweets
+const X_MIN_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes between standalone tweets
 
 function loadXPostedHistory() {
   if (fs.existsSync(X_POSTED_HISTORY_FILE)) {
@@ -276,6 +282,10 @@ function hasAlreadyPostedToX(headline) {
 function canPostToX(headline, isMustPost = false) {
   if (headline && hasAlreadyPostedToX(headline)) {
     return false; // NEVER post the same story twice to X!
+  }
+  if (isMustPost) {
+    console.log(`🚨 [Bypass Cooldown] MUST POST / viral breaking story bypasses timer for immediate publishing!`);
+    return true;
   }
   if (!fs.existsSync(X_COOLDOWN_FILE)) return true;
   try {
@@ -391,10 +401,11 @@ function isBlockedAuthorOrContent(user = '', text = '') {
   return false;
 }
 
-function isAuthorOverCommented(authorHandle) {
-  // Unrestricted: never skip IGN, WuBlockchain, BBCWorld or any creator
-  // Comment on whatever valid post is discovered across the feed or outlets
-  return false;
+// Author De-clustering Tracker: Prevents over-commenting on NYPost, Variety, IGN, or any single account
+function isAuthorOverCommented(authorHandle, recentWindow = 15) {
+  if (!authorHandle) return false;
+  const recentAuthors = getRecentlyCommentedAuthors(recentWindow);
+  return recentAuthors.map(a => a.toLowerCase()).includes(authorHandle.toLowerCase());
 }
 
 async function generateHumanReply(tweetText) {
@@ -1767,11 +1778,17 @@ const OUTLETS_BY_CATEGORY = {
 const OUTLETS_TO_SCAN = Object.values(OUTLETS_BY_CATEGORY).flat();
 
 function getBalancedOutletsToScan() {
+  const recentAuthors = new Set(getRecentlyCommentedAuthors(20).map(a => a.toLowerCase()));
   const categories = Object.keys(OUTLETS_BY_CATEGORY).sort(() => 0.5 - Math.random());
   const selected = [];
-  // Sample 2 random accounts from each category to guarantee 100% full-spectrum coverage every cycle
+  // Sample 2 accounts from each category, actively deprioritizing recently commented accounts
   for (const cat of categories) {
-    const list = [...OUTLETS_BY_CATEGORY[cat]].sort(() => 0.5 - Math.random());
+    const list = [...OUTLETS_BY_CATEGORY[cat]].sort((a, b) => {
+      const aRecent = recentAuthors.has(a.toLowerCase()) ? 1 : 0;
+      const bRecent = recentAuthors.has(b.toLowerCase()) ? 1 : 0;
+      if (aRecent !== bRecent) return aRecent - bRecent;
+      return 0.5 - Math.random();
+    });
     selected.push(...list.slice(0, 2));
   }
   return selected.sort(() => 0.5 - Math.random());
@@ -1829,13 +1846,13 @@ async function discoverAndCommentOnX(maxComments = 1) {
       }
       scannedCount++;
 
-      // Early stop condition: when we have gathered enough fresh candidate tweets
+      // Early stop condition: ensure broad coverage across multiple categories
       const freshCandidates = allTweets.filter(tw => {
         if (!tw.url || hasAlreadyCommented(tw.url) || tw.text.startsWith('RT @')) return false;
         const ageMins = (Date.now() - new Date(tw.createdAt).getTime()) / 60000;
         return ageMins >= 1 && ageMins <= 360;
       });
-      if (freshCandidates.length >= 6 && scannedCount >= 8) break;
+      if (freshCandidates.length >= 12 && scannedCount >= 14) break;
 
       await new Promise(r => setTimeout(r, 400));
     }
@@ -1853,16 +1870,14 @@ async function discoverAndCommentOnX(maxComments = 1) {
     let candidates = validTweets.map(tw => ({
       ...tw,
       ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-    })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 180) // Tier 1: under 3h
-      .sort((a, b) => a.ageMins - b.ageMins);
+    })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 180); // Tier 1: under 3h
 
     if (!candidates || candidates.length === 0) {
       console.log('🌐 [X Explorer] No candidate tweet found under 3h; checking under 12 hours...');
       candidates = validTweets.map(tw => ({
         ...tw,
         ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-      })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 720) // Tier 2: under 12h
-        .sort((a, b) => a.ageMins - b.ageMins);
+      })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 720); // Tier 2: under 12h
     }
 
     if (!candidates || candidates.length === 0) {
@@ -1870,8 +1885,7 @@ async function discoverAndCommentOnX(maxComments = 1) {
       candidates = validTweets.map(tw => ({
         ...tw,
         ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-      })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 1440) // Tier 3: under 24h
-        .sort((a, b) => a.ageMins - b.ageMins);
+      })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 1440); // Tier 3: under 24h
     }
 
     if (!candidates || candidates.length === 0) {
@@ -1879,7 +1893,7 @@ async function discoverAndCommentOnX(maxComments = 1) {
       candidates = validTweets.map(tw => ({
         ...tw,
         ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-      })).sort((a, b) => a.ageMins - b.ageMins);
+      }));
     }
 
     if (!candidates || candidates.length === 0) {
@@ -1887,9 +1901,28 @@ async function discoverAndCommentOnX(maxComments = 1) {
       return 0;
     }
 
+    // STRICT AUTHOR DIVERSITY ENGINE:
+    // 1. Bias candidates so authors NOT in getRecentlyCommentedAuthors(15) come FIRST!
+    // 2. Tie-break by freshness (ageMins)
+    const recentAuthors = new Set(getRecentlyCommentedAuthors(15).map(a => a.toLowerCase()));
+    candidates.sort((a, b) => {
+      const aRecent = recentAuthors.has((a.user || '').toLowerCase()) ? 1 : 0;
+      const bRecent = recentAuthors.has((b.user || '').toLowerCase()) ? 1 : 0;
+      if (aRecent !== bRecent) return aRecent - bRecent;
+      return a.ageMins - b.ageMins;
+    });
+
+    const cycleAuthors = new Set();
     let placed = 0;
     for (const candidate of candidates) {
       if (placed >= maxComments) break;
+
+      const authorLower = (candidate.user || '').toLowerCase();
+      // Strictly forbid commenting on the same handle multiple times in the same cycle!
+      if (cycleAuthors.has(authorLower)) {
+        console.log(`⏩ Skipping duplicate author @${candidate.user} in same cycle.`);
+        continue;
+      }
 
       console.log(`🎯 [X Explorer] Selected target from @${candidate.user} (${candidate.ageMins}m ago): ${candidate.url}`);
       console.log(`Original Text: "${candidate.text.slice(0, 80)}..."`);
@@ -1905,6 +1938,7 @@ async function discoverAndCommentOnX(maxComments = 1) {
 
       if (replyRes && replyRes.ok) {
         recordXComment(candidate.url, humanComment);
+        cycleAuthors.add(authorLower);
         placed++;
         console.log(`✅ [X Explorer] Successfully placed top comment (${placed}/${maxComments}) under post!`);
         if (placed < maxComments) {
@@ -2088,12 +2122,26 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       return 0;
     }
 
-    // Prioritize freshest posts first for maximum reply visibility
-    const prioritizedCandidates = candidates.sort((a, b) => a.ageMins - b.ageMins);
+    // Prioritize authors NOT in recent history, then freshest posts
+    const recentAuthors = new Set(getRecentlyCommentedAuthors(15).map(a => a.toLowerCase()));
+    const prioritizedCandidates = candidates.sort((a, b) => {
+      const aRecent = recentAuthors.has((a.user || '').toLowerCase()) ? 1 : 0;
+      const bRecent = recentAuthors.has((b.user || '').toLowerCase()) ? 1 : 0;
+      if (aRecent !== bRecent) return aRecent - bRecent;
+      return a.ageMins - b.ageMins;
+    });
+
+    const feedCycleAuthors = new Set();
     let commentsPlaced = 0;
 
     for (const target of prioritizedCandidates) {
       if (commentsPlaced >= targetCommentsCount) break;
+
+      const targetUserLower = (target.user || '').toLowerCase();
+      if (feedCycleAuthors.has(targetUserLower)) {
+        console.log(`⏩ Skipping duplicate feed author @${target.user} in same cycle.`);
+        continue;
+      }
 
       console.log(`🎯 [Feed Explorer] Selected feed post from ${target.user}: ${target.url}`);
       console.log(`Original Text: "${target.text.slice(0, 80)}..."`);
@@ -2112,6 +2160,7 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
       if (replyRes && replyRes.ok) {
         recordXComment(target.url, humanComment);
+        feedCycleAuthors.add(targetUserLower);
         commentsPlaced++;
         console.log(`✅ [Feed Explorer] Successfully placed Reply under post (${commentsPlaced}/${targetCommentsCount})!`);
         
