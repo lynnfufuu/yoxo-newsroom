@@ -27,8 +27,8 @@ if (fs.existsSync(envPath)) {
 // Credentials & Group Setup
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const GROUP_ID = process.env.TELEGRAM_GROUP_ID || '-1004324901964'; // YoXo sources supergroup with Forum Topics
-const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '-1002810302328'; // @yoxo_station
-const GEMINI_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_KEYS = (process.env.GEMINI_API_KEY || '').split(',').map(k => k.trim()).filter(Boolean);
+const GEMINI_KEY = GEMINI_KEYS[0] || '';
 const PORT = process.env.PORT || 3000;
 
 // 7 Categorized News Desks & Topic Thread Mappings
@@ -338,6 +338,10 @@ HOW TO THINK BEFORE WRITING (MANDATORY PRINCIPLES):
    - ANTI-CAPITALISM & ANTI-CORPORATE GREED:
      * Strongly condemn corporate greed, mass layoffs, executive bonuses, worker exploitation, price gouging, and monopoly power.
      * Stand with workers, labor unions, and everyday people over billionaires and Wall Street.
+   - PRO-PROTEST, PRO-REBELS & PRO-STRIKES:
+     * Firmly support protests, rebellions, labor strikes, and civil disobedience against corrupt governments, authoritarian regimes, and oppressive higher authorities.
+     * Stand unapologetically with ordinary citizens, working-class strikers, freedom fighters, and rebel movements resisting state tyranny, police brutality, and institutional corruption.
+     * Hold corrupt politicians, authoritarian leaders, and abusive ruling elites accountable. Never take the side of oppressive state power or corrupt establishments against people fighting for freedom, democracy, and basic human rights.
    - ANTI-RACISM & UNIVERSAL HUMAN RIGHTS:
      * Absolute zero tolerance for racism, xenophobia, white supremacy, Islamophobia, antisemitism, or discrimination.
      * ALL PEOPLE DESERVE BASIC HUMAN RIGHTS: health, dignity, safety, equality, housing, and freedom regardless of race, gender, nationality, or identity.
@@ -366,9 +370,11 @@ STRICT WRITING RULES:
       'gemini-3.1-flash-lite'
     ];
 
-    for (const model of activeModels) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+    const keysToTry = GEMINI_KEYS.length ? GEMINI_KEYS : [GEMINI_KEY];
+    for (const key of keysToTry) {
+      for (const model of activeModels) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -391,6 +397,7 @@ STRICT WRITING RULES:
       } catch (me) {
         console.warn(`⚠️ [Gemini ${model}] network notice: ${me.message}`);
       }
+    }
     }
 
     return null; // Skip if no high-context reply can be generated
@@ -678,6 +685,10 @@ ${photoGuidance}
    - ANTI-CAPITALISM & ANTI-CORPORATE GREED:
      * Strongly condemn corporate greed, mass layoffs, executive bonuses, worker exploitation, price gouging, and monopoly power.
      * Stand with workers, labor unions, and everyday people over billionaires and Wall Street.
+   - PRO-PROTEST, PRO-REBELS & PRO-STRIKES:
+     * Firmly support protests, rebellions, labor strikes, and civil disobedience against corrupt governments, authoritarian regimes, and oppressive higher authorities.
+     * Stand unapologetically with ordinary citizens, working-class strikers, freedom fighters, and rebel movements resisting state tyranny, police brutality, and institutional corruption.
+     * Hold corrupt politicians, authoritarian leaders, and abusive ruling elites accountable. Never take the side of oppressive state power or corrupt establishments against people fighting for freedom, democracy, and basic human rights.
    - ANTI-RACISM & UNIVERSAL HUMAN RIGHTS:
      * Absolute zero tolerance for racism, xenophobia, white supremacy, Islamophobia, antisemitism, or discrimination.
      * ALL PEOPLE DESERVE BASIC HUMAN RIGHTS: health, dignity, safety, equality, housing, and freedom regardless of race, gender, nationality, or identity.
@@ -726,9 +737,11 @@ Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
     'gemini-3.1-flash-lite'
   ];
 
-  for (const model of activeModels) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+  const keysToTry = GEMINI_KEYS.length ? GEMINI_KEYS : [GEMINI_KEY];
+  for (const key of keysToTry) {
+    for (const model of activeModels) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -748,6 +761,7 @@ Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
     } catch (e) {
       console.warn(`⚠️ [Gemini ${model}] analysis exception: ${e.message}`);
     }
+  }
   }
   return null;
 }
