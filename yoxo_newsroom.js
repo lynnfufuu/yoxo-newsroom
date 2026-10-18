@@ -359,10 +359,10 @@ STRICT WRITING RULES:
 
     // Try available active models with full quotas
     const activeModels = [
-      'gemini-3.7-flash',
       'gemini-3.5-flash-lite',
-      'gemini-flash-lite-latest',
       'gemini-3-flash-preview',
+      'gemini-flash-lite-latest',
+      'gemini-3.7-flash',
       'gemma-4-26b-a4b-it',
       'gemini-3.5-flash',
       'gemini-3.8-flash',
@@ -726,10 +726,10 @@ Respond ONLY in valid raw JSON with this exact structure (no markdown fences):
 }`;
 
   const activeModels = [
-    'gemini-3.7-flash',
     'gemini-3.5-flash-lite',
-    'gemini-flash-lite-latest',
     'gemini-3-flash-preview',
+    'gemini-flash-lite-latest',
+    'gemini-3.7-flash',
     'gemma-4-26b-a4b-it',
     'gemini-3.5-flash',
     'gemini-3.8-flash',
