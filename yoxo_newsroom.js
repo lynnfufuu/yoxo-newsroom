@@ -27,9 +27,22 @@ if (fs.existsSync(envPath)) {
 // Credentials & Group Setup
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const GROUP_ID = process.env.TELEGRAM_GROUP_ID || '-1004324901964'; // YoXo sources supergroup with Forum Topics
+const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '@yoxo_station';
 const GEMINI_KEYS = (process.env.GEMINI_API_KEY || '').split(',').map(k => k.trim()).filter(Boolean);
 const GEMINI_KEY = GEMINI_KEYS[0] || '';
 const PORT = process.env.PORT || 3000;
+
+function gitSyncHistory(actionDesc) {
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    try {
+      const { execSync } = require('child_process');
+      execSync('git config user.name "github-actions[bot]" && git config user.email "github-actions[bot]@users.noreply.github.com" && git add history.json history_headlines.json x_posted_history.json last_x_post.json last_x_comment.json commented_tweets.json last_style.txt && (git diff --cached --quiet || git commit -m "chore: instant sync history after ' + (actionDesc || 'post') + ' [skip ci]") && (git pull --rebase origin main && git push origin main)', { stdio: 'ignore', timeout: 20000 });
+      console.log(`💾 [Instant Git Sync] History committed and pushed to GitHub (${actionDesc || 'post'})!`);
+    } catch (e) {
+      // Ignore background git synchronization errors
+    }
+  }
+}
 
 // 7 Categorized News Desks & Topic Thread Mappings
 const DESKS = [
@@ -137,6 +150,7 @@ function saveHeadline(headline) {
   const list = loadHeadlines();
   list.push({ text: headline, time: Date.now() });
   fs.writeFileSync(HEADLINES_FILE, JSON.stringify(list.slice(-300), null, 2));
+  gitSyncHistory(`headline: "${headline.slice(0, 30)}"`);
 }
 function isDuplicateStory(newHeadline, postText = '') {
   const list = loadHeadlines();
@@ -282,6 +296,7 @@ function recordXPost(headline, url) {
       postedAt: Date.now()
     });
     fs.writeFileSync(X_POSTED_HISTORY_FILE, JSON.stringify(history.slice(-300), null, 2), 'utf8');
+    gitSyncHistory(`X tweet: "${headline.slice(0, 30)}"`);
   } catch (e) {}
 }
 
@@ -1804,9 +1819,9 @@ async function discoverAndCommentOnX(maxComments = 1) {
         placed++;
         console.log(`✅ [X Explorer] Successfully placed top comment (${placed}/${maxComments}) under post!`);
         if (placed < maxComments) {
-          const waitMins = 3 + Math.random() * 2; // Strict 3 to 5 mins wait
-          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (3-5m pacing) before engaging with next post...`);
-          await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
+          const waitSecs = 15 + Math.random() * 15; // Natural 15-30s human pacing
+          console.log(`⏳ [Pacing Rhythm] Pausing for ${waitSecs.toFixed(1)} seconds before engaging with next post...`);
+          await new Promise(r => setTimeout(r, waitSecs * 1000));
         }
       } else {
         console.warn('X Explorer reply error:', replyRes ? replyRes.error : 'unknown');
@@ -2012,9 +2027,9 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
         console.log(`✅ [Feed Explorer] Successfully placed Reply under post (${commentsPlaced}/${targetCommentsCount})!`);
         
         if (commentsPlaced < targetCommentsCount) {
-          const waitMins = 3 + Math.random() * 2; // Strict 3 to 5 mins wait
-          console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes (3-5m pacing) before engaging with next post...`);
-          await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
+          const waitSecs = 15 + Math.random() * 15; // Natural 15-30s human pacing
+          console.log(`⏳ [Pacing Rhythm] Pausing for ${waitSecs.toFixed(1)} seconds before engaging with next post...`);
+          await new Promise(r => setTimeout(r, waitSecs * 1000));
         }
       } else {
         console.warn('Feed Explorer reply note:', replyRes ? replyRes.error : 'unknown');
@@ -2045,12 +2060,12 @@ async function autoCommentOnXFeedOrOutlets() {
   // Stream 2: Expanded Community Creators, Viral Commentators & Outlets (60+ diverse accounts)
   try {
     if (feedCount > 0) {
-      const waitMins = 3 + Math.random() * 2;
-      console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes before engaging community creator accounts...`);
-      await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
+      const waitSecs = 20 + Math.random() * 10;
+      console.log(`⏳ [Pacing Rhythm] Pausing for ${waitSecs.toFixed(1)} seconds before engaging community creator accounts...`);
+      await new Promise(r => setTimeout(r, waitSecs * 1000));
     }
     const communityTarget = Math.max(2, 4 - (feedCount || 0));
-    console.log(`🔄 Engaging diversified community & creator posts (Target: ${communityTarget} replies with 3-5 min pacing)...`);
+    console.log(`🔄 Engaging diversified community & creator posts (Target: ${communityTarget} replies)...`);
     await discoverAndCommentOnX(communityTarget);
   } catch (e) {
     console.warn('Community discover error:', e.message);
