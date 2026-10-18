@@ -76,6 +76,8 @@ const DESKS = [
     threadId: 4,
     sources: [
       { type: 'rss', name: 'Variety', url: 'https://variety.com/feed/' },
+      { type: 'rss', name: 'DiscussingFilm', url: 'https://discussingfilm.net/feed/' },
+      { type: 'rss', name: 'Rolling Stone', url: 'https://www.rollingstone.com/feed/' },
       { type: 'rss', name: 'DailyMail', url: 'https://www.dailymail.co.uk/news/index.rss' }
     ]
   },
@@ -126,7 +128,9 @@ const DESKS = [
       { type: 'telegram', channel: 'WatcherGuru' },
       { type: 'telegram', channel: 'disclosetv' },
       { type: 'telegram', channel: 'insiderpaper' },
-      { type: 'rss', name: 'BBC Breaking', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' }
+      { type: 'rss', name: 'BBC Breaking', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
+      { type: 'rss', name: 'DiscussingFilm Mega', url: 'https://discussingfilm.net/feed/' },
+      { type: 'rss', name: 'Variety Breaking', url: 'https://variety.com/feed/' }
     ]
   }
 ];
@@ -690,8 +694,11 @@ async function analyzeNewsWithGemini(newsText, deskName = 'Web3 & Crypto') {
       1. ZERO ANIME VOICE CASTING: Absolutely NO anime voice actors, voice cast additions, seiyuu reveals, or voice talent announcements.
       2. ZERO CELEBRITY GOSSIP: Absolutely NO celebrity marriages, dating, pregnancies, baby announcements, divorces, or lifestyle gossip.`;
   } else if (deskName === 'Entertainments') {
-    roleDesc = 'a leading digital culture and entertainment reporter';
-    scoreGuide = 'Only score >= 8 for major viral controversies, pop culture milestones, streaming platform moves, or high-profile industry drama. Routine red carpet outfits or trivial gossip must be scored < 7.';
+    roleDesc = 'a leading digital culture, fashion & entertainment journalist';
+    scoreGuide = `PRIORITIZE HIGH-ENGAGEMENT CULTURAL MOMENTS (Score >= 8):
+    - Major star-studded galas and red carpets (Academy Museum Gala, Met Gala, Cannes, Oscars, landmark fashion debuts like Taylor Swift in Dior, standout celebrity appearances).
+    - Iconic cultural milestones, major entertainment awards, and viral pop culture discussions that dominate social media feeds.
+    - REJECT (score < 5): Routine dating gossip, trivial paparazzi snaps, or boring corporate executive moves.`;
   } else if (deskName === 'International Disasters') {
     roleDesc = 'a senior global natural disaster, wildfire & public health emergency reporter';
     scoreGuide = `STRICT EDITORIAL MANDATE FOR "International Disasters":
@@ -721,6 +728,11 @@ If the incoming breaking news covers the EXACT SAME event, milestone, corporate 
 
   const prompt = `You are ${roleDesc} writing for @YoXo_Station on X (Twitter).
 ${dupCheckPrompt}
+
+CRITICAL GROWTH MANAGER MANDATE (VIRAL INTEREST TEST):
+You are the growth manager for @YoXo_Station. To grow our account, every standalone post MUST be something real everyday social media users actively care about, search for, debate, or check on X!
+- STRICTLY REJECT (score < 5, is_interesting = false): Dry macroeconomic forecasts (e.g. "analyst predicts gold to slide"), boring corporate quarterly updates, obscure municipal policy statements, or niche business filings that nobody on social media talks about!
+- SCORE >= 8 ONLY FOR: High-velocity viral topics, major star-studded galas & fashion debuts, massive video game drops, historic political/civil milestones (e.g. iconic birthdays, landmark strikes, mass protests), explosive investigative revelations, or jaw-dropping natural disasters.
 
 CRITICAL INSTRUCTIONS FOR HEADLINES, BODY, DEBATE & REAL PHOTOGRAPHY:
 1. HEADLINE FOR GRAPHIC CARD (2-5 WORDS MAX, ALL CAPS):
@@ -2350,5 +2362,8 @@ module.exports = {
   canPostToX,
   canCommentOnX,
   recordXPost,
-  recordXComment
+  recordXComment,
+  renderCard,
+  searchWebPhotos,
+  getNextCardStyle
 };
