@@ -188,7 +188,7 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
     await page.setViewport({ width: 1280, height: 900 });
     await page.setCookie(...cookies);
 
-    await page.goto(tweetUrl, { waitUntil: 'load', timeout: 45000 }).catch(e => console.log('Goto note:', e.message));
+    await page.goto(tweetUrl, { waitUntil: 'domcontentloaded', timeout: 35000 }).catch(e => console.log('Goto note:', e.message));
     await dismissCookieBanner(page);
 
     // Wait for the tweet article to render
@@ -226,7 +226,13 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
       console.log('Inline composer not ready, opening modal reply dialog via tweet reply button...');
       const replyIcon = 'article[data-testid="tweet"] [data-testid="reply"], [data-testid="reply"]';
       await page.waitForSelector(replyIcon, { timeout: 15000 });
-      await page.click(replyIcon);
+      await page.evaluate((sel) => {
+        const el = document.querySelector(sel);
+        if (el) {
+          el.scrollIntoView({ behavior: 'instant', block: 'center' });
+          el.click();
+        }
+      }, replyIcon);
       await new Promise(r => setTimeout(r, 1500));
 
       // Wait for modal dialog
