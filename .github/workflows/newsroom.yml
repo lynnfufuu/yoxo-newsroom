@@ -52,14 +52,19 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          for file in history.json history_headlines.json last_style.txt last_x_post.json last_x_comment.json commented_tweets.json; do
+          for file in history.json history_headlines.json x_posted_history.json last_style.txt last_x_post.json last_x_comment.json commented_tweets.json; do
             if [ -f "$file" ]; then
               git add "$file"
             fi
           done
           if ! git diff --cached --quiet; then
             git commit -m "chore: update editorial history [skip ci]"
-            git pull --rebase origin main || true
-            git push origin main || true
+            for attempt in 1 2 3; do
+              git pull --rebase origin main && git push origin main && break || {
+                echo "Rebase/push failed, retrying ($attempt/3)..."
+                git rebase --abort 2>/dev/null || true
+                sleep 2
+              }
+            done
           fi
 

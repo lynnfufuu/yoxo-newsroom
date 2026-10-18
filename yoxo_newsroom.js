@@ -138,25 +138,44 @@ function saveHeadline(headline) {
   list.push({ text: headline, time: Date.now() });
   fs.writeFileSync(HEADLINES_FILE, JSON.stringify(list.slice(-300), null, 2));
 }
-function isDuplicateStory(newHeadline) {
+function isDuplicateStory(newHeadline, postText = '') {
   const list = loadHeadlines();
-  const getWords = (s) => (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
-  const newWords = new Set(getWords(newHeadline));
-  if (newWords.size === 0) return false;
+  const stopWords = new Set(['the', 'and', 'for', 'with', 'from', 'this', 'that', 'after', 'over', 'into', 'will', 'new', 'says', 'said', 'has', 'have', 'had', 'been', 'about', 'more', 'amid', 'near', 'under', 'back', 'just', 'ahead']);
+  const getWords = (s) => (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
+  
+  const newHeadlineWords = new Set(getWords(newHeadline));
+  const newTextWords = new Set(getWords(postText));
+  if (newHeadlineWords.size === 0 && newTextWords.size === 0) return false;
 
   const now = Date.now();
-  const recentList = list.filter(item => !item.time || (now - item.time < 24 * 60 * 60 * 1000));
+  const recentList = list.filter(item => !item.time || (now - item.time < 48 * 60 * 60 * 1000)); // 48-hour memory
 
   for (const item of recentList) {
     const existingWords = getWords(item.text);
-    let common = 0;
+    if (existingWords.length === 0) continue;
+
+    let commonHeadline = 0;
     for (const w of existingWords) {
-      if (newWords.has(w)) common++;
+      if (newHeadlineWords.has(w)) commonHeadline++;
     }
-    const similarity = common / Math.min(newWords.size, existingWords.length);
-    if (similarity >= 0.65 && common >= 3) {
-      console.log(`⚠️ Duplicate detected: "${newHeadline}" is similar to previously covered "${item.text}" (${Math.round(similarity*100)}% match)`);
+    const headlineSim = commonHeadline / Math.min(newHeadlineWords.size, existingWords.length);
+
+    // Highly sensitive duplicate catch: 2 distinct keywords match in a short headline or >= 50% overlap
+    if ((commonHeadline >= 2 && headlineSim >= 0.5) || commonHeadline >= 3) {
+      console.log(`⚠️ Duplicate detected: "${newHeadline}" is similar to previously covered "${item.text}" (${Math.round(headlineSim*100)}% match)`);
       return true;
+    }
+
+    // Context overlap check against raw post text
+    if (postText && newTextWords.size > 0) {
+      let commonText = 0;
+      for (const w of existingWords) {
+        if (newTextWords.has(w)) commonText++;
+      }
+      if (commonText >= Math.min(3, existingWords.length) && (commonText / existingWords.length) >= 0.6) {
+        console.log(`⚠️ Duplicate story context detected: "${item.text}" was already covered in recent history!`);
+        return true;
+      }
     }
   }
   return false;
@@ -193,9 +212,48 @@ function getChromeExecutable() {
 
 // X Cooldown & Anti-Shadowban Rate Limiter (28-minute minimum spacing between standalone tweets)
 const X_COOLDOWN_FILE = path.resolve(__dirname, 'last_x_post.json');
+const X_POSTED_HISTORY_FILE = path.resolve(__dirname, 'x_posted_history.json');
 const X_MIN_COOLDOWN_MS = 28 * 60 * 1000; // ~28 minutes between standalone tweets
 
-function canPostToX(isMustPost = false) {
+function loadXPostedHistory() {
+  if (fs.existsSync(X_POSTED_HISTORY_FILE)) {
+    try { return JSON.parse(fs.readFileSync(X_POSTED_HISTORY_FILE, 'utf8')); } catch (e) { return []; }
+  }
+  return [];
+}
+
+function hasAlreadyPostedToX(headline) {
+  if (!headline) return false;
+  const history = loadXPostedHistory();
+  const stopWords = new Set(['the', 'and', 'for', 'with', 'from', 'this', 'that', 'after', 'over', 'into', 'will', 'new', 'says', 'said', 'has', 'have', 'had', 'been', 'about', 'more']);
+  const getWords = (s) => (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
+  
+  const newHeadlineWords = new Set(getWords(headline));
+  if (newHeadlineWords.size === 0) return false;
+
+  const now = Date.now();
+  const recent = history.filter(item => (now - (item.postedAt || 0)) < 48 * 60 * 60 * 1000); // 48-hour history
+
+  for (const item of recent) {
+    const existingWords = getWords(item.headline);
+    if (existingWords.length === 0) continue;
+    let common = 0;
+    for (const w of existingWords) {
+      if (newHeadlineWords.has(w)) common++;
+    }
+    const sim = common / Math.min(newHeadlineWords.size, existingWords.length);
+    if ((common >= 2 && sim >= 0.5) || common >= 3) {
+      console.log(`⚠️ Story already posted to X recently: "${headline}" matches "${item.headline}". Skipping to prevent duplicate tweet!`);
+      return true;
+    }
+  }
+  return false;
+}
+
+function canPostToX(headline, isMustPost = false) {
+  if (headline && hasAlreadyPostedToX(headline)) {
+    return false; // NEVER post the same story twice to X!
+  }
   if (!fs.existsSync(X_COOLDOWN_FILE)) return true;
   try {
     const data = JSON.parse(fs.readFileSync(X_COOLDOWN_FILE, 'utf8'));
@@ -216,6 +274,14 @@ function recordXPost(headline, url) {
       headline,
       url
     }, null, 2), 'utf8');
+
+    const history = loadXPostedHistory();
+    history.push({
+      headline,
+      url,
+      postedAt: Date.now()
+    });
+    fs.writeFileSync(X_POSTED_HISTORY_FILE, JSON.stringify(history.slice(-300), null, 2), 'utf8');
   } catch (e) {}
 }
 
@@ -624,7 +690,7 @@ async function analyzeNewsWithGemini(newsText, deskName = 'Web3 & Crypto') {
      * DISAMBIGUATION: If an entity name contains common royal or celebrity names (e.g., Charles, William, Jordan), clarify with "brokerage firm", "financial exchange", or "technology company" to prevent confusing financial institutions with royalty!
    - "photo_fallback": The broader contextual setting or related industry anchor (e.g. "New York Stock Exchange trading floor", "Global financial district skyscraper", "Modern digital cryptocurrency terminal", "Software development office").`;
 
-  const recentHeadlines = loadHeadlines().slice(-20).map(h => h.text);
+  const recentHeadlines = loadHeadlines().slice(-60).map(h => h.text);
   const dupCheckPrompt = recentHeadlines.length > 0 ? `
 CRITICAL DEDUPLICATION MANDATE:
 Here are our recently published stories:
@@ -1429,7 +1495,7 @@ async function runCycle() {
             .toUpperCase();
 
           // Cross-source semantic deduplication
-          if (isDuplicateStory(cleanHeadline)) {
+          if (isDuplicateStory(cleanHeadline, post.text)) {
             console.log(`⏩ Skipping duplicate story for [${desk.name}]: "${cleanHeadline}"`);
             continue;
           }
@@ -1547,7 +1613,7 @@ async function runCycle() {
 
             // 100% Autopilot Publishing to X and Telegram Channel for top breaking stories (score >= 8 or MUST POST)
             if (!autoPostedXThisCycle && (analysis.score >= 8 || analysis.is_must_post)) {
-              if (canPostToX(analysis.is_must_post)) {
+              if (canPostToX(cleanHeadline, analysis.is_must_post)) {
                 autoPostedXThisCycle = true;
 
                 // 1. Auto-publish directly to Telegram Channel @yoxo_station
