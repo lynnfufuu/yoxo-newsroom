@@ -248,6 +248,14 @@ async function replyToTweetOnX({ tweetUrl, imagePath, replyText }) {
     // Click the strict Reply button (strictly inside modal or inline composer)
     console.log(`🚀 Dispatching Reply comment via ${replySubmitBtn}...`);
     await page.waitForSelector(replySubmitBtn, { timeout: 10000 });
+    await page.waitForFunction(
+      (btnSel) => {
+        const btn = document.querySelector(btnSel);
+        return btn && btn.getAttribute('aria-disabled') !== 'true' && !btn.disabled;
+      },
+      { timeout: 15000 },
+      replySubmitBtn
+    );
     await page.click(replySubmitBtn);
 
     await new Promise(r => setTimeout(r, 4500));

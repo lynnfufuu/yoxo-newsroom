@@ -360,8 +360,8 @@ function isWithinCommentRecencyWindow(publishedAt) {
   if (!publishedAt) return true;
   const ageMs = Date.now() - new Date(publishedAt).getTime();
   const ageMins = ageMs / 60000;
-  if (ageMins > 120) {
-    console.log(`⏳ Tweet is too old for top-reply snipe (${Math.round(ageMins / 60)}h old). Must be under 2 hours.`);
+  if (ageMins > 720) {
+    console.log(`⏳ Tweet is too old for top-reply snipe (${Math.round(ageMins / 60)}h old). Must be under 12 hours.`);
     return false;
   }
   return true;
@@ -386,19 +386,8 @@ function getRecentlyCommentedAuthors(limit = 10) {
   }
 }
 
-const FAR_RIGHT_AND_ETHICAL_BLACKLIST = [
-  'tpaction', 'tpusa', 'turningpoint', 'charliekirk', 'maga', 'trump', 'donaldtrump', 'donaldjtrump',
-  'bannon', 'posobiec', 'rubinreport', 'prageru', 'libsoftiktok', 'dailywire', 'benshapiro',
-  'mattwalsh', 'tuckercarlson', 'laurenboebert', 'mtg', 'marjorietaylor', 'warroom', 'oann',
-  'newsmax', 'foxnews', 'breitbart', 'heritage', 'netanyahu', 'idf', 'israelipm', 'gallant',
-  'smotrich', 'bengvir', 'ben-gvir', 'aipac', 'yairnetanyahu', 'charliekirk11'
-];
-
+// Never blacklist political or controversial topics - we actively engage and criticize them!
 function isBlockedAuthorOrContent(user = '', text = '') {
-  const combined = `${user} ${text}`.toLowerCase();
-  for (const kw of FAR_RIGHT_AND_ETHICAL_BLACKLIST) {
-    if (combined.includes(kw)) return true;
-  }
   return false;
 }
 
@@ -410,10 +399,6 @@ function isAuthorOverCommented(authorHandle) {
 
 async function generateHumanReply(tweetText) {
   try {
-    if (isBlockedAuthorOrContent('', tweetText)) {
-      console.log('🛡️ [Ethical Blocklist] Refused to generate comment on blacklisted content.');
-      return null;
-    }
     const prompt = `You are @YoXo_Station on X (Twitter), an authentic, insightful human peer.
 Read this post very carefully:
 """
@@ -440,11 +425,11 @@ HOW TO THINK BEFORE WRITING (MANDATORY PRINCIPLES):
    - ANTI-WAR CRIMES, ANTI-NETANYAHU & ANTI-ISRAEL MILITARY AGGRESSION:
      * Firmly and explicitly oppose Benjamin Netanyahu, the Israeli military/government violence, and Israeli state aggression.
      * Fiercely condemn war crimes, genocide, apartheid, collective punishment, and the bombing and killing of innocent civilians and children.
-     * Demand accountability, justice, international law, and world peace.
-   - ANTI-TRUMP, ANTI-MAGA & ANTI-FAR-RIGHT:
-     * Strictly oppose Donald Trump, MAGA extremism, and far-right/white nationalist agendas.
-     * Never validate, flatter, normalize, or excuse Trump, his allies, or far-right culture-war talking points.
-     * Expose authoritarianism, voter suppression, fascism, and reactionary politics.
+     * When other accounts, news handles, or figures tweet about Netanyahu, the Israeli military, or Middle East conflict: ACTIVELY CRITICIZE THEM, expose war crimes, and demand accountability under international law.
+   - ANTI-TRUMP, ANTI-MAGA & ANTI-FAR-RIGHT (CRITICIZE & EXPOSE):
+     * Strictly oppose Donald Trump, MAGA extremism, Turning Point, Charlie Kirk, Ben Shapiro, and far-right agendas.
+     * NEVER validate, flatter, or normalize them.
+     * When news outlets or accounts tweet about Trump, MAGA, Turning Point, or far-right politics: ACTIVELY CRITICIZE, CHALLENGE, AND CALL THEM OUT! Expose their voter suppression, billionaire tax cuts, authoritarianism, and harm to working people.
    - ANTI-CAPITALISM & ANTI-CORPORATE GREED:
      * Strongly condemn corporate greed, mass layoffs, executive bonuses, worker exploitation, price gouging, and monopoly power.
      * Stand with workers, labor unions, and everyday people over billionaires and Wall Street.
@@ -1844,37 +1829,61 @@ async function discoverAndCommentOnX(maxComments = 1) {
       }
       scannedCount++;
 
-      // Only stop scanning early if we actually have enough candidate tweets under 2 hours old!
-      const freshUnder2h = allTweets.filter(tw => {
+      // Early stop condition: when we have gathered enough fresh candidate tweets
+      const freshCandidates = allTweets.filter(tw => {
         if (!tw.url || hasAlreadyCommented(tw.url) || tw.text.startsWith('RT @')) return false;
-        if (isBlockedAuthorOrContent(tw.user, tw.text)) return false;
         const ageMins = (Date.now() - new Date(tw.createdAt).getTime()) / 60000;
-        return ageMins >= 1 && ageMins <= 120;
+        return ageMins >= 1 && ageMins <= 360;
       });
-      if (freshUnder2h.length >= 5 && scannedCount >= 8) break;
+      if (freshCandidates.length >= 6 && scannedCount >= 8) break;
 
       await new Promise(r => setTimeout(r, 400));
     }
     console.log(`🌐 [X Explorer] Retrieved ${allTweets.length} live tweets across outlets.`);
 
-    // Find the freshest tweets (1m - 24h fallback, sorted freshest first)
+    // Find the freshest tweets (progressive fallback from under 3h -> 12h -> 24h -> all valid)
     const now = Date.now();
     const validTweets = allTweets.filter(tw => {
       if (!tw.url || !tw.text || tw.text.length < 10) return false;
       if (tw.text.startsWith('RT @')) return false;
       if (hasAlreadyCommented(tw.url)) return false;
-      if (isBlockedAuthorOrContent(tw.user, tw.text)) return false;
       return true;
     });
 
-    const candidates = validTweets.map(tw => ({
+    let candidates = validTweets.map(tw => ({
       ...tw,
       ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
-    })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 120) // Strictly within the last 2 hours (under 120m)
+    })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 180) // Tier 1: under 3h
       .sort((a, b) => a.ageMins - b.ageMins);
 
     if (!candidates || candidates.length === 0) {
-      console.log('🌐 [X Explorer] No candidate tweet found under 2 hours old this cycle.');
+      console.log('🌐 [X Explorer] No candidate tweet found under 3h; checking under 12 hours...');
+      candidates = validTweets.map(tw => ({
+        ...tw,
+        ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
+      })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 720) // Tier 2: under 12h
+        .sort((a, b) => a.ageMins - b.ageMins);
+    }
+
+    if (!candidates || candidates.length === 0) {
+      console.log('🌐 [X Explorer] No candidate tweet found under 12h; checking under 24 hours...');
+      candidates = validTweets.map(tw => ({
+        ...tw,
+        ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
+      })).filter(tw => tw.ageMins >= 1 && tw.ageMins <= 1440) // Tier 3: under 24h
+        .sort((a, b) => a.ageMins - b.ageMins);
+    }
+
+    if (!candidates || candidates.length === 0) {
+      console.log('🌐 [X Explorer] Expanding window to all available valid tweets...');
+      candidates = validTweets.map(tw => ({
+        ...tw,
+        ageMins: Math.round((now - new Date(tw.createdAt).getTime()) / 60000)
+      })).sort((a, b) => a.ageMins - b.ageMins);
+    }
+
+    if (!candidates || candidates.length === 0) {
+      console.log('🌐 [X Explorer] No unreplied candidate tweet available.');
       return 0;
     }
 
@@ -2065,23 +2074,17 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       if (hasAlreadyCommented(t.url)) return false;
       if (t.text.startsWith('RT @')) return false;
 
-      // Absolute Ethical Blacklist: NEVER comment under Turning Point, MAGA, Trump, far-right, or war criminal accounts!
-      if (isBlockedAuthorOrContent(t.user, t.text)) {
-        console.log(`🛡️ [Ethical Blocklist] Skipped far-right / blacklisted account post: ${t.user}`);
-        return false;
-      }
-
       let ageMins = 15;
       if (t.time) {
         ageMins = (now - new Date(t.time).getTime()) / 60000;
-        if (ageMins > 360 || ageMins < -10) return false; // Max 6 hours (360m) old, capturing full live feed scroll
+        if (ageMins > 720 || ageMins < -10) return false; // Up to 12 hours old
       }
       t.ageMins = Math.max(0, Math.round(ageMins));
       return true;
     });
 
     if (!candidates || candidates.length === 0) {
-      console.log('🌐 [Feed Explorer] No unreplied candidate found under 6 hours old directly on home/explore feed.');
+      console.log('🌐 [Feed Explorer] No unreplied candidate found under 12 hours old directly on home/explore feed.');
       return 0;
     }
 
