@@ -617,8 +617,12 @@ async function analyzeNewsWithGemini(newsText, deskName = 'Web3 & Crypto') {
 
   const photoGuidance = `
    - We need dramatic, authoritative, eye-catching real-world editorial photography (ABSOLUTELY ZERO CARTOONS, ZERO 2D CLIP ART, ZERO MEMES).
-   - "photo_primary": The primary, specific subject that DIRECTLY MATCHES the central context of this exact news story (e.g. if story is about an AI tool cloning Photoshop/Figma -> "Adobe Photoshop" or "Figma"; if about Donald Trump -> "Donald Trump"; if about Solana -> "Solana cryptocurrency"; if about GTA 6 -> "Grand Theft Auto VI"; if about Boeing -> "Boeing aircraft"; if about a specific film/anime -> the official film title or director; if about a disaster/wildfire -> specific volcano, wildfire location, or storm satellite). Focus on what the story is ACTUALLY about!
-   - "photo_fallback": The broader contextual setting or related industry anchor (e.g. "Software developer workspace", "New York Stock Exchange", "White House", "PlayStation 5 console", "Wildfire smoke aerial", "Emergency rescue responders").`;
+   - "photo_primary": The primary, specific subject that DIRECTLY MATCHES the central context of this exact news story.
+     * CRITICAL IDENTITY & CORPORATE RULE: NEVER output a single first name alone!
+     * IF THE SUBJECT IS A COMPANY OR FINANCIAL INSTITUTION (e.g. Charles Schwab, Robinhood, Apple, Citadel, Boeing): NEVER output a person's first name! Output the full institution and corporate setting (e.g. "Charles Schwab corporate financial institution", "Charles Schwab headquarters building", "Robinhood trading headquarters").
+     * IF THE SUBJECT IS A PERSON: ALWAYS include their full name PLUS their organization, sport, film, or role (e.g. "Charles Hoskinson Cardano crypto founder", "Charles Leclerc Ferrari F1 driver", "King Charles III British coronation", "Noah Centineo actor").
+     * DISAMBIGUATION: If an entity name contains common royal or celebrity names (e.g., Charles, William, Jordan), clarify with "brokerage firm", "financial exchange", or "technology company" to prevent confusing financial institutions with royalty!
+   - "photo_fallback": The broader contextual setting or related industry anchor (e.g. "New York Stock Exchange trading floor", "Global financial district skyscraper", "Modern digital cryptocurrency terminal", "Software development office").`;
 
   const recentHeadlines = loadHeadlines().slice(-20).map(h => h.text);
   const dupCheckPrompt = recentHeadlines.length > 0 ? `
@@ -817,11 +821,27 @@ async function searchWebPhotos(query) {
         continue;
       }
 
-      // Relevance check: ensure the image title or URL actually matches at least one keyword from the story query!
+      // Strictly filter out British Royal Family false-positives unless story is explicitly about royalty
+      const isRoyalQuery = query.toLowerCase().includes('prince') || query.toLowerCase().includes('king') || query.toLowerCase().includes('royal') || query.toLowerCase().includes('monarch');
+      const lowerAll = (lowerUrl + ' ' + lowerTitle);
+      if (!isRoyalQuery) {
+        if (lowerAll.includes('king charles') || lowerAll.includes('prince charles') || lowerAll.includes('buckingham') || lowerAll.includes('queen elizabeth') || lowerAll.includes('coronation') || lowerAll.includes('royal family') || lowerAll.includes('windsor')) {
+          continue; // Discard British royal pictures mistakenly matching corporate queries (e.g. Charles Schwab)
+        }
+      }
+
+      // Relevance check: ensure the image title or URL actually matches keywords from the query!
       if (queryWords.length > 0) {
-        const hasKeyword = queryWords.some(kw => lowerUrl.includes(kw) || lowerTitle.includes(kw));
+        // If multi-word query (e.g. "Charles Schwab"), must match the distinctive word (e.g. "schwab") or all words
+        let hasKeyword = false;
+        if (queryWords.length >= 2) {
+          const distinctiveWord = queryWords[queryWords.length - 1]; // e.g. "schwab" or "leclerc" or "hoskinson"
+          hasKeyword = lowerUrl.includes(distinctiveWord) || lowerTitle.includes(distinctiveWord) || queryWords.every(kw => lowerUrl.includes(kw) || lowerTitle.includes(kw));
+        } else {
+          hasKeyword = queryWords.some(kw => lowerUrl.includes(kw) || lowerTitle.includes(kw));
+        }
         if (!hasKeyword) {
-          continue; // Skip unrelated images (e.g. sports/cricket thumbnails appearing in sidebars)
+          continue; // Skip unrelated images
         }
       }
 
@@ -1599,33 +1619,18 @@ async function runCycle() {
 }
 
 const OUTLETS_TO_SCAN = [
-  'CultureCrave',
-  'DiscussingFilm',
-  'IGN',
-  'GameSpot',
-  'Kotaku',
-  'Dexerto',
-  'PopBase',
-  'PopCrave',
-  'Complex',
-  'Cointelegraph',
-  'nypost',
-  'CNN',
-  'rare_remarks',
-  'ScreenRant',
-  'Variety',
-  'DEADLINE',
-  'WuBlockchain',
-  'CoinDesk',
-  'unusual_whales',
-  'WatcherGuru',
-  'TechCrunch',
-  'TheVerge',
-  'WIRED',
-  'BBCWorld',
-  'Reuters',
-  'AP',
-  'BitcoinMagazine'
+  // 1. Entertainment, Movies & Pop Culture
+  'CultureCrave', 'DiscussingFilm', 'Variety', 'DEADLINE', 'ScreenRant', 'PopBase', 'PopCrave', 'Complex', 'FilmUpdates', 'RollingStone', 'A24', 'Pitchfork',
+  // 2. Gaming, Esports & Indie Games
+  'IGN', 'GameSpot', 'Kotaku', 'Dexerto', 'Wario64', 'shinobi602', 'GeoffKeighley', 'PlayStation', 'Xbox', 'NintendoAmerica', 'Steam', 'PCGamer', 'Polygon', 'Eurogamer',
+  // 3. Internet Culture, Viral Satire & Community
+  'theonion', 'HardDriveMag', 'kirawontmiss', 'InternetH0F', 'pubity', 'rare_remarks', 'dailyloud', 'saycheesetv',
+  // 4. Tech, AI & Startups
+  'TechCrunch', 'TheVerge', 'WIRED', 'arstechnica', 'levelsio', 'sama', 'paulg', 'karpathy', 'rowancheung', 'MKBHD',
+  // 5. Crypto, Web3 & Macro Finance
+  'CoinDesk', 'Cointelegraph', 'BitcoinMagazine', 'WatcherGuru', 'WuBlockchain', 'unusual_whales', 'ZackXBT', 'VitalikButerin',
+  // 6. Investigative, Global News & Human Rights
+  'nypost', 'CNN', 'BBCWorld', 'Reuters', 'AP', 'guardian', 'AJEnglish', 'democracynow', 'DropSiteNews', 'MorePerfectUS'
 ];
 
 async function fetchUserTweetsViaSyndication(username) {
@@ -1772,14 +1777,38 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 1000 });
-    const rawUa = await page.evaluate(() => navigator.userAgent);
-    const cleanUa = rawUa.replace('HeadlessChrome', 'Chrome');
+    
+    // Stealth Evasions: Hide automated browser fingerprints to pass Cloudflare and bot checks
+    await page.evaluateOnNewDocument(() => {
+      delete Object.getPrototypeOf(navigator).webdriver;
+      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+      window.chrome = { runtime: {} };
+      Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+      Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
+    });
+
+    const cleanUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
     await page.setUserAgent(cleanUa);
     await page.setCookie(...cookies);
 
     console.log('🌐 [Feed Explorer] Loading x.com/home...');
     await page.goto('https://x.com/home', { waitUntil: 'domcontentloaded', timeout: 35000 }).catch(e => console.log('Feed goto notice:', e.message));
     console.log(`🌐 [Feed Explorer] Landed on: ${page.url()} | Title: ${await page.title()}`);
+    
+    // Cloudflare Turnstile Auto-Pass: wait if challenge interstitial is active
+    let currentTitle = await page.title();
+    if (currentTitle.includes('Just a moment') || currentTitle.includes('Cloudflare')) {
+      console.log('⏳ Cloudflare challenge detected on home feed. Waiting for auto-pass...');
+      for (let i = 0; i < 12; i++) {
+        await new Promise(r => setTimeout(r, 1000));
+        currentTitle = await page.title();
+        if (!currentTitle.includes('Just a moment') && !currentTitle.includes('Cloudflare')) {
+          console.log(`✅ Passed Cloudflare! New Title: ${currentTitle}`);
+          break;
+        }
+      }
+    }
+
     await dismissCookieBanner(page);
     
     // Dismiss any modal dialogs (notifications, popups, etc.)
@@ -1792,12 +1821,22 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       }
     });
 
-    // Wait for timeline tweets to mount and render
+    // Wait for timeline tweets to mount and render, fallback to explore tab if home timeline stalls
+    let timelineMounted = false;
     try {
       await page.waitForSelector('article[data-testid="tweet"]', { timeout: 15000 });
+      timelineMounted = true;
       console.log('✅ [Feed Explorer] Timeline tweets rendered successfully!');
     } catch (e) {
-      console.log('Feed timeline wait note:', e.message);
+      console.log('Feed timeline wait note, attempting fallback to live explore/community feed...');
+      try {
+        await page.goto('https://x.com/explore', { waitUntil: 'domcontentloaded', timeout: 25000 });
+        await page.waitForSelector('article[data-testid="tweet"]', { timeout: 15000 });
+        timelineMounted = true;
+        console.log('✅ [Feed Explorer] Explore community feed rendered successfully!');
+      } catch (e2) {
+        console.log('Explore fallback note:', e2.message);
+      }
     }
     await new Promise(r => setTimeout(r, 1500));
 
@@ -1868,14 +1907,14 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       let ageMins = 15;
       if (t.time) {
         ageMins = (now - new Date(t.time).getTime()) / 60000;
-        if (ageMins > 120 || ageMins < -10) return false; // Strictly max 2 hours (120m) old, allowing brand-new posts
+        if (ageMins > 360 || ageMins < -10) return false; // Max 6 hours (360m) old, capturing full live feed scroll
       }
       t.ageMins = Math.max(0, Math.round(ageMins));
       return true;
     });
 
     if (!candidates || candidates.length === 0) {
-      console.log('🌐 [Feed Explorer] No unreplied candidate found under 2 hours old directly on home feed.');
+      console.log('🌐 [Feed Explorer] No unreplied candidate found under 6 hours old directly on home/explore feed.');
       return 0;
     }
 
@@ -1927,27 +1966,28 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
 }
 
 async function autoCommentOnXFeedOrOutlets() {
-  const TARGET_TOTAL_COMMENTS = 3; // Active continuous 3-5 min rhythm (3 thoughtful comments per cycle)
-  console.log(`🎯 [Pacing Rhythm] Commencing commenting cycle (targeting up to ${TARGET_TOTAL_COMMENTS} thoughtful replies, max 2h old)...`);
+  console.log(`🎯 [Pacing Rhythm] Commencing dual-stream commenting cycle (Home Feed Scroll + 60+ Community Creators)...`);
 
-  // Priority 1: Direct Home Feed Deep Scroll (Personal algorithm & following creators across all fields)
+  // Stream 1: Direct Home Timeline / Explore Scroll (Engages posts outside the fixed lists)
   let feedCount = 0;
   try {
-    feedCount = await browseFeedAndCommentOnX(TARGET_TOTAL_COMMENTS);
+    feedCount = await browseFeedAndCommentOnX(2);
   } catch (e) {
     console.warn('Feed Explorer error:', e.message);
   }
 
-  // Priority 2: If feed had fewer than target comments, immediately fulfill remaining comments so there is NEVER a gap!
-  const remainingNeeded = TARGET_TOTAL_COMMENTS - (feedCount || 0);
-  if (remainingNeeded > 0) {
+  // Stream 2: Expanded Community Creators, Viral Commentators & Outlets (60+ diverse accounts)
+  try {
     if (feedCount > 0) {
-      const waitMins = 3 + Math.random() * 2; // Strict 3 to 5 mins wait
-      console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes before engaging next post...`);
+      const waitMins = 3 + Math.random() * 2;
+      console.log(`⏳ [Pacing Rhythm] Chilling for ${waitMins.toFixed(1)} minutes before engaging community creator accounts...`);
       await new Promise(r => setTimeout(r, waitMins * 60 * 1000));
     }
-    console.log(`🔄 Engaging diversified live posts for ${remainingNeeded} reply/replies with 3-5 min pacing...`);
-    await discoverAndCommentOnX(remainingNeeded);
+    const communityTarget = Math.max(2, 4 - (feedCount || 0));
+    console.log(`🔄 Engaging diversified community & creator posts (Target: ${communityTarget} replies with 3-5 min pacing)...`);
+    await discoverAndCommentOnX(communityTarget);
+  } catch (e) {
+    console.warn('Community discover error:', e.message);
   }
 }
 
