@@ -325,7 +325,9 @@ const X_MIN_COMMENT_COOLDOWN_MS = 0; // Unrestricted commenting without time lim
 const COMMENTED_TWEETS_FILE = path.resolve(__dirname, 'commented_tweets.json');
 
 function canCommentOnX() {
-  return true; // No time limit restriction on comments
+  // HALTED FOR 3-7 DAY SHADOWBAN COOLDOWN:
+  // Automated replies have been completely paused to allow X anti-spam reply-deboosting to expire.
+  return false;
 }
 
 function getTweetIdFromUrl(url) {
