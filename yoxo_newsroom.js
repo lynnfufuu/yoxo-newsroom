@@ -47,14 +47,16 @@ function gitSyncHistory(actionDesc) {
 // 7 Categorized News Desks & Topic Thread Mappings
 const DESKS = [
   {
-    name: 'Web3 & Crypto',
-    threadId: 2,
+    name: 'MUST POST',
+    threadId: 57,
     sources: [
+      { type: 'rss', name: 'Google Worldwide Breaking', url: 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en' },
       { type: 'telegram', channel: 'WatcherGuru' },
-      { type: 'telegram', channel: 'CoingraphNews' },
-      { type: 'telegram', channel: 'cointelegraph' },
-      { type: 'rss', name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
-      { type: 'rss', name: 'Decrypt', url: 'https://decrypt.co/feed' }
+      { type: 'telegram', channel: 'disclosetv' },
+      { type: 'telegram', channel: 'insiderpaper' },
+      { type: 'rss', name: 'BBC Breaking', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
+      { type: 'rss', name: 'DiscussingFilm Mega', url: 'https://discussingfilm.net/feed/' },
+      { type: 'rss', name: 'Variety Breaking', url: 'https://variety.com/feed/' }
     ]
   },
   {
@@ -82,6 +84,17 @@ const DESKS = [
       { type: 'rss', name: 'DiscussingFilm', url: 'https://discussingfilm.net/feed/' },
       { type: 'rss', name: 'Rolling Stone', url: 'https://www.rollingstone.com/feed/' },
       { type: 'rss', name: 'DailyMail', url: 'https://www.dailymail.co.uk/news/index.rss' }
+    ]
+  },
+  {
+    name: 'Web3 & Crypto',
+    threadId: 2,
+    sources: [
+      { type: 'telegram', channel: 'WatcherGuru' },
+      { type: 'telegram', channel: 'CoingraphNews' },
+      { type: 'telegram', channel: 'cointelegraph' },
+      { type: 'rss', name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
+      { type: 'rss', name: 'Decrypt', url: 'https://decrypt.co/feed' }
     ]
   },
   {
@@ -124,19 +137,6 @@ const DESKS = [
       { type: 'rss', name: 'USGS Earthquakes', url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.atom' },
       { type: 'telegram', channel: 'insiderpaper' },
       { type: 'telegram', channel: 'disclosetv' }
-    ]
-  },
-  {
-    name: 'MUST POST',
-    threadId: 57,
-    sources: [
-      { type: 'rss', name: 'Google Worldwide Breaking', url: 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en' },
-      { type: 'telegram', channel: 'WatcherGuru' },
-      { type: 'telegram', channel: 'disclosetv' },
-      { type: 'telegram', channel: 'insiderpaper' },
-      { type: 'rss', name: 'BBC Breaking', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
-      { type: 'rss', name: 'DiscussingFilm Mega', url: 'https://discussingfilm.net/feed/' },
-      { type: 'rss', name: 'Variety Breaking', url: 'https://variety.com/feed/' }
     ]
   }
 ];
@@ -1459,7 +1459,7 @@ async function findViralSourceTweetForQRT(headline, photoPrimary, deskName) {
 async function runCycle() {
   console.log(`[${new Date().toLocaleTimeString()}] Scanning sources across all 3 News Desks...`);
   const history = loadHistory();
-  let autoPostedXThisCycle = false;
+  let autoPostedXCount = 0;
 
   for (const desk of DESKS) {
     console.log(`\n========================================`);
@@ -1661,9 +1661,9 @@ async function runCycle() {
             saveHeadline(cleanHeadline);
 
             // 100% Autopilot Publishing to X and Telegram Channel for top breaking stories (score >= 8 or MUST POST)
-            if (!autoPostedXThisCycle && (analysis.score >= 8 || analysis.is_must_post)) {
+            if (autoPostedXCount < 2 && (analysis.score >= 8 || analysis.is_must_post)) {
               if (canPostToX(cleanHeadline, analysis.is_must_post)) {
-                autoPostedXThisCycle = true;
+                autoPostedXCount++;
 
                 // 1. Auto-publish directly to Telegram Channel @yoxo_station
                 try {
@@ -2063,19 +2063,27 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
           const userElem = a.querySelector('div[data-testid="User-Name"]');
           const timeElem = a.querySelector('time');
 
+          const isPromoted = (a.innerText || '').includes('Promoted') || 
+                             (a.innerText || '').includes('Ad\n') || 
+                             a.querySelector('[data-testid="placementTracking"]') !== null;
+          if (isPromoted) return null; // STRICTLY SKIP ADS / SPONSORED POSTS!
+
           let rawUrl = linkElem ? linkElem.getAttribute('href') : null;
           if (rawUrl) {
             rawUrl = rawUrl.split('?')[0].replace(/\/analytics$/, '');
             if (!rawUrl.startsWith('http')) rawUrl = 'https://x.com' + rawUrl;
           }
 
+          const timeAttr = timeElem?.getAttribute('datetime');
+          if (!timeAttr) return null; // Must have a valid timestamp
+
           return {
             user: userElem?.innerText.replace(/\n/g, ' ') || '',
             text: textElem?.innerText.trim() || '',
             url: rawUrl,
-            time: timeElem?.getAttribute('datetime')
+            time: timeAttr
           };
-        });
+        }).filter(Boolean);
       });
 
       for (const t of visible) {
@@ -2108,11 +2116,12 @@ async function browseFeedAndCommentOnX(targetCommentsCount = 4) {
       if (hasAlreadyCommented(t.url)) return false;
       if (t.text.startsWith('RT @')) return false;
 
-      let ageMins = 15;
-      if (t.time) {
-        ageMins = (now - new Date(t.time).getTime()) / 60000;
-        if (ageMins > 720 || ageMins < -10) return false; // Up to 12 hours old
-      }
+      // STRICT FRESHNESS MANDATE: Reject any tweet lacking a real timestamp or older than 6 hours
+      if (!t.time) return false;
+      const parsedTime = new Date(t.time).getTime();
+      if (isNaN(parsedTime)) return false;
+      const ageMins = (now - parsedTime) / 60000;
+      if (ageMins > 360 || ageMins < -10) return false; // Must be strictly within 6 hours (never allow September/old posts)
       t.ageMins = Math.max(0, Math.round(ageMins));
       return true;
     });
