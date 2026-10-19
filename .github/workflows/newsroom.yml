@@ -1,9 +1,10 @@
 name: YoXo Newsroom Autonomous Cloud Dispatcher
 
 on:
-  schedule:
-    # Runs every 10 minutes automatically 24/7/365 in GitHub Cloud ($0, no card needed)
-    - cron: '*/10 * * * *'
+  # HIBERNATION MODE (3-7 DAY SHADOWBAN COOLDOWN)
+  # Schedule disabled to allow X anti-spam & trust score to fully reset.
+  # schedule:
+  #   - cron: '*/10 * * * *'
   workflow_dispatch: # Allows 1-click manual trigger anytime from GitHub Actions tab
 
 permissions:

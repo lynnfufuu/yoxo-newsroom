@@ -280,13 +280,10 @@ function hasAlreadyPostedToX(headline) {
 }
 
 function canPostToX(headline, isMustPost = false) {
-  if (headline && hasAlreadyPostedToX(headline)) {
-    return false; // NEVER post the same story twice to X!
-  }
-  if (isMustPost) {
-    console.log(`🚨 [Bypass Cooldown] MUST POST / viral breaking story bypasses timer for immediate publishing!`);
-    return true;
-  }
+  // FULL HIBERNATION MODE (3-7 DAY COOLDOWN):
+  // X posting is strictly disabled to allow X anti-spam algorithms and trust score to fully reset.
+  console.log('🛑 [Hibernation Mode] Standalone posting to X is locked during account shadowban cooldown.');
+  return false;
   if (!fs.existsSync(X_COOLDOWN_FILE)) return true;
   try {
     const data = JSON.parse(fs.readFileSync(X_COOLDOWN_FILE, 'utf8'));
