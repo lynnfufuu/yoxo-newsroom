@@ -1,15 +1,4 @@
 [
-  "https://news.google.com/rss/articles/CBMipAFBVV95cUxPdjNBQjROOW01Qkhldmw4Ul9RQVUxdGVpTWIyWU5EZ1l1VEZpN0Z5QlVfcWNQOUM4YzRzbi04N3FTSEdfUXlzYlJ5V0lVYXA0dGFaRXk4Vk1telhJOVJ3ZE9xal9EalBoSlVoZDRfZWdFTmpKbW9HS2lzQ2ljMUNwRmFIRjJVUGd1N2RuRjlENUdiQU1oeGdyaExWT2JDdHp1VTI4WQ?oc=5",
-  "https://theintercept.com/2026/10/28/yemen-saudi-arabia-iran/",
-  "https://theintercept.com/2026/10/25/hegseth-military-christian-religion/",
-  "https://news.google.com/rss/articles/CBMihgFBVV95cUxPNHdONmVBdW5aXzlmOGxvcXNQcHhWQS1nc1VXWjhQOHFwaDd6V2FrS0xrcWhrR2laWTlITFFPYk9vRjgzZzlXVmF3YkFBb2QzUmtMYVRmYmhTdmlnMzNNaXo3VTAtcnFRZFNlYTFpRjJTazhobDhtckZiYm9TZmY4ZU1WTzFjZw?oc=5",
-  "WatcherGuru/15689",
-  "CoingraphNews/23751",
-  "https://www.gamespot.com/articles/xbox-wants-to-be-more-profitable-than-playstation-and-nintendo-by-2030/",
-  "https://www.gamespot.com/articles/xboxs-recent-efforts-havent-changed-anything-and-the-future-remains-bleak-expert-says/",
-  "https://www.gamespot.com/articles/free-games-epic-games-store/1100-6476419/",
-  "https://www.gematsu.com/2026/10/virtua-fighter-crossroads-adds-lionel-rafale",
-  "https://www.gematsu.com/2026/10/adorable-adventures-coming-to-switch-2-on-november-12",
   "https://collider.com/cupertino-episode-4-mike-colter/",
   "https://news.google.com/rss/articles/CBMipwFBVV95cUxOZVAzc25wUFpVTlVaNWpKcDhIRDFIWkFlU1A3bjVwaHZsS2MwdS04emp4RDNNQ3I4QkpiT2RsOFRQQUZFOXFjc3BMVWNUbFVPWmE0LTdZeG5iVjA5am9xRWdrYVZlQklHVmQ4bUJFTlI1VkxvRTdGWlFkeTN0ZlQ5bG1nWmp5OUJHWGtYRC0walczV2VZWURqd2ZzS3lidS1GVXFxUkxZUQ?oc=5",
   "disclosetv/21971",
@@ -498,5 +487,16 @@
   "https://kotaku.com/no-thank-you-roblox-i-do-not-want-an-ai-driven-explosion-of-content-2000751567",
   "https://news.google.com/rss/articles/CBMirgFBVV95cUxOcGFYRTBtVk5ZUWE5TUd0WVpZVzVTdUxLRjhHc0poWUxBaXlURkFTRnNhWXFVa0JGODBoSEROUG44UDZnM2Z6ZURGNEZpUEx3TkJad0cxa1N6aWRTOXkyR1lDOEZSNUVnVUY5Sm5Kd1AwT2ItOWRGeWkxYnhTTDNFNTlzQWJJUVRIS2lYaHdiU05sQzluRzRaR2ZYd2djdkJnSm0yRzVtd2FJNVE4UVE?oc=5",
   "insiderpaper/45588",
-  "insiderpaper/45589"
+  "insiderpaper/45589",
+  "insiderpaper/45590",
+  "https://www.aljazeera.com/video/newsfeed/2026/10/30/aje-onl-nf_north-korea-seeks-absolute-superiority-in-drone-301026?traffic_source=rss",
+  "https://discussingfilm.net/2026/10/09/street-fighter-movie-2d-animation/",
+  "https://www.rollingstone.com/product-recommendations/lifestyle/court-of-thorns-and-roses-box-set-deal-discount-1235343100/",
+  "CoingraphNews/23742",
+  "CoingraphNews/23750",
+  "https://www.coindesk.com/markets/2026/10/30/live-news-binance-hack-rattles-crypto-as-intel-plunges-and-ai-spending-fears-hit-tech",
+  "https://decrypt.co/382269/crypto-kidnapping-texas-brothers-15-year-prison",
+  "https://news.google.com/rss/articles/CBMipAFBVV95cUxOUFBBSkJMMmRwSUZZT0JsQ09mcTVzbFRPd202c0hTaUg2a09HckFNMDh5ZTVWOXNyU0pUVjN1eGpCcldXNDNQVFQxQVNaQXF2RmpUWWh6OGJUNzBfU3J2SndfdmloMENNMWplbkRyY3o0bUgtWFBiUEM3Nl9SN3F3R0FCZjdrT2l0VUd2cXlvWlcxYTZoTHFiNmlRRzJEMDZVV1pjaQ?oc=5",
+  "https://kotaku.com/star-wars-knights-of-the-old-republic-bioware-lucasfilm-ea-rpg-2000751625",
+  "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOX2t0M0p0Ymktb21aZFNCRjdWN2hRU2trWHhwMEZzOEIwN0QtVkVieVFES1J2U0E3N1FmSFBVSkd4YWU5cERkclJpTWNXT1VoQUNMUnVEZEI3OF9IcWFSZm1mMEgtXzNqeVdWMUhrZ01uWkhfZXdUNGhiUE1kUDdsSGU3LXRjTFZxVnlkeDJTRGFObXNyS25yWFhadTZ6M2JKZnVldGVOVzZFUGpOLTh5aGJrTWE0QVFEWFQxOWF5Ni1qTkFnXzN3OA?oc=5"
 ]
