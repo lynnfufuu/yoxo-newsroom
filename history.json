@@ -1,13 +1,4 @@
 [
-  "https://news.google.com/rss/articles/CBMizwFBVV95cUxPN243LWNVNG4zV0lPQmtrdE9iMjRicWxkVzRVZjFzQXJaVnpuYXZoUENaS3NKMUpVR082Z2hrVEs1eENKNHp4aW5ZdmtvMHdaN18tXzJZbUtpUWFOdlhEdWlia1pHODBObFBpUDRKcGJvZFFvT0dxbmJwWk1GNFlRZVJkd205R0FXM0I2eW96LTRNTVNNQlU2cUZoM2RSRnYzNXFKU1BsNTBSbDA1X1FDSU1wb0JELTZlNzJOVGN1bUFObks1M2FPUlFLR2N6bzA?oc=5",
-  "https://news.google.com/rss/articles/CBMigwFBVV95cUxNQ3Nob19XNzBVcnloTXh6VlhvdDFfSGNxMzE2YkluRGdfLVF2Q091V3I1bFZCRXE2d1lzWHBZR2hSNGRJNHgxZGRkRlBNdE5GNXdFcF9VdUo4dGF5dm42MVAwOGxXQmZvZG5qcjdsaXdlXzBDMzA0WmVIYUxNaVNNbGFtNA?oc=5",
-  "WatcherGuru/15801",
-  "WatcherGuru/15802",
-  "https://www.aljazeera.com/news/2026/11/4/no-regrets-trump-says-iran-war-justified-despite-polls-drubbing?traffic_source=rss",
-  "https://www.aljazeera.com/news/2026/11/4/iranian-leaders-welcome-us-midterms-but-trump-may-still-attack?traffic_source=rss",
-  "https://www.aljazeera.com/sports/2026/11/4/ice-hockey-federation-reiterates-opposition-to-reinstatement-of-russia?traffic_source=rss",
-  "https://news.google.com/rss/articles/CBMivAFBVV95cUxNeUJsck14Q2xxdnJVbWkzcUFUV2xkNTR6TUtkQnRUY1I2NVNGYndBMUFTX0g2bDRGSjFUbGJrSHpYQ0dJbTFyZUcyS1Q5Z0dLWUpTODZvNWh0MzNZbUxnSUNzLTFDQzFCbTZpbkZqbm1FUXRia29fT0tLYUJsLS1ZMDNib0VQT2kweDBhcVdoRHprdks0aXA0MmlGOXJqZ3dhUTgzVHAxWEszTHBtRm5zM0JyQWx5SmUwNWRkUw?oc=5",
-  "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNWEw5ell3WmhSTFRzcTVVcGRVUHByRTFTM1gtUDNoUXlHNkFjc0E5QTlWR1d1UHFPS1pxUzlLS0hfZ1VqcTM3MU9wZlhhUnp6Q3VtWUppQlZjUVNfWmRvSG4zeF9OaUhzT1pfdzRHZTBHd1FhQTlzWVlEOHJfS2k0Njl2bnNKMTlUMVdhTWFjQlI0VVJnQS1rUE5VazQtcFJfajN6bG1JcGc?oc=5",
   "CoingraphNews/23746",
   "cointelegraph/73054",
   "https://www.ign.com/articles/ubisoft-among-suitors-trying-to-buy-marvels-blade-dishonored-studio-arkane-lyon-from-xbox",
@@ -498,5 +489,14 @@
   "https://news.google.com/rss/articles/CBMivgFBVV95cUxQZGE5NlN2TTlFenR0dW5ET1pRMmtJMzRkemFPZklyV1lpM0FnV1ROZm0tN0Jhc1JPNkRuOFp1aXZBOXZTOHI1dzRNM0g0Wm9XQlhjSjExdVNpc1RaMzJKajJoWmVwWG1BT2tNZkJGVFVkSk1XVUdmZjNCUGh0T2NRSUNZSF9mZzg5cmgxRGswSk15UEN2cDFhbXNlNW4wLUQ3Wl9ZNXhobGtxUlFmVm1rd0FscXhYRTRCa0NFSVNB?oc=5",
   "https://www.coindesk.com/markets/2026/11/05/bitcoin-miners-are-oversold-following-35-october-rout-says-vaneck",
   "https://www.ign.com/articles/mob-entertainment-lays-off-almost-entire-escape-from-playtime-team",
-  "https://kotaku.com/marvels-wolverine-insomniac-sony-playstation-ps5-sales-figures-2000754126"
+  "https://kotaku.com/marvels-wolverine-insomniac-sony-playstation-ps5-sales-figures-2000754126",
+  "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1HMzQwZkNtWnM3ci1XOWpTeGItSFhoVzUtdGVENE1jZkFDVnFuUzVycjJuSnNUUWNxVzVralZfRkJZcWZvTjhJQnVGMUNiMndIRmQyRzVNczZmVm8?oc=5",
+  "https://theintercept.com/2026/11/04/midterm-election-results-democrats-blue-wave/",
+  "https://www.aljazeera.com/news/2026/11/5/knives-out-will-congress-impeach-pete-hegseth-after-gop-midterms-loss?traffic_source=rss",
+  "https://news.google.com/rss/articles/CBMilwFBVV95cUxNWC1jWE8xS21QaUtyTEhiTXl5VGswTnBnUzVZZzhYQ3pnLWh5WWJxb3Zkbk1wVXB1RE92TGZMdE1qdGVXTFg3VFRjaTZ1cXJHSFg2Uk1PanFGbUxlWnhHYjYzT2xiVVFEMWJCY0o2Z0t2bHBpQjA5N0JvZUpxZEc3LU9zYUxJb1Vka29Sb1RlY3p2bmh3QThN?oc=5",
+  "https://www.coindesk.com/daybook-us/2026/11/05/bitcoin-is-resilient-but-leverage-is-missing-and-demand-still-tepid",
+  "https://decrypt.co/382599/binance-cuts-off-signalplus-api-keys-over-potential-security-issue-at-trading-platform",
+  "https://www.ign.com/articles/world-of-warcraft-forever-review",
+  "https://www.eurogamer.net/bioware-canada-house-of-commons-petition-save-mass-effect",
+  "https://kotaku.com/sony-promises-some-players-up-to-400-to-trade-in-their-used-ps5s-2000753447"
 ]
