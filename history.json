@@ -1,14 +1,4 @@
 [
-  "https://www.bbc.co.uk/news/articles/c6p9g39vln3yo?at_medium=RSS&amp;at_campaign=rss",
-  "insiderpaper/45741",
-  "https://variety.com/2026/politics/news/abdul-el-sayed-the-view-slams-trump-ted-cruz-1236940461/",
-  "https://www.politico.com/video/2026/11/02/haley-stevens-caps-a-bizarre-midterm-cycle-2217279",
-  "https://www.aljazeera.com/gallery/2026/11/5/photos-thousands-rally-in-france-over-rising-costs-and-economic-struggles?traffic_source=rss",
-  "https://www.rollingstone.com/product-recommendations/lifestyle/ashlee-simpson-liquid-iv-christmas-campaign-new-music-1235650413/",
-  "https://www.rollingstone.com/music/music-features/adam-lambert-queen-future-tour-1235652831/",
-  "https://www.dailymail.com/news/article-16268457/Rape-cases-record-386-days-work-courts-new-figures-Labour-continues-dither-clearing-justice-backlog.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
-  "WatcherGuru/15807",
-  "WatcherGuru/15817",
   "https://www.coindesk.com/business/2026/11/05/what-is-tradertraitor-the-hacking-squad-behind-the-usd6-3-billion-binance-heist",
   "https://www.gamespot.com/articles/gta-6-looks-pretty-realistic-until-it-comes-to-gym-etiquette/",
   "https://www.polygon.com/official-new-project-hail-mary-story-is-on-the-way/",
@@ -498,5 +488,15 @@
   "https://www.eurogamer.net/bioware-closure-documentary-release",
   "https://www.eurogamer.net/grand-theft-auto-6-pc-sooner-than-you-expect-curb-ai-clone",
   "https://screenrant.com/jason-statham-mechanic-resurrection-stream-tubi-november-2026/",
-  "https://www.theguardian.com/us-news/2020/aug/26/wildfires-us-south-west-colorado-arizona-new-mexico-utah"
+  "https://www.theguardian.com/us-news/2020/aug/26/wildfires-us-south-west-colorado-arizona-new-mexico-utah",
+  "https://news.google.com/rss/articles/CBMigwFBVV95cUxOX0VaY3Q2aFBMZDBjWFpsV3l6OXhNVE95RXpGWWtzdV8yMFA1bVdLRmJJWWg5T1NnLW1IX2w2VlBYY0NkajhWeG9UVlpXdUdGeWZ0YVpWTFdEVXZLUVZVY2dKdWxSckZ0bW1aeDFETkd0MzZISTZYc1dwYVdLcnJONHhzVQ?oc=5",
+  "https://news.google.com/rss/articles/CBMikAFBVV95cUxOYVYtbm1rYS1WWTVyQ3QwMjMwaXJRWGNDdHFnVy1KUldNTUhCNmZ6UFdiakFTU1p3VjdKN05EM21aTXVpYnZPQy1LMW80Slpxd2UxeF90RUFGb0F3YVoxY3hZY2lTUkxwc0VobmxDVmowcTg3Tmo2cU9XdWd5Zm5kT1gxUVFBdUFmX0hxeWt2eEo?oc=5",
+  "https://news.google.com/rss/articles/CBMioAFBVV95cUxOd01QVUtvYmZ4ZW5qVmdoVldoMTBTSmxqdXBpTmg2QVBfWTVTcGY0WURIN2UxSUtuTmN3cF9XWmpvU3BHNnhEV2hBRWRPeTY3ajBvNnVBMXRzZEVNVUQza3VQd0NLalVUQ1hRcmpfelY5VS1zdVhjNVdQYVd1bUhxYkZjaDZsaG5pTGtLYjRqVlByQW9YNkhpSjV2ZElweXdn?oc=5",
+  "https://www.aljazeera.com/video/newsfeed/2026/11/6/air-turns-hazardous-in-new-delhi-days-before-diwali?traffic_source=rss",
+  "https://news.google.com/rss/articles/CBMiswFBVV95cUxNNDZPcUVsTDZuTk5tVkF0OFdBMjhUX0NTeUZwWmp0Y2hOQUZDRHB4ZG5jZHloMFU4UkJwbmUzZzVlM21OWUpnVFlfOV9pOWZmY1pHRUZvdURNRUtjbndUaVM2Rjk3dXRMenczeFFSNHRBTWJOa2xnTnpWZkRVUlY1VWFnM002cFpTQ25EX2VUZlNjdmFidTFsd19NcHFUTWhKMjhuZWxTczZWWnNGSm9FREluRQ?oc=5",
+  "https://news.google.com/rss/articles/CBMivgFBVV95cUxQZV9QS2FiM0pfM0VqZE1FMS1uV2dyd0M2M3NJbzhlaDl5WFFaTnNIVW1pYlVVTFAxMGpiQ0M3WTZtQTdoYXV1VjdZd2pwOWdTR0tGcFlEcHE5U1BqOFlXMDdHWVpGS2kzeTRzLUFleEVNN3d4X3RoaTJVSHBlQ0x2NkN4cVVrN3dScUpRRzNpUjJxSVdPelJTY0pFZ2VIcW9pRUtKVF85d3V4TlpQNUk2eHAtSWRFNFBFNnVNQTlR?oc=5",
+  "https://news.google.com/rss/articles/CBMic0FVX3lxTE1KTjl3NWFRUFdXYndHaW9OQXlpT0poWXhSUE1NTXM4ejFReC0yeEFsdjAwZzA0OFRjWVJKcm93b3dZVllnanpsVU5iSkI2cnAwRUdOa09ReGJCTng4TWFGQkNfU0VNbmJMTERjcWNkdTVZbHPSAXhBVV95cUxQR295cGZObEdRcE50SUVKU1ZqNk1vZTU3NGRQZjJ5ejFmbEdXbndCSU1TQWtHaUp4aEFhZTFCSTJJS0tUM3FOY1lYN0htN0lGcmRUbTRfTGJMRjVYMThtSExjVVJoUnhQQTg5QURiNjhaOVZRMUxCdGc?oc=5",
+  "https://kotaku.com/microsoft-data-center-protest-ai-amsterdam-palestine-banners-2000754616",
+  "https://news.google.com/rss/articles/CBMitwFBVV95cUxQVVZMejNkZDJIanQzQXFRaE1jT3FRbE9hNW9QbzhBemZHREZpdlRwNTV4c1k1cUFiTzRUVk1HMjRfakRhU0p4YXRRU193MThxN3d5Wm9fVE1QUG5Ra0dWdm5RVjEzSHcwc1FySmQ3VkxhbWRHYnV6TW9jai04R2NxOXIzSTFsLW9qSThGWGhhcU9aa1psZU1jc3BmSUZUaFllVzBLM2hzaEVCMVlvVjYtTGxKRVRqNG8?oc=5",
+  "disclosetv/22051"
 ]
