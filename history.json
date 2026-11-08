@@ -1,15 +1,4 @@
 [
-  "https://news.google.com/rss/articles/CBMid0FVX3lxTE9TdzlKcHJ0anlDZ2JSaXVlYzdIXy1kNGhQRjA5dGZScW53TG4yU2wwSnRqSGN5VUE4a0YySEYxakw4SXAwc0RJaTdmYlZYMVplQUlzNmdhV3N2dGRiMW5oN1Q2eGZNT3owLWU3SlVYRUR5WUVsemNB?oc=5",
-  "https://news.google.com/rss/articles/CBMiigFBVV95cUxObTV0aUIwMHVXZWwxM1ZncHRja3E5SmUtenNHZE5XSHZ5elpSRDg1eVNmQnJGaHpkQzNGc1Vvck9TdklVWVFvVHpHYkZxazZlRi1fREJBdHRzQkxMNjhST0JuLWNDNGxyYWhaaGhXZDZKdFdUaGtYUzdKREYyU09iWFpDd0JUUU9oUVE?oc=5",
-  "https://collider.com/stephen-king-it-welcome-to-derry-horror-series-8-episode-binge/",
-  "https://www.theguardian.com/us-news/2020/aug/26/wildfires-us-south-west-colorado-arizona-new-mexico-utah",
-  "https://news.google.com/rss/articles/CBMilgFBVV95cUxPRDljb3o2b3c3ekxpVVJoVUZTLXdCVUZjOExKSVhnZVBFTkdzM1lkZjFVbHdZeW5GeFFyZ0lXMFRvTVFuc3pUYy1BWGNDWXVRaG9vbXNQU1pQcVpVQTZySkk4cHdhTkZqcTBBb05qNVR4Qk1xMVpJM2hTZEg5ZjZtTWlXajY2R204S3JOdTMtZEthZVljWUE?oc=5",
-  "https://news.google.com/rss/articles/CBMirgFBVV95cUxOQ0hzOUNLZUw4VklCNFBfZ0lyaU1WWTVXaFJUT0NNd3J4VUloem9VdDRfbW96WXh6MWQwLURSbC1LN3d5N2h5VGhteVRyWlB6RXI0bTBpdTBXVkVFbmQyRjZqLWlvVUl5R2g4QU13QzFlbzRKVmMwSmRCdEtyaHZQbGdBSmZvY2ZqRmFWMFJDQm5YVGVQNnRKYW03STJMVTI2RkhDLVh6N2dyX01JaWc?oc=5",
-  "https://www.aljazeera.com/news/2026/11/8/egypts-reopening-of-its-embassy-in-tripoli-signals-regional-shift-on-libya?traffic_source=rss",
-  "https://news.google.com/rss/articles/CBMivgFBVV95cUxOU2cxWERFdE0tN1pxTEhCQTdoSllrMzhOWjV4c3ZhaGFMTmx5aHQ1MmpzQzdDcmJweGtDV0xRVjY4eVdyQnctdVdDSGhJRzFRUTctc3c0bjF2YW55eVRISFFIZU5RZ05rd29SbGdCOF9fRnZQWEhERU15dlQ5M0Y3aFkzcTdFanRjaUtxNF9PQURvZGpyUThnUWRjeWlObHl5ZHBRQTN6WUFveXR2cURQYXlNWldVekdtLU0xOWR3?oc=5",
-  "CoingraphNews/23742",
-  "CoingraphNews/23743",
-  "https://decrypt.co/382761/bitcoin-developer-quantum-landmines-losing-bet",
   "https://news.google.com/rss/articles/CBMixAFBVV95cUxPT1JzbGtFNENzd2ZKY3JuSlJCNEdMeS1ES3o1UzZjV0NJYXVCMzd1bVdFSnJVZU1HMVNmV2lKcnJMbGZlQVBNR2E5REhLU1F5VnJ3dldOUElkSEJsbW8xS0psRjFNOVJ3STg4N05BbUQwdEctVUkwMy1FVndndFJ2eU9meHRUU1dBSklSdnVBRmxrQkpHQ2pRaUV4anU2RVkzSDhWYS1mQkw3UGhSR2lSX1o3NVQyVEh3Q2x6aFB6NjhFYVRu?oc=5",
   "https://screenrant.com/stephen-king-misery-horror-movie-streaming-free-tubi/",
   "https://news.google.com/rss/articles/CBMitAFBVV95cUxPTjMxbXR4SnMxRnNYZnBnU2NGWFdxNUVpMzZrdGpGbWVUSUlHTFlOSDZnSnNGeEYyRDNWUE5xVGRkUDlTOHF3Wk9aVEZneDBYN1hGTEZBR1liN2NaVmFub19yZ1QycUNSV0Z4MGpqRkxreHRfSk5jMXRDZkdZX2o4SUppVGhFeTFVZGZCRWY4LWJfb0Nqb0NieENOdjRUSnVldnpIdzY1Z3BiaHN3WklBWDZuRFA?oc=5",
@@ -498,5 +487,16 @@
   "https://news.google.com/rss/articles/CBMitgFBVV95cUxNUDVaR1Z1M0x5b1B2ZzMzN1N5RmxkZVQ2UXBqdUVFSHJ0aUxXQVIyMnJoMFZqRElsQ3Fac1FrV2NQMzFsSXpQOG9ZSWVwdXVKR2RfcUdMa1Eydy0xTWc3ZFZFVDZsaFczcEZQV19EOFJFUUlTQVdnYVhXM1BrenBQX1EtRlM0MDR5ajJQV2pwNEJiU29kTFBUVTUtUzY3dklrdkJXVkRtVldPSmRkRkhXZGJWVm5nUQ?oc=5",
   "https://www.videogameschronicle.com/guide/zelda-oot-remake-win-treasure-chest-shop-game/",
   "https://www.eurogamer.net/wow-forever-biggest-launch-world-of-warcraft-history-concurrent-players",
-  "https://screenrant.com/lord-of-the-rings-andy-serkis-gollum-still-haunts-him/"
+  "https://screenrant.com/lord-of-the-rings-andy-serkis-gollum-still-haunts-him/",
+  "https://news.google.com/rss/articles/CBMie0FVX3lxTE1YNTdGbHJEZEVFVGpoRFVHeXkxVWRSSDFmMWhsWmd1UEMyb0YtQWk0ZTNod1VPM0Vtc0o0d3Zsa20xOUlHcE9yQWdWbmJCMmhqeXB6R1NnMHJTb2lCV3owaUZ5eHBHV3NkUXUza045Z3kxTWVuZU5FME10b9IBgAFBVV95cUxQMlNQU2JvaTZiTUZGd01rNDJNRlFmRnBMbjJVRkpqbVlZenpxbDNfSVZMdDZqd2xiWHY0bEExWVE0c0QtSGF6Ti1OdXF5Q1FSSDBWTDNuOU9zS1BwWWhrT2VMbG5yRnk3RGlUdGRBNUo5VDhsam1oZkZiTk9aM0w4cg?oc=5",
+  "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQS3FnVXp6aUdnT2dUOXZOczdNMjBiTmR5SFpHS0Q3X1RVckVFMmdvWVJzUjhHYUk0Z255Sk4xbW02TUw2Zk94eWNNeG96UE1oN2QwUFhpSFhQbHJoaDZ6MUFvQ2d1SjNSemVYNzBVNHRRdkhUYzdnV01pZE5oZjhhZUhWMDh5emJSSHhPUS1ENkJGSERCWFJLWndydHZicUtlakFYaWhYWFhwWndmcHFZcWI1VndQcW5xLVMtMll1YWFDZDjSAcgBQVVfeXFMUGw2Zm9sTFZHWWVqazdqdzhlU1J3YXZ1bkZwVHVVNmZoT1FMbFpRaE1scWNweUplVmY1dDhwSTVQWFZXaXd2M1NzTTY1UEZ0T3otODJRN2dNU1VjT0otUElURldxMkFVdnRCMS1RdTJuSUlQRFp2SGMxTWFuU1V6UFFMTmJTUTFiR3VHdk8yUTRHcHZhYnRWM2hFSHoxcG9tNzQ0WXNXeHd1M2tBX3lYRXlkTGhqeS05S0xBX2dhN3Q3T2tJUEVVekk?oc=5",
+  "https://www.bbc.co.uk/news/articles/cm4g1nq8158po?at_medium=RSS&amp;at_campaign=rss",
+  "https://theintercept.com/2026/11/06/defeating-zionism-to-free-palestine/",
+  "https://news.google.com/rss/articles/CBMijAFBVV95cUxNLWpJcHZFeUJUSUc1WkZkRGktMG15eXl3czh6U0Y1Rk5hVjRwZGhvSmRKQllrdVVWdnMxY0ZTQzJ1d2w2WjU2aW5ERVdjclFEZ0hNODYxUUxYZjhRbks0Zm1ZcWxZcnJ4Y1J3R0hpdVFLMFdvWFkzS011bi05T1V5dVBKWGV3cnJfVXMtMw?oc=5",
+  "CoingraphNews/23746",
+  "CoingraphNews/23748",
+  "https://www.coindesk.com/markets/2026/11/08/these-finland-homes-get-free-heat-from-bitcoin-miners-as-long-as-btc-stays-above-usd70-000",
+  "https://decrypt.co/382756/greece-passes-crypto-tax-law-staking-defi",
+  "https://www.eurogamer.net/among-us-missing-teen-rescued-utah-oregon",
+  "https://screenrant.com/i-play-rocky-2026-movie-sylvester-stallone-reaction/"
 ]
