@@ -1,13 +1,4 @@
 [
-  "disclosetv/22061",
-  "insiderpaper/45779",
-  "https://discussingfilm.net/2026/10/15/street-fighter-review-kitao-sakurai/",
-  "http://www.democracynow.org/2026/11/4/keisha_lance_bottoms_becomes_first_black",
-  "https://www.aljazeera.com/news/2026/11/7/irans-irgc-says-building-underground-sites-for-weapons-production-storage?traffic_source=rss",
-  "https://news.google.com/rss/articles/CBMilgFBVV95cUxPME9wSE5FNTJ5VlM4T1pRcG0ybTEwbVpYazh3a01iNnM1VFJrX0JhWWIyUmpISmNSU3NYOTVWMUJlR3dLRnAyZWNIOUJhX09MT3Ztc09Dc21MQklESzVqeFJ1cEU1ZzVuMUc0YTlRQjFLZEJKV29ZeDhtQ3ZYYklXbE5wT0xWMGJtc183Wi10SG1YeWtDV2c?oc=5",
-  "https://www.rollingstone.com/music/music-features/houndmouth-matt-myers-interview-lordy-1235653878/",
-  "https://www.dailymail.com/news/article-16268497/Met-boss-warns-Britain-risks-having-fewer-bobbies-beat-soaring-crime-rates-unless-red-tape-cut-biggest-shake-forces-half-century.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
-  "https://www.dailymail.com/news/article-16271919/Keir-Starmer-cashes-lucrative-speaking-gigs-quitting-No10-signs-US-based-agency-boasts-Joe-Biden-Jacinda-Ardern-Kamala-Harris-clients.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
   "https://decrypt.co/382770/ai-chip-stocks-bounce-global-rout-bubble-starting-burst",
   "https://www.ign.com/articles/ed-boon-wants-to-know-what-fans-want-the-next-mortal-kombat-game-to-be-called",
   "https://www.ign.com/articles/gta-6-players-in-germany-can-legally-take-time-off-work-to-play-the-game-on-launch-but-theres-a-catch",
@@ -498,5 +489,14 @@
   "cointelegraph/73102",
   "https://news.google.com/rss/articles/CBMitAFBVV95cUxQU2VvdzQ3WE5ycG9JWWFTRGxfN05mWHVBLUwydHh3b2k1WGdXSVZobFlwVHlmT1VfWkQxeVMtd1U5bkNHSnFQUlJiYV9FSnprWGR4ZVBacG1MZFpDUEJHOTNhVlNDVl9oMWVZOVFHMjRyWnpTeUY4eUc4b2FDdnc4S3dxZWE5bHZzQ2ZZU3c0MW9jRDEyMTdWQWRYMTNBY28zTFlBT05iSFgydVoyZzBQUzdfdGI?oc=5",
   "https://collider.com/best-hbo-comedy-series-the-rehearsal-nathan-fielder-before-you-can-see-everything/",
-  "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNZ1lUc0dDYnBBUFYzV2tSX3BpV2wxNWxHMElMNkRsMjU2dmVPOTNLa0FoeFdBby05RUsxbTBlS0Z2dGRFODU5UW9UOUxmTU5jM3BvV29reTdqSUFpZ3JOTnFjT0otX1duN0JRdHc5YjZVNkVZX19ZOXFpLXNmN2had2F3el9CelZIQi10SDlNWEgyYUZla2xWWjBraEVXbnpodWg1QlJBdERnU2M?oc=5"
+  "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNZ1lUc0dDYnBBUFYzV2tSX3BpV2wxNWxHMElMNkRsMjU2dmVPOTNLa0FoeFdBby05RUsxbTBlS0Z2dGRFODU5UW9UOUxmTU5jM3BvV29reTdqSUFpZ3JOTnFjT0otX1duN0JRdHc5YjZVNkVZX19ZOXFpLXNmN2had2F3el9CelZIQi10SDlNWEgyYUZla2xWWjBraEVXbnpodWg1QlJBdERnU2M?oc=5",
+  "WatcherGuru/15857",
+  "insiderpaper/45762",
+  "https://news.google.com/rss/articles/CBMivgFBVV95cUxNenZpbnVjZW9talNUVnpGMG82UWl3ZjluMFNfUF9sSFN2V04zVUQybnI0Wm55Wm9pTDQwYlpIVGxDaVA2SFpRdEtXSG5sckc0QXNqT2tjWUExaHFlWHRBZE1DZlpEbkt1TDltTlJ0aV80czE0bkJROHRIRHlPOV9KM3A0YXhJdEw0Vjc4MDRwajlzYlgtUUdiRUdoMlZXUU9lTXVxN0t5bjY1STBpVG10MXJKdkV4ZHhiRWRvZk5R?oc=5",
+  "https://news.google.com/rss/articles/CBMi2AFBVV95cUxQTm96YkV3UjVLQUJxZHVWNDFzOGJhanNaTnJrdnNYdmVBSGNGWldkUUhoU01GWEVKZUYxRHh5OGlLN2NpYzk4S0hHLUpOdHpndVhCd2VsX0JjXzdncks0dWxET1VyYVBGeXhxSEkyckxUTHFLLTRyNF9xb3lHSWN4Zy1BWnh2Y0NZYnRsZDBtOGdoYTR6dWdQUnA1UTdZM0ZveUZXRFFqRlc1UHVWUk1kcDQteGozczBzVUluQm5YdDJOdUh1SmpudFkzSmdfcmYtVng0bUFOWUU?oc=5",
+  "https://news.google.com/rss/articles/CBMifEFVX3lxTE1hd3JTV2RabjRhUl9kcVJKcnVYWVhoUExiX0FrLWxpdmFaWUpQTXcxaDRUdUFfR0JtR2M0Um1kOXlUVFhQWmhGNjFQRTNsbVk3M1R4TUE4bS1OUENhdTloX0llakdNWDhZbXkxR0Y0ZWxKMTgyN3BXRHZXTi0?oc=5",
+  "https://news.google.com/rss/articles/CBMipAFBVV95cUxPVlJqY2ZPMTRWZUk2anU0ZUNzVzNuYlJVQWlUYVU2MUY2b3c0YXFuc2I1X0hKZ3RFUlk5UWJLWUpmdnYtUi02a051SnVZejR0dlZVQU9ONDA5aUpQZzR5ZXJ2YU1oSWwtLTlLMm1TTEJ4M2ctZkgzQmRTTHZ6bFI2Zk1KQ09LaEUxTkdWaWt4M2tXcm05dU9TcndxVnU1dGgzYlllbA?oc=5",
+  "https://www.eurogamer.net/crimson-desert-charting-the-unknown-now-playing",
+  "https://www.gematsu.com/2026/11/aniplex-and-cybird-announce-dark-fantasy-visual-novel-lunareverse-for-switch-pc",
+  "https://collider.com/rebecca-ferguson-doctor-sleep-streaming-success-november-2026/"
 ]
