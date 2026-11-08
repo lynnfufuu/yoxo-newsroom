@@ -1,13 +1,4 @@
 [
-  "https://news.google.com/rss/articles/CBMirwFBVV95cUxQNlNKVFloSU5UTkJjVlNEU3p4Qk1kVXJMaUdJVTZiS0Z5WGszaFllT1U2d0swd0pkUFlORHhzN1NDQ1VVTGQxem9oU0JoTWM5Ull5bTJVc1htVGFaMnVYN0daczlzbXE1U0JMTG1LQVFxSDA3STRueUxkV0hCMTA3djJBcVBuVnZybDRZb0dDNV9KT0F2Y3JCcGFBREJvYkRLWGhnNm5icC16LURPTmhn?oc=5",
-  "CoingraphNews/23742",
-  "CoingraphNews/23743",
-  "https://news.google.com/rss/articles/CBMilwFBVV95cUxPcWlORzZ3VDZlQzJPaUNNSnBFSjZYOWNpNXM4MkIxVUVxTmJ5ZF9SWHo4b2hxYm1GNnBzekRfWVV2Q19wQ2l6blJDTDZRWmRwdG1HNnZ5WllfM19Hc0tzSk1pLXR3a3ZFU3ItQl9oTDFTWXhPcmRBeDk5YTIxNFhzeXk5VXRGLTJCd3Q5bThFdVN1d2UxMkFj0gGcAUFVX3lxTFBEZjF5RTltLXdYczRDN0VLWFpYT2hNWGhrZzhyTnN6RFFsMTFvX3llcUdwNjZveTZJQ3o4b0hiUnczMUpQcjBJUDZhQ0d3NGc3bkZHa2NYcEFRQ2J0XzdqSHV5V1FQZDlOWlItUTB1UVpmdjg0RkIyTGs2M1JTckswcmNXQnNpRGlHbGRCcDRkbDg2VzF4RkdXN2tCdA?oc=5",
-  "https://screenrant.com/godzilla-minus-zero-ending-third-movie-clarified-kamiki-hamabe-yamazaki/",
-  "https://news.google.com/rss/articles/CBMisgFBVV95cUxQNjJubXg0Znh4QVI4cm5kSENUVE9LYXZWR2xJZm5Ya2NQRDRzcXZRMzNMakZzTHpPbFp6cE51WHBmNUlLWlN5T0F5X1ZoeUpRYklCOVNkOU50enRfMFlGTGVsTktVQU1qcWhfazN0eE5yZGJfd1Fmdk9SY1NZSkZta3E4M2x3cHhrb20wbDl5YU5UdkZVRlVOTWZCSFhFSkh5QU5EbnpMRkIxaFIxQWVSdEN30gG3AUFVX3lxTFB5OENqM2pFYzQzdXlrMHBiaGF1RlhPd2hDQzJxSW1FQlNqRVNMV3VlOFMwS0tLaDM1RThDcmF3ZVZSMUM0SkFXenhDZmlCMW0tWUhhQ2d6OWJYQlprd3h3SUttM2djTDlIM09HdVVWY1VJZ01hZ3REbkpTellwSDQ0WVpQcFNyTUM3MlZhenhwcWFYS3p1MjB5bDlTQ1ZYbVNRN2tQdER4N3RYaFowcVVIRjN6X1k5WQ?oc=5",
-  "remarks/6422",
-  "https://news.google.com/rss/articles/CBMilwJBVV95cUxPdk1ySTN1ck8tSnJ2UFczbGI5OWI1NUpBcDZfRTdSNm0tdVhoVTQ4TVRhNks3Ums4SDNXRmE2cVM5cktWUkdCa0c4SzBxUi1oZXFXRXpaa1E2dVZ0akNaY2Z0dFFLUTNSWU04NjhZS3kzbjZrNEZOYlNXMzdWSEEyY0Y3MTk4dXVVcUpfb29ScWlVVll1WkpFRVZ5TE5DZ2FMNlhxeGVFcHZKZEE2VF9RWmxNUmNyLUIxdnU5LWZ0VzBmeVdYZnIzQUVDaG1lUDdiTEtWaHBFR3dYdzJuNDliNzFjdC12MjFxRzduRUxrbmdTbTR2Qml1bDJBV2JVNGtwTlJBMVNmZnVqV3NMU3d1R3JkTnhSc2s?oc=5",
-  "https://variety.com/2026/tv/markets-festivals/pokemon-anime-studio-olm-ai-coloring-tool-three-frames-1236942198/",
   "CoingraphNews/23740",
   "CoingraphNews/23741",
   "CoingraphNews/23744",
@@ -498,5 +489,14 @@
   "https://www.eurogamer.net/among-us-missing-teen-rescued-utah-oregon",
   "https://www.gamespot.com/articles/can-you-upgrade-to-gta-6s-100-edition-yes-and-its-easy-heres-how/",
   "https://screenrant.com/alan-ritchson-prime-video-christmas-action-movie-red-one/",
-  "https://www.bbc.co.uk/news/articles/cm4g1nq8158po?at_medium=RSS&amp;at_campaign=rss"
+  "https://www.bbc.co.uk/news/articles/cm4g1nq8158po?at_medium=RSS&amp;at_campaign=rss",
+  "https://news.google.com/rss/articles/CBMinwFBVV95cUxPeDh4eC1jTFdGeTg4TW5XZVlOSTZERjJZQTNZem5kbmNVZ3NWWEZpUkI5NnRsazdCZHZCWnRMbmpHcFdIbFRMYndKeFhONGdHTUdTZ3hiRG1fOUZxWW1zLUZxRlgtWGhUdEdpWWVLSGpCakMyWUlGQnF5S003RjROd29Kbkl5cVlJRjlWUExyN2xsX2syZkNjenhkNDdLcms?oc=5",
+  "https://www.aljazeera.com/video/newsfeed/2026/11/8/cctv-captures-streets-shaking-as-5-7-magnitude-earthquake-hits-japan?traffic_source=rss",
+  "https://www.dailymail.com/news/article-16271017/Russell-Brand-matey-time-Labour-drug-talk-Vaz-cocaine-rent-boys.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
+  "CoingraphNews/23746",
+  "https://decrypt.co/382756/greece-passes-crypto-tax-law-staking-defi",
+  "https://news.google.com/rss/articles/CBMid0FVX3lxTE9TdzlKcHJ0anlDZ2JSaXVlYzdIXy1kNGhQRjA5dGZScW53TG4yU2wwSnRqSGN5VUE4a0YySEYxakw4SXAwc0RJaTdmYlZYMVplQUlzNmdhV3N2dGRiMW5oN1Q2eGZNT3owLWU3SlVYRUR5WUVsemNB?oc=5",
+  "https://news.google.com/rss/articles/CBMiigFBVV95cUxObTV0aUIwMHVXZWwxM1ZncHRja3E5SmUtenNHZE5XSHZ5elpSRDg1eVNmQnJGaHpkQzNGc1Vvck9TdklVWVFvVHpHYkZxazZlRi1fREJBdHRzQkxMNjhST0JuLWNDNGxyYWhaaGhXZDZKdFdUaGtYUzdKREYyU09iWFpDd0JUUU9oUVE?oc=5",
+  "https://collider.com/stephen-king-it-welcome-to-derry-horror-series-8-episode-binge/",
+  "https://www.theguardian.com/us-news/2020/aug/26/wildfires-us-south-west-colorado-arizona-new-mexico-utah"
 ]
