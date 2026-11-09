@@ -1,13 +1,4 @@
 [
-  "cointelegraph/73133",
-  "https://www.ign.com/articles/i-feel-like-modding-is-kind-of-dying-mass-effect-3-multiplayer-modder-on-ais-impact-on-the-scene",
-  "https://www.videogameschronicle.com/guide/zelda-oot-remake-full-gerudo-proving-grounds-walkthrough/",
-  "https://www.eurogamer.net/the-elder-scrolls-6-sentinel-ladders-skyrim-bethesda-designer",
-  "https://screenrant.com/best-sylvester-stallone-movies-not-rocky-rambo-ranked/",
-  "https://www.theguardian.com/us-news/2020/aug/26/wildfires-us-south-west-colorado-arizona-new-mexico-utah",
-  "https://news.google.com/rss/articles/CBMinAFBVV95cUxNWmJEMmVtUEhWSGJXODN3UWtpcHZVbGpaZ0d0VE41N3JseEhjVXdBaHJ2ZHI5MkFnbHRVeFpscDRIWDd3cmRpTFpLWUFTVjRyMjI5U2ZDSXpXREtrUmFONjgyQXVnbGUwWjRUclhFUDMxUHR0NHQ1RVBqMkJDcmlfaTF3cnFYSEdHU2RNWTJSaWVxRW9hR21KN0dZVEs?oc=5",
-  "remarks/6418",
-  "remarks/6419",
   "https://www.aljazeera.com/video/newsfeed/2026/11/9/china-rejects-baseless-claims-it-spied-on-nvidia-boss?traffic_source=rss",
   "https://www.aljazeera.com/video/newsfeed/2026/11/9/partial-collapse-of-pakistans-tarbela-dam-causes-flood-water-surge?traffic_source=rss",
   "https://variety.com/2026/tv/news/anjali-sud-ceo-siriusxms-tubi-1236943001/",
@@ -498,5 +489,14 @@
   "https://www.coindesk.com/daybook-us/2026/11/09/bitcoin-bulls-can-t-rely-on-etf-flows",
   "https://news.google.com/rss/articles/CBMi9gFBVV95cUxPZGc0NG9ISHFOM3JOSWI2Z21GcHp6dEwyUVJZdlVZSmFoS3BLaHJVNXJGWWpYeEFHS3hKeEZaZW14LUFBVWpvQWhmOXlHN2pGSGk0cHRMZEpjZFNhTnhMRUFPSnNDSm9iREk4QW1RVFUyOW1HcU5MTU56bl9qcC03YkU0VG9GTmJQelpPcXQtSGFFMlpja0gzMVZES28wWXg5WDV2UHNST3lnYTFrYk9ackFLcVZMc1VjVFNkLUw5elYwWUx1dkZ1Rk5HaVVLNHY3Zm5aN3NONWZkM3VJWkw5ZWtNMUpIc05qSVdkb24xYVVQZWpldnc?oc=5",
   "https://kotaku.com/first-25-hours-wow-forever-wasting-time-2000755140",
-  "https://www.polygon.com/zelda-ocarina-of-time-remake-oot-biggorons-sword-how-to-get/"
+  "https://www.polygon.com/zelda-ocarina-of-time-remake-oot-biggorons-sword-how-to-get/",
+  "https://news.google.com/rss/articles/CBMipwFBVV95cUxQcnk2bHNkaTJLbFNVcWZtcVZlbUtfcnFCZktRbHFoNFZGamhYaHVycG5DOVUtakRSRFhBWENqZ3drc3UtRGoxOFB1TW13LTJtOFJ5M0xfT1g5MDdCdFVGYjlrNVlhUUh3Qml0Y0tUWVpQS3llbkNxc3NDZ3FFNDZVQXpaMDdDMV9ER0w1eVZkX09yQWMxVjhtanp2V1BMeWkzOWt2LTdRbw?oc=5",
+  "https://theintercept.com/2026/11/08/nithya-raman-la-mayor-socialist-progressive/",
+  "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQUTMxWDJaaTBGZ2RVZUR4M0s4TWZlR3JJOHVOeEhsc3Z2ZWtad2NFcWR1LXpqak5WSlpYLUMzNzBLbklNQVRKeGlTdi1mOGtsNngtLWE5WWxOanRHelQtbm1TZS03UGx3U0daM3ZEWldsVkpic0JEX0VfNlk3SUhaM093X0JZSHlnZldQYTVrMHZvRVhQUmh3TDZ3aFp5SlJ5Vjg2SS1HdVBydw?oc=5",
+  "https://news.google.com/rss/articles/CBMilwFBVV95cUxOOThwME5FbXlJQWJkX0tXdHZtXzRGelRFOVFrcklRbThHZUJKWFdDWk0wUEd0MXJETFIxNXVBTElBeVQ2SW5YWGdnczFYdjUtQ1RkdlBzdkswVmNtb0tjbVhlNTh4dnpRTzk1bldYTTNfY3VMdS1CaUNEa2tJX2MxQlhFRVFUSkFRWExzSGJwaEs1TGpMNXFr?oc=5",
+  "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNTWRjd2gteXZTTUgwSy1zZWtfVl9mcFZubXp1S0tNYmIyMEs0NlpodFp5cl9TTXh1T3BDNjdFMUJVSXZfbGRkNlIxQllKR3RIUmJ0QndLSjc3QkVrQ3VGa3k0SHZfWFJMcjluRTVkNlV1VkJISmxtRHMyV3N1Zzkxb3MweUFxbWZLdi00Vy1hV3A4UVRjZXFzdm1FcXlDbjhnOHVQVGZzQVpxaFR1Nm9BVVhjOG9lMXBsNkd1UGxRcHZSNmxmNzlhQ2VIU3JqSzd4bF9CV1M0SE56TFRIRUE?oc=5",
+  "https://www.coindesk.com/business/2026/11/09/trump-says-he-knows-nothing-about-world-liberty-s-uae-ties-as-justin-sun-challenges-filings",
+  "https://decrypt.co/382890/ai-data-centers-used-jet-engines-power-turbines",
+  "https://news.google.com/rss/articles/CBMioAFBVV95cUxOdXBRQWZQTUxFVFR0NkdRMHV3LTNPT1lPU2VfUmxZRXNHSFpaeWRobHM0cnU0cTR0N2E3MTB5aWx1YlBheS1welFTZ2NNWV9OX3lmRmdtem1WbGlRMWFPci05M2p5M3Y4Sjc0UUpmYm9DLUNUb3lZQ29MTExlT1QxTURQaDhReXMyS3FJVkE2OGxFcFozVkFPX1l0YzAxOVpo?oc=5",
+  "https://kotaku.com/nba-2k27-sold-less-than-expected-because-of-gta-6-2000755174"
 ]
