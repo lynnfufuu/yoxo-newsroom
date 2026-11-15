@@ -1,14 +1,4 @@
 [
-  "https://news.google.com/rss/articles/CBMi4gFBVV95cUxQTjFkRTVYX0h5YmtsNUpQOUtranpKZUtRdk9xalY2Ny1Vc0JDV2xwdjdDb2hNZ193THJwM0p2ajlRWmIwbjBXZ0xfUl9MWi1peC1vMUd3Vl9ENGxHcUJwVXBmVWtiYm45NW1nZXVSd0E4bXJBbjVQaXpnMDR1bVA4aklTT244UXIxQ1FXaXBiOENKMVJEM0JmYWZoTVhpR2RoSjR6RTFwMVNaM0w5QmUtUXNHVDZPWDFWMUgzWFV2NmpfYlFGSEE0eFJTbldFN1dLZ0VhT240aUZxVFlRaHRjVUZn?oc=5",
-  "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOWFBiWjA4THJWR3h4bzVXeU1WcHI3NVdQZW5EbjV3QzUyZy14d0xmbUdxWDdnVTNNeW05eWZsV0tMNXRjeHVnZG5ZMlZsVHZzc00wUjNfRzYxenlTbmNZZWVNTUcxS1FDQVkxMEViWkNaS2JkWWJLVlZHOUVJYV9yZFJINkRNUnAzQkdmckNGQ29sZDgyNk0xNDJKdWV6NFdBNFBMQXloZk43Y1ZUZFR4VGh5V3ZwQU5RN3dV?oc=5",
-  "cointelegraph/73269",
-  "https://decrypt.co/383259/fed-chair-warsh-wants-answers-ai-inflation-bitcoin",
-  "https://www.ign.com/articles/league-of-legends-new-dawn-unveiled-with-debut-trailer-riot-announces-major-overhaul-coming-in-2027",
-  "https://www.ign.com/articles/resident-evil-requiem-star-hopes-grace-ashcroft-has-a-long-way-to-go-even-if-she-wont-ever-be-a-leon-character",
-  "https://www.videogameschronicle.com/news/machinegames-has-finally-officially-confirmed-that-wolfenstein-3-is-in-development/",
-  "https://www.gamespot.com/articles/gta-6-could-sell-55-million-copies-by-early-next-year-report-says-and-average-selling-price-could-be-90/",
-  "https://www.gematsu.com/2026/11/strategy-rpg-guild-saga-vanished-worlds-coming-to-ps5-in-may-2027",
-  "https://screenrant.com/ryan-gosling-ghost-rider-movie-tone-direction/",
   "https://www.theguardian.com/us-news/2020/aug/25/california-fires-hope-warning-lifted-deadliest-blaze-25-contained",
   "disclosetv/22135",
   "disclosetv/22136",
@@ -498,5 +488,15 @@
   "https://www.gematsu.com/2026/11/stranger-than-heaven-act-2-kure-story-trailer",
   "https://collider.com/reacher-season-5-ari-stidham-strip-club-kingpin-casting/",
   "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQUndHazZUZ0d0WnliYVY0Y1V3eTNQUEhLZjh6bkg4cUR0NEJBR05GQkw0bGpyVU1TQ3hDZXpsaV9RTERkZ2tvRDh4UWxHZ29UcnNCYWNnV19HS3hHelJfblFucFg0YVJEU2RqUFpsbmpYSFpHZU5xeWp2ZVoyWHRuUGxOSkh4MldUZWN1RFFiSm9ONklQX2lyTW9vblhaYWVRRk15XzU0cDFOUGpYYUFMX0xYZkRRX1NyekpZREJNUDM1dw?oc=5",
-  "https://news.google.com/rss/articles/CBMizgFBVV95cUxNU2ZGdldRbXk4UUlZd19KMGt5NGw3eGcwOHdIN1FKc3lTMzZUSWhLc2lzOEwzNFhIRlR1U0k5UEltUXFNQ2hTQTJXUWNvbUVmWXRWV1JpTUFqd2dvRXd4WXVEWnduUTQ2U2RGQ0ZRdnZwcS1KZ3VjUWdDcFRpeHRXMlY5ck9ySm0zY1V5WTl1dG1aak1JVXBwWGQ0X0xBOUFUdmVsZzVyZkFKeWZUX0ZSUXFPaWNSOHgtX0x1MFBtTWN1R3RvTkhkazZHQldoUQ?oc=5"
+  "https://news.google.com/rss/articles/CBMizgFBVV95cUxNU2ZGdldRbXk4UUlZd19KMGt5NGw3eGcwOHdIN1FKc3lTMzZUSWhLc2lzOEwzNFhIRlR1U0k5UEltUXFNQ2hTQTJXUWNvbUVmWXRWV1JpTUFqd2dvRXd4WXVEWnduUTQ2U2RGQ0ZRdnZwcS1KZ3VjUWdDcFRpeHRXMlY5ck9ySm0zY1V5WTl1dG1aak1JVXBwWGQ0X0xBOUFUdmVsZzVyZkFKeWZUX0ZSUXFPaWNSOHgtX0x1MFBtTWN1R3RvTkhkazZHQldoUQ?oc=5",
+  "https://news.google.com/rss/articles/CBMikAFBVV95cUxNbkFrNlZlUFBVRC1VNGV5c0IxMmJmdFE3M1h2Z2RBcXVMaHlxTVdOVkdJdGNuZEk3ZTZhbExrMDJrTEZsN1lOay1oeWFDaFpCTjlRT1pSVUo1eVJzVmFNSjQ0RjctLW53M3d6WHh2Y2FBenQyUlBNdmYwR0g2UmpGckFNTVFVclFid1M2S2h6Sk0?oc=5",
+  "https://theintercept.com/2026/11/13/pete-hegseth-impeachment-tom-morello-interview/",
+  "https://www.aljazeera.com/video/newsfeed/2026/11/15/iran-targets-us-military-radar-in-bahrain-in-retaliatory-drone-strikes?traffic_source=rss",
+  "https://www.aljazeera.com/news/2026/11/15/israel-coalition-talks-put-arab-party-leader-under-pressure-over-hamas?traffic_source=rss",
+  "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNbmRzVzFHR0NCUXpxOEN2NDhzaVdhOVpvTnJ6c3F3OHJubGRaUnBVbVJrRTZMREF0a2hrM0tHVUd4MHhBRThGLTNkQm9xSzE1Tk1jR3RKRXhhLVQ4TUpQb1pkQXpxWFBRN0JzT2lqT1Zod1ZhVDJtWEpLM0g5Sl92RmFRZDNjemkwS000aWJ3QjdxT2lXQ3VIbDNtaUZ2THVjbGEyUF9nekk4ZE9KMDFoQnl0eHFOMVo4?oc=5",
+  "https://variety.com/2026/film/news/chris-pratt-james-gunn-guardians-of-the-galaxy-4-dc-exit-1236947808/",
+  "https://www.rollingstone.com/product-recommendations/gift-guide/best-gifts-for-holiday-parties-family-gatherings-best-buy-1235657590/",
+  "WatcherGuru/16043",
+  "https://collider.com/best-thriller-shows-didnt-need-second-season/",
+  "https://news.google.com/rss/articles/CBMigAFBVV95cUxQUmNEUGFRcHZ2UnQyY1VsOFI2QVZaNFlNNEhkaEJxY3V5TEhRRzI1RnJrU2Y4WWNsMnpzY0xJdWpudEo0aUNCUFBva1BudUZiSVpXS01TZjlfamZTUXB0NFAtek82d2hNSmNFR1JZeUpHY1FKaHl2WjVNcVNLWkZHUA?oc=5"
 ]
