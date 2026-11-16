@@ -1,12 +1,4 @@
 [
-  "https://variety.com/2026/film/news/ben-affleck-robert-pattinson-the-odyssey-1236948199/",
-  "WatcherGuru/16041",
-  "https://www.videogameschronicle.com/news/id-software-confirms-its-working-on-a-new-game-after-layoffs/",
-  "https://www.eurogamer.net/rainbow-six-vegas-new-game-ubisoft-spades-report",
-  "https://screenrant.com/adam-driver-heat-2-movie-best-villain-role/",
-  "https://news.google.com/rss/articles/CBMihAFBVV95cUxQZEpuQmNMLUd4TWRNTkdFSngzaTFwTWFYcWJOb294Wl8xeEVDVjJuaXFiejVjeHR4WUo5OFhUeXlMY3E5Y1RJc0ktTnhLZ1d5MFVwNUVQM0FDV1hTMUtCSWptR2NiXy1TaS11b3BuYVJFQnR1SWM0bG51X21aRGV0ZjhvUC3SAYQBQVVfeXFMUG9OR0xZNGhZaHg2Y1RvUVhtcWZiVkVaLVhDSDVSbGlCUGxtNWRycy1kS0JRczRWZkdJSzJuV0tXYVVOa0xsd3UyUk15dHRvdXVBaXNkSzRwWkF6U1ptRWlDbTAwel9UcTdxcEUybWQ0QnBiLWdYbXc1ODVIR1VJcUZkX3lR?oc=5",
-  "https://news.google.com/rss/articles/CBMitgFBVV95cUxPUkpkV1ItaUhBMXotbE5qWW5EZ25mYUxDWElCb3prUjlQdmZZSDJzeW9xMTVNM1BWZGQ5aWcwYTI1UW1zUHNydm5kYXVEUDJxYjBRN1JqX0lyYWk3bFZ0Uy11UUVFdFRaSU5ScjN6X3lmRzZpNmZHUlRtSTlUWjI5Rmx1S3VESXFDUHpnOVdUcjdfald6T29kaThUQjRHZk1hLXZpX21kRWNPNFBQdzBzVkMzeDlnQQ?oc=5",
-  "https://news.google.com/rss/articles/CBMinAFBVV95cUxQWHgxNlcxWmZFYjdRMXBqdE54OTJCbkhPUDliN29aMTFNTU85QXgzVnpsdi1peW5QY2xEMUdObG9lbUlwTVFsYndiclgyZ2Q3ZU50RlIwMTVKTUFuRFlfNkhJQWxjS0RsUm1kT1g5Sm1jTDdkWlNYVmhEOWQ2WmZCNDEyRnZKQjR0dGNtUThyUXV0QTA2VVF1b0cyaXU?oc=5",
   "http://www.democracynow.org/2026/11/11/providence_divestment_david_morales",
   "https://www.aljazeera.com/news/2026/11/15/estonia-to-close-border-crossings-with-russia-after-attack-on-drone-maker?traffic_source=rss",
   "https://news.google.com/rss/articles/CBMijAFBVV95cUxNRXcyaS1MRmJvZURPY3FLNE12VTMtNG8wbk91RkVhUVliSzBsVkFRM0JwWUozNWowZDJrb3I4enBfQm9PVF84MU5Fanh3MjgycjFXYzhraWhzNTlnTzFxdzhfaXBhVWJrUjdJNmhqa3dseEhLdVhtT211WExXaUFLRlBaYTEzRE83dHBpdg?oc=5",
@@ -498,5 +490,13 @@
   "https://www.eurogamer.net/the-big-question-whats-the-best-gta",
   "https://www.gematsu.com/2026/11/ps5-qssr-support-added-to-marvels-spider-man-2-control-resonant-arc-raiders-the-finals-no-mans-sky-and-hell-let-loose-vietnam",
   "https://collider.com/game-of-thrones-meets-jack-reacher-netflix-near-perfect-action-epic-the-northman/",
-  "https://www.bbc.co.uk/news/articles/cwm2mllj1pp8o?at_medium=RSS&amp;at_campaign=rss"
+  "https://www.bbc.co.uk/news/articles/cwm2mllj1pp8o?at_medium=RSS&amp;at_campaign=rss",
+  "https://news.google.com/rss/articles/CBMiW0FVX3lxTE56c1VlS1BvaF9oRzB4Z2FiUnRyNG9GcGY3VVlYMEw3c3V2d0VKZ3FKZ2VNTFhqZnEzdW5YQ1RKWUlxeUJRTjVFNlA2ZzljX0FnLXdLejNEUHZHT0k?oc=5",
+  "https://www.bbc.co.uk/news/articles/cx5y1pzr9604o?at_medium=RSS&amp;at_campaign=rss",
+  "https://www.aljazeera.com/video/newsfeed/2026/11/16/third-us-aircraft-carrier-arrives-in-middle-east-amid-tensions-with-iran?traffic_source=rss",
+  "https://variety.com/2026/film/global/autlook-filmsales-peter-alsted-dr-hedgehog-idfa-forum-1236948625/",
+  "CoingraphNews/23757",
+  "https://news.google.com/rss/articles/CBMimgFBVV95cUxQRENhOV9sbFBJdS1ZM1ZCRU1HOXAwcVhZdEkwOXphREo4dU1IdnBmeHVnaTIzQW1KYjMwN1VRV3RfUXh5SzBoT19xVV9RdnFVWk9fTnd1WFhyVjVWMkNzN1ZBa2xNVFYzbm9Kc0VzallGVFYybnNodjAzRTRWSmQ5RjVnc3ppRzJEaWpZdmQtTkVnY3RMUWswUDVR0gGfAUFVX3lxTE1ySlpWclhiWV9zQnc2dUxfcG9xeHZQMGZWRnhsSTc2dG1qMXJnSjNPeDg4TE9WaVk2aGoxVEFWX2ttamhyRnYxMlZrS0xyRkthSjRDdzRVRG1RZTRVOXp1Y1FVbEJEQ0xHQzV3SkhXX0d3SF9VQUxKNGxFNzNCLXNmUng2TkUzRjhVLUVJYXpNTWNPbVlVeVRQOThnQ2dWVQ?oc=5",
+  "https://kotaku.com/mass-effect-fans-send-protest-cupcakes-to-ea-in-tribute-to-movement-that-successfully-altered-mass-effect-3-ending-2000757106",
+  "https://kotaku.com/team-meat-whips-out-remake-of-classic-brutal-platformersuper-meat-boy-2000756869"
 ]
