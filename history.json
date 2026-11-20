@@ -1,14 +1,4 @@
 [
-  "CoingraphNews/23768",
-  "CoingraphNews/23769",
-  "https://www.eurogamer.net/wow-forever-weekly-players-15-years",
-  "https://www.polygon.com/gta6-prologue-secret/",
-  "insiderpaper/46026",
-  "https://variety.com/2026/film/awards/the-odyssey-dune-you-can-see-everything-best-picture-race-1236952487/",
-  "https://variety.com/2026/digital/news/meta-3d-movies-rent-buy-quest-vr-headsets-1236953488/",
-  "https://variety.com/2026/film/news/serendipity-reboot-cast-aulii-cravalho-1236953411/",
-  "https://variety.com/2026/tv/news/larry-poindexter-dead-swat-days-of-our-lives-1236952702/",
-  "https://variety.com/2026/biz/global/mooky-greidinger-acquisitionshowcase-cinemas-uk-imax-1236953380/",
   "https://www.aljazeera.com/news/2026/11/19/world-reacts-to-icj-finding-myanmar-guilty-of-genocide-against-rohingya?traffic_source=rss",
   "https://www.aljazeera.com/video/newsfeed/2026/11/19/rohingya-survivors-react-to-landmark-genocide-ruling-against-myanmar?traffic_source=rss",
   "https://www.aljazeera.com/video/newsfeed/2026/11/19/man-protests-on-roof-of-spanish-embassy-over-fergie-chambers-extradition?traffic_source=rss",
@@ -498,5 +488,15 @@
   "https://collider.com/netflix-castle-rock-stephen-king-thriller-leaving-december-14/",
   "https://news.google.com/rss/articles/CBMiowFBVV95cUxQSTBEUXVQSFhBUnR6cFoyTmQ2MXBKMkxkdnRhdUVBeUNyVF9iSUNKOUx5bVNZYVBTY1FaZWctbldwQkhnTlBOVlpKTkZ1WC1YX1NTdVpZWkxuaDM5cUV6djFjaDU1aFlRZWpORzhqRWVTRER4bXRCcmN3TEpHelkxZ3E0cmNYRmVuekFuZDVOSHpoSDlkQk9EemF3eElieHJVN25V?oc=5",
   "https://news.google.com/rss/articles/CBMitwFBVV95cUxON2NqUGNSN0hpWFFpX1ZQVGpwV2hXT1l5d1I3VEN0Tk5lcEhCekhJWDJVekNhRE5WcWNCeE8zWTVZNDFNWmNkMTlQVndZeUxmYTVWaGpaUGV5Y3RfTGRVQTRRSGRjQjVwcEMteVJyYWZTYUEwc0tjNnJFVHdSVFltUnVQSVhhazVpX1lvbWdNWWZSX1ZfZmJOQ3I3c2pfYXNYdktiZzB1by1pdjc5bW1EQlFrbEE2U3M?oc=5",
-  "https://www.theguardian.com/us-news/2020/aug/25/california-fires-hope-warning-lifted-deadliest-blaze-25-contained"
+  "https://www.theguardian.com/us-news/2020/aug/25/california-fires-hope-warning-lifted-deadliest-blaze-25-contained",
+  "https://www.bbc.co.uk/news/articles/ckzd9nln5e6go?at_medium=RSS&amp;at_campaign=rss",
+  "https://www.politico.com/news/2026/11/19/after-texas-triumph-daga-chief-steps-aside-01176340",
+  "https://www.dailymail.com/news/article-16308315/EU-summit-Burnham-Brussels-Brexit-Labour.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
+  "CoingraphNews/23755",
+  "https://www.videogameschronicle.com/guide/gta-6-bigfoot-explained-how-to-find-bigfoot-in-gta-6/",
+  "https://www.videogameschronicle.com/news/new-baldurs-gate-3-console-mods-include-spells-and-another-difficulty-mode/",
+  "https://collider.com/robert-pattinson-good-time-streaming-free-roku-channel-november-2026/",
+  "https://news.google.com/rss/articles/CBMi2gFBVV95cUxOWk5RMUhVbnFNMlVkbzZ6ZEM2U21DSW1ubHVxYzZLcHR2eGV1Q05neTVweHc1VFloLTRybnpPSDRlY19WeUR0dlY4bXJzLWNCdW9ncmh1NGJ6dURER1VFenVIRHNsLVhZR0Q4QUhYZVhQUnkxNll0VVEzRmYzQm5JdzRjZ3paRkZKZ2tuM1locWIxNEtJN3gtanNaLWlQaWtYS0l0SmJyM05vUlh5SVJ2bTY3bzBFbUllMmd6Nlo3NEc0bE1UVV92Q2dSZHRPb2pqNjRJOXh2QXpodw?oc=5",
+  "https://news.google.com/rss/articles/CBMigAFBVV95cUxQZDE0R0prM0lJRXpfMmU4Rl8waVZmNzB3X2ExLTlMaGN0eENEaWkxZFZEbk16d1VnOGc4ZTlaVVJfTjdCSUNkYl93WDNZY0tTNENuaGZOUjUxSEJnVy0yQld5ZThUWG4zSnMzakd2S0VHLXNZQTJzYXBRSWJaeUIzYQ?oc=5",
+  "https://news.google.com/rss/articles/CBMipgFBVV95cUxPdXNQRmd4NmpUM3VDc1JuXy1sblhVVkYzcTJRYnBGa0Z3U3Nrb2M2QVpjaVlhT3h3b3JSZnFXQzUxQnUxS01aTW1SdjJldXAyZ3psQzcwWGNQWTREVWU0QWhPYjdXVDJHM0p5Zl9iVGh6VmR3ZVItOGhZUHpsQ3M4Z09FSXNUU1dEYjRrWVhqOWxzYUZRYTJCeDlyZUpybnBlcGY5R0tB?oc=5"
 ]
