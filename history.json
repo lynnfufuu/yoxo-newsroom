@@ -1,14 +1,4 @@
 [
-  "https://www.theguardian.com/us-news/2020/aug/26/wildfires-us-south-west-colorado-arizona-new-mexico-utah",
-  "https://news.google.com/rss/articles/CBMiW0FVX3lxTFBFODE1OHY1cFcwSGdUUGhHdVVsdVc2NU1YVHk0eEVRT2xyLUUyR2phMkpMYmR5ZC1uTk5PSnJKTDVtUkRaU0xzdUFlVGRXRmhkUU53UnM2czBrVGc?oc=5",
-  "WatcherGuru/16227",
-  "https://news.google.com/rss/articles/CBMiugFBVV95cUxPS2NDX2gya2JxN0FLNlFBSjdJcXNqczVsWGJrNHdGVHoxNEF6a2hrSnlKc2hkVC0wSGROWkMzcXgyN0YtaHdMX0k0U043RE5BSkRXVGtlQ3h1Ym9iVk9uaVFnV0YyZEw0a3ZjRWxvUkZ6NHNGVWJSc1dDcEU5aUtrODZ5YTRQMVQ5UTA2WHd5U0ZGUkhybGllQXNseGR0ZHl4dC1JdGtPa2FGT3MzNzhXdkxrSU9XcENkLUE?oc=5",
-  "https://variety.com/2026/film/news/russell-crowe-a-beautiful-mind-sequence-ron-howard-1236955038/",
-  "https://www.dailymail.com/news/article-16311189/Sam-Dan-Houser-Grand-Theft-Auto.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
-  "cointelegraph/73429",
-  "https://decrypt.co/383747/claude-historic-math-breakthrough-anthropic-ipo",
-  "https://decrypt.co/383744/nvidia-shares-sink-52-week-low-sec-probing-accounting",
-  "https://decrypt.co/383739/sbf-altruists-ftx-anthropic-shares-worth-43-billion",
   "https://www.ign.com/articles/the-cosmere-rpg-core-rulebook-for-the-stormlight-archive-is-50-off-for-black-friday-2026",
   "https://www.indiewire.com/film/film/inside-out-2-writer-meg-lefauve-pixar-brain-trust-1235017147/",
   "https://news.google.com/rss/articles/CBMiugFBVV95cUxNNGtId240WlRvQ3pkajE3NDI1cTJJc0R1UEowc0JoZ0dFRjVrUm9QT0NsdFM1cGJxZHVmMVRCZExfZGU5cW5VRzZ0dnVqc3RRLXFILU1RNEpIQzRGcUs1dkhVcnVkOFlVcDdCVlJCbVBxMUQ3aG53MjlMSktBekhMR2FzNFJ6OThPVlFZcjZoTnFXWjRxeDU2UVNYSkt3eWRyT3oxN3ItUHBOS3hKVE00cUhGajZIYlpIR1E?oc=5",
@@ -498,5 +488,15 @@
   "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5ySlV0ekk2ZDhyT1ZOdXJJNnROYkFjSGVxR1Q3OUdUamlpSHk3N3FTN2RvOU1Fc1NRR2NjbHR3Rnc0Z2k3YjRxcmVhYw?oc=5",
   "https://www.coindesk.com/business/2026/11/20/fairmint-plans-tokenized-stock-venue-on-canton-ethereum-under-sec-experiment",
   "https://www.videogameschronicle.com/guide/gta-6-chapter-3-laptop-password-how-to-unlock-the-laptop-in-boobies-apartment/",
-  "https://kotaku.com/godfather-of-cyberpunk-says-hes-never-played-a-video-game-but-finds-gta-6-intriguing-2000759281"
+  "https://kotaku.com/godfather-of-cyberpunk-says-hes-never-played-a-video-game-but-finds-gta-6-intriguing-2000759281",
+  "https://www.bbc.co.uk/news/articles/cqwy06zrd26lo?at_medium=RSS&amp;at_campaign=rss",
+  "https://www.bbc.co.uk/news/videos/cr1ewge81q4qo?at_medium=RSS&amp;at_campaign=rss",
+  "https://www.bbc.co.uk/news/videos/cre3dvd1k9y1o?at_medium=RSS&amp;at_campaign=rss",
+  "https://www.aljazeera.com/sports/2026/11/22/liverpool-thrash-10-man-man-united-in-nightmare-start-for-pochettino?traffic_source=rss",
+  "https://news.google.com/rss/articles/CBMigAFBVV95cUxPUXpUR2xvZVh4ZEk0RW1Td3gyRVR2bENoWEJKbnhwN0lBQjdWNjRlODI4YVlURGtQM0phTVJRQTBDQ2hXc0R5cG1MaEY5dldMZXdxUzZOcTRibFBtZlF1VnJJRWhhYjdRck9NNWZxeGNEUm9LeTRSbHpJekNtenF4cQ?oc=5",
+  "https://variety.com/2026/film/news/noah-schnapp-auditioned-hunger-games-1236955369/",
+  "https://decrypt.co/383756/gta-6-leaker-dangles-pc-port-15-million-crypto-pump",
+  "https://www.videogameschronicle.com/guide/gta-6-dealers-choice-walkthrough-should-you-choose-cut-or-pure/",
+  "https://kotaku.com/original-director-behind-marvels-failed-mahershala-ali-blade-movie-says-lifes-too-short-to-make-sht-films-2000759167",
+  "https://news.google.com/rss/articles/CBMigAFBVV95cUxQZDE0R0prM0lJRXpfMmU4Rl8waVZmNzB3X2ExLTlMaGN0eENEaWkxZFZEbk16d1VnOGc4ZTlaVVJfTjdCSUNkYl93WDNZY0tTNENuaGZOUjUxSEJnVy0yQld5ZThUWG4zSnMzakd2S0VHLXNZQTJzYXBRSWJaeUIzYQ?oc=5"
 ]
