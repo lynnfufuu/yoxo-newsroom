@@ -1,13 +1,4 @@
 [
-  "https://www.dailymail.com/news/article-16311801/brave-Ukrainians-deaths-brutal-Russians-LORD-ASHCROFT.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
-  "https://decrypt.co/383752/fraudsters-fake-crypto-exchanges-steal-37-million-sec",
-  "https://collider.com/books-like-harry-potter-but-better/",
-  "https://screenrant.com/best-dystopian-movies-all-time-ranked/",
-  "https://news.google.com/rss/articles/CBMiW0FVX3lxTE80NHFlYW1fRG1Yd0hrOWJ6bFFyQ1pHOFJCYnQ2LXpuM0pnN2VYRFNrM1JXdzBUZmI3M1NkaHBOVFdpWG1sOTROZ3RsOFc0Vlp4TU93aEdMTURFNnM?oc=5",
-  "remarks/6531",
-  "https://www.dailymail.com/news/royals/article-16311941/Meghan-fireplace-discount-controversial-Advent-calendar.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
-  "cointelegraph/73417",
-  "https://decrypt.co/383733/google-gives-gemini-control-mac-apps-ai-agent",
   "https://www.gamespot.com/articles/gta-6-doesnt-have-any-doja-cat-music-and-she-didnt-censor-her-message-to-rockstar/",
   "https://collider.com/tom-hanks-the-polar-express-streaming-hit-100-days-hbo-max-november-2026/",
   "https://collider.com/taylor-sheridan-jon-bernthal-those-who-wish-me-dead-leaving-netflix-december-2026/",
@@ -498,5 +489,14 @@
   "https://www.videogameschronicle.com/guide/gta-6-dubious-provenance-walkthrough-should-you-trust-halifax/",
   "https://www.gamespot.com/articles/gta-6-is-crashing-on-some-ps5s-with-ce-108255-1-error-code/",
   "https://collider.com/netflix-southland-detective-drama-binge/",
-  "https://news.google.com/rss/articles/CBMikwFBVV95cUxOa25yYlhDb0N6VEowU056UXZ1M3Vid3NmZWtpd09FQXcyY3pQekJNNnVieW45Um1Nd1RQUUZkdWdXMVQzRVFkR3BKZktucV9GRW1hbDhOWTZpUk9FMmtTOFlBaGxpVTA2UFl0cWo2ZTJ6Rm9HcEtWTlZjd1ZZWTYzNGk1eU1nOUtSMkR2VmJvNW1MUnM?oc=5"
+  "https://news.google.com/rss/articles/CBMikwFBVV95cUxOa25yYlhDb0N6VEowU056UXZ1M3Vid3NmZWtpd09FQXcyY3pQekJNNnVieW45Um1Nd1RQUUZkdWdXMVQzRVFkR3BKZktucV9GRW1hbDhOWTZpUk9FMmtTOFlBaGxpVTA2UFl0cWo2ZTJ6Rm9HcEtWTlZjd1ZZWTYzNGk1eU1nOUtSMkR2VmJvNW1MUnM?oc=5",
+  "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNTFJTU0cwLTRZT19QbWtfNFR0UlhKd2h6clZMWlVBM2lkaF9VSDMxNGZvMWR2a19obnpYb3FKNEFYSjFTb3VJcGxGS0lWbGhOUFo0b0ZoTG5TN0RmbGd2Y0RBMWl4VnlRam9qdlI4bFBZTzlpaWo0N0Q1dk51V1VQVlQyYmdhLWJ0Y3AweVNXSTU0RkZENVVGZUlrVUw2S25nT2xRc29kVGk5bXJmOFNYdThMOVNZbVZvWlJfelNzOV95Z9IBxwFBVV95cUxORThqb3RSVl9FQkl3aXFyM2QxX1FMV2U0UF9aVGFDNVdXUFZiekJfdWZtTzhUbHlPWWt5ZGNpZnRhRTNodW9tallJMm85MHdxUFZ0Mm1rU2JSd2J4NXlkM3FzXzB5WmRQejZzSGpWV2FteWw3RFl6TEo4SlJyb3JFZjZLZ0dleVFsWUktZjNyR05qUlpvWWR3QXMzcHlaeWVQUHJzUDJKbFV4d0ZJZVJvQ0JfazRUNk80RXNDdDB4OTdMR3pwS0NB?oc=5",
+  "https://www.bbc.co.uk/news/articles/cm9w9p4geke8o?at_medium=RSS&amp;at_campaign=rss",
+  "https://discussingfilm.net/2026/11/17/game-awards-2026-nominations-list/",
+  "https://www.aljazeera.com/video/true-crime-reports/2026/11/22/uncovering-a-criminal-network-on-the-early-internet-true-crime-reports?traffic_source=rss",
+  "https://www.aljazeera.com/news/2026/11/22/what-next-for-iraqs-push-against-militias-following-jurf-al-sakhar-deal?traffic_source=rss",
+  "https://discussingfilm.net/2026/11/01/new-on-netflix-november-2026/",
+  "cointelegraph/73438",
+  "https://news.google.com/rss/articles/CBMipwFBVV95cUxPTUJBeWxFQS1rR3NFRW9iNTVhNDJfNXFTbkJ2YTlUTXhiWElmdWV4OEQxZEJHTFBiLTlFRHhPdjB1TkFlOHFPRjdEcHV6VWU0SkR3eW5GckFIVW0tb0dST3lHTnpfRTZ3YnBDbTN3dkU3WjlzNEd3SXM0YmdiVTExal9qYXoyOS02bGs3UjNRZHliMkFZRGg5c0lJb25YcmZnSENpT3k2Y9IBrAFBVV95cUxPZkpJbFNPN0p1bDlaOWdlNmZla0tlSmlVc0RrSzVqWWwyeDVGTGUyQkxMdndodWR2dFRfVzJ2cnR4UWZ5bEF1Z25nS1E4ajg1N0g4emk4aXdqN1JjYWhLUkpuX19xbXJQRngzMTN5c09xLXFXWldCNnROTXZUQVJyN2tZR2FIRDNSWERrcGhwb3lHRDdEZ0kxUkFLMEhXLUFDaUFWd1NGelNqRWNT?oc=5",
+  "https://screenrant.com/wild-horse-nine-john-malkovich-sam-rockwell-theater-removal/"
 ]
