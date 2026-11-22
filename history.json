@@ -1,14 +1,4 @@
 [
-  "https://news.google.com/rss/articles/CBMinAFBVV95cUxPbEo3Q29rWEo0UHY2RDZFcWZoZlpEdUNyX01jaW9YOC16Z2dCMzJQRUNHQm85dEtkbVZ4RUVJVkVJZ3hFalZjSDlIam5FVGE4aGt4NW9TcEdHWUN3QzZ0c1Rja0tzcXNXY3dOQ3IwcmU2OHE0VE11S1FHWFotWlA1bHFsUXQ5X3F0OVU0ellJdTVpeXZ5bU0tZTRpdTg?oc=5",
-  "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNRUduVnlxQ1RUUG1Id0lhMHhXUnd1TzNRTGIwS2hCV0NFTWJSdlJXTkNLNXZyR0pfYnZMYUhraE9rS1RoN0ZmR3dDODJmakp4b193T1dBWFR1MlpJTXBORXpNMVB3N0I3U3UzOXFVWDh1ZEJVZ1dtU1RUUko5WklvcTYyN0s1ZTVH?oc=5",
-  "https://news.google.com/rss/articles/CBMioAFBVV95cUxPcjdXSS1ld1dTNzdDNnhGWVlHM0lMemNQMnp2aUw3dmZzQmJETU9rQzIwTUN0WEtEaHFfOUo0ME5PRjk1MVJGSkFwQjBta1R2QmJFSXFkVlBxZ1VxQWZFNHVvcnB4VllsN1R5TnpTVDRqUDVMbHQ5RUEwY1hTSjhtSU5LVEl2bzBjMHVBZk1JRU1oOWcwQ3gxVmNXdHBLTG9E?oc=5",
-  "https://www.politico.com/news/2026/11/19/keisha-lance-bottoms-democrats-campaigns-south-01177147",
-  "https://news.google.com/rss/articles/CBMicEFVX3lxTFBNWFVJMjFkYnB5d2FlMEtjbTVLVUIyRnpBekgtdXdoOW83akl4OVRYN21sbGtLQkdEZ0tHZWoyaC1oYmc4UzJNbkRXS0dodXI5WDlDeHVZZWQ2R1NvZVpDVTBrM0ZMaEo4SHp4MmY5bDI?oc=5",
-  "WatcherGuru/16230",
-  "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOTVM0WGVYd0FwWkM5Y3ZuNmo0NHJpRVBBc2tzSXBfNVUwbG9vankwUnFaTFJ0Z2RNUEd1bzdGTTVrMkczR1VCQ2xjY3oyMk9iaW9QNV8xcjFDdkVpVEFjbl9GbjE4TEV0STJESFN5clo3VXhaWlpfb2pRMDNKdEc4dzlqWG5YaHNyUUs2NWZTRnJON254WDRVTDR2SDJYUXQxV3oybUh1REZydWFiRUxFLTV1UHByUnMxQnFVNmt1UkFnUQ?oc=5",
-  "https://news.google.com/rss/articles/CBMitgFBVV95cUxNLWtzUmY5ZUFJOUJ5OHpEa2FlSkQxUjBNeGdiRDROcjlzYmVxdk54Qk9BZkt1SWo3WlhNbjUxM2staTV1UDVoQmhGZWpiQlRTYllZNmdOSEp2OGgxQWFZbXVKek1MdkJiTU5wV2Nub3FKVG13Q2dhMk16amY4akJTWU5pblRJV0U1eDZGQ3E3bEdDeE51bFY4eFJ6Z25zdVpuU3NSN2kwUGF3N2VzaENKV0Z0VGhQdw?oc=5",
-  "https://collider.com/snl-saturday-night-live-uk-cut-sketches/",
-  "disclosetv/22220",
   "https://news.google.com/rss/articles/CBMivwFBVV95cUxNTFhSR29UOE9YYlhmdlNIaXVaaHcxR0V0LUJYUTJ2eWxZYm02NV9ISWx5VjFua3BpVi02WEpVX3JIX29XLTdZaDYyWWpmbWU2U2JDaTE0R0NnRUViRVBGa3Z6Qno4VFRtb1Jnc2dsSVBJazhDc1JnNWdZcmx4U0VxVnFFVzFRemRfcnRXNlZyZ3pUdlNaRDFuZW1yVHBEMzlkQVk4SDZKTUYyZGtTVkJiX3dWRlp0dGRmNGxLUi1xZw?oc=5",
   "https://news.google.com/rss/articles/CBMirwFBVV95cUxNQy1HRmtuYU9aVXlJYkNPR1FxLXlDMEVLMzd1M1Q4ODRfUV9Zd3BLenJBRENhYVNMSTM2UU1Yc2VCSkxaXzNJRy1jM3AyZWhldE41WmJET0huQUlIaUZNdF9ZNVhQanMtLUIwc1RUTHF4QlFzeWNBdVgxZkRneFZfNkdCTkd1UjJ2dzM2bUVYOVRfX0ZFemRZTE5vREVlZEp6ajNvcWw5RUlwMkhXeHVZ?oc=5",
   "https://news.google.com/rss/articles/CBMie0FVX3lxTFBTXzBRSldadmZ0TWI0bFVPRm1YRzIzLWp6YVpfak5NV3RtVWxqXzVzZVc1MExPYm5sVUl3WVFqMUdrYWR1Z1gzSzdFUUxNNW4zRmUxVEZlYnE2SHV4WXNVVE5nVDdGY3BxR3ZJemU5NjZabDZEcjZ3bi1yUQ?oc=5",
@@ -498,5 +488,15 @@
   "https://www.ign.com/articles/the-binding-of-isaac-dev-removes-undisclosed-ai-generated-music-from-repentance-following-creator-response-review-bombing",
   "https://screenrant.com/what-happens-after-sunrise-on-the-reaping-before-the-hunger-games/",
   "https://screenrant.com/most-emotionally-devastating-war-movies-ranked/",
-  "https://www.bbc.co.uk/news/articles/ckz749ey0r75o?at_medium=RSS&amp;at_campaign=rss"
+  "https://www.bbc.co.uk/news/articles/ckz749ey0r75o?at_medium=RSS&amp;at_campaign=rss",
+  "WatcherGuru/16238",
+  "disclosetv/22210",
+  "https://theintercept.com/2026/11/18/greg-abbott-terrorist-cair-muslim-texas-ken-paxton/",
+  "https://news.google.com/rss/articles/CBMiW0FVX3lxTFBrdE0teVV4UUp2eFpoYkdCYXVTZHFuSk9fYXpna1RHM3dheUo5dks3dDF0cjVySDZ1T2h4MEg1VlBJbW5EcENlZnNoc2dnOFk1ZWdwMDNvUUNSZGM?oc=5",
+  "https://decrypt.co/383702/bitcoin-breaks-below-60k-crypto-fear-greed-index-lowest",
+  "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBuMklUa0tYMzlCT3ZhUklvcG5uR21OWGd4MmZ1THMyaFNXYjZNcXhuZXZPNmM4Y0h5UjVlVzlWdm96UXRxSnJ2UTBnaF9ZcDh0ZlZ0QWJQOWxkdUJGYTFSUDVPMA?oc=5",
+  "https://www.eurogamer.net/gta-6-ps5-crashing-ce-108255-1-error-fix",
+  "https://www.gamespot.com/articles/gta-6-is-a-british-success-story-prime-minister-says-but-he-wont-play-it/",
+  "https://collider.com/anne-hathaway-the-end-of-oak-street-streaming-hit-hbo-max-november-2026/",
+  "https://screenrant.com/james-bond-copycats-knockoffs/"
 ]
