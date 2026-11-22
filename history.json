@@ -1,14 +1,4 @@
 [
-  "https://news.google.com/rss/articles/CBMisgFBVV95cUxPUWhEX0xuSzU0QjN5dE0ycWpxY2NCRnlLU2NwdnptT2EtaGZCblhiRFZWeEJTNk1YWVl5QkZDNVotaWdmY2Q5OVZ6YUlEaklZZ3dEZTEzeWk4LTBweHJKdDBkUkpvMEJxT21pVzVuMGdWcVVVbWpReHFpMEVBV0c4SW95VHk1Ty1CandKV0x3bkVBZFRZcGpsMlBTMXhjNjVnUWJCWm9McVJsdXc3NXBMaWhn?oc=5",
-  "https://www.theguardian.com/us-news/live/2020/aug/25/california-fires-firefighters-work-contain-two-largest-blazes-7000-others-burn-live-latest-news-updates",
-  "https://www.theguardian.com/world/2020/aug/25/tropical-storm-laura-hurricane-texas-louisiana-gulf-coast",
-  "https://news.google.com/rss/articles/CBMikAFBVV95cUxNSEFhZ0EtSWNJRmJSY1U4TkU3cjRhbUFyQ1ZSWGNuZ3NiazBZbGlUZ2xTR3ktODlIb045dGYzdGRoRTBFemR0RXp3MDluOFpvQXRua29XOWd2OEtDRGlsSmlPNWs4LXA0ZnRLakFkeU5qbmc2ZE95MzFFeU1ydmZnTVg4NlB4MDk5cGRVbEg4OG4?oc=5",
-  "https://news.google.com/rss/articles/CBMigwFBVV95cUxNUllxRDFtbnhkTmZzblN4Skw5bzdDNkpDZnlaYW8zUldXSHV4bWIwT1I5YmdmMy1wQ1oxY3h1ZmJvbFhDYl9ybjZIVzRDZFZPV25adG9xYVk4OEV6aGM0R0NieUk0THZUeUR2b3hDTVNjWjZQbUdlMUpHajgydjNtXzVBSQ?oc=5",
-  "disclosetv/22214",
-  "disclosetv/22223",
-  "https://www.aljazeera.com/video/newsfeed/2026/11/22/trumps-exit-strategy-may-depend-on-quietly-lifting-iran?traffic_source=rss",
-  "https://news.google.com/rss/articles/CBMisAFBVV95cUxNSjV1WU02bzM3RXprY1AyeHVFc2JPWjBRM0NEODBXdFFIeXI3XzYyRW9rVk90SVpFQ1lzS2g0NTZQR0NqTG83VzU0U0FIN054NmlGcWlmbTlpYmV4TlVSR04tQzFEdVQ4VV9NUXBlMXN3a19HZ21mWnJRMm5YRi0yX29iTDdBUnBtazNTY0xKQ0pPdU9zQk00aXllVXBoMnl0QVpmRGl0Q3NhUVM4NE9jTA?oc=5",
-  "https://news.google.com/rss/articles/CBMiYkFVX3lxTE91NktaZFlhNURLYVNfTEdaZEQ5TU1HQ1ltSmFkU2hxZ04tU3l4clFaekc4MWZ4bm1yUUVDQ2kyN2lVR3ZTUG0zUGUwWS1hbDRENXJsTFI2ckxhVGhKeFJZY2JR?oc=5",
   "CoingraphNews/23755",
   "CoingraphNews/23756",
   "CoingraphNews/23765",
@@ -498,5 +488,15 @@
   "https://www.animenewsnetwork.com/news/2026-11-22/martial-arts-manhwa-yeolhyeol-gangho-to-end-next-year-after-33-years/.244079",
   "https://www.bbc.co.uk/news/articles/cq8e0p87l89lo?at_medium=RSS&amp;at_campaign=rss",
   "disclosetv/22216",
-  "disclosetv/22222"
+  "disclosetv/22222",
+  "https://news.google.com/rss/articles/CBMilgFBVV95cUxQaDFOWlliSFRHZGdqLXJ4Z0xzOVhEc3BLVHpDRjktUUVQTWtzY0h3VnptYzdQNW1GNFMyM2JGT0dkUkJFXy11ZmpURzg2ZzZZbkhaNkJaZVNHVmJIdDhrc0ZqUXdVYmo2c3pYWHktY2d5YmRGdkRzOXVhN2VMaDQzeE9WaERRN05XM0E3SFB3NGVKUDktbFE?oc=5",
+  "https://news.google.com/rss/articles/CBMirwFBVV95cUxQMnd2bkdQRzJ0WTFVcENtU2lrOXJMTnVDUlIwMXBDVlpfOVl1ZlplZkpteEU0RHBvRWoyMG1IblE3M0wwRG5MMjBURnItbGlQd25ibG1WcHJ5d3ZiWnRRNFZ6ZzR6S2s1LWdyeEJiV25pRlFaUTBENXE5MWR1MU1Fc0pGN0FHU0JQazV2dk9rVEN0cFNfNTFMcDZkbmgyNWdDb0tnV1RycmZ1aWVpX2o4?oc=5",
+  "https://www.politico.com/news/2026/11/19/after-texas-triumph-daga-chief-steps-aside-01176340",
+  "http://www.democracynow.org/2026/11/20/little_hands_big_change_marren_akeyo",
+  "https://news.google.com/rss/articles/CBMibkFVX3lxTE5JY0J0dXV5V1BCdmdEMU9FRkstT1dlNWlQN0tNR0laN1hBeUU3SkRENjB5ODVsOFlCdUN0UGRQdzFPVFM1djB6aFlDa3ZLR2JwZjZXWEVvaHUzUFk3elRhTzcydGk1dy1wNU5wY0p3?oc=5",
+  "https://www.coindesk.com/",
+  "https://www.eurogamer.net/gta-6-video-games-biggest-moment",
+  "https://www.gamespot.com/articles/gta-6-console-wars-are-already-over-and-xbox-lost/",
+  "https://www.gematsu.com/2026/11/brokenlore-dont-play-adds-switch-2-version",
+  "https://kotaku.com/new-report-claims-jensen-huang-regularly-threatened-nvidia-staff-with-over-the-top-violence-2000759179"
 ]
