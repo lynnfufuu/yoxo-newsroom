@@ -1,14 +1,4 @@
 [
-  "https://news.google.com/rss/articles/CBMipAFBVV95cUxNM2Q2bGZlTUFpUDRPa01CMU82N0g4c0JEX1pHMDNXMUlZbjh5dDVNVnEwNHhIZE5tbjhubDhob1B2dWRtb1hzaFdicUNOYVhSSmxZMjhkSFlsZUZNb04xS216SnNDVXBQOFdDdjkxZ1B6NzN0dWdRUld1N192Y01ESGhSTXpKem1rTUJkb3d3NGliaGlQcTlwN3lpcEVCYVI4T3k3MQ?oc=5",
-  "https://www.coindesk.com/daybook-us/2026/11/26/bitcoin-etfs-are-bleeding-cash-and-the-fed-is-unlikely-to-help",
-  "https://www.coindesk.com/markets/2026/11/26/ripple-is-worth-usd90-a-share-to-one-fund-and-usd300-to-another-sec-filings-show",
-  "https://www.eurogamer.net/fable-the-witcher-3-gold-standard",
-  "https://kotaku.com/heres-some-video-game-conversation-starters-thats-not-about-gta-6-2001000451",
-  "https://kotaku.com/marathons-trailers-are-still-the-best-2001000455",
-  "https://www.bbc.co.uk/news/articles/c61wr87wyg5wo?at_medium=RSS&amp;at_campaign=rss",
-  "https://www.bbc.co.uk/news/articles/c9gklryvj24do?at_medium=RSS&amp;at_campaign=rss",
-  "insiderpaper/46169",
-  "https://www.bbc.co.uk/news/articles/cmly7jve72r2o?at_medium=RSS&amp;at_campaign=rss",
   "https://www.aljazeera.com/video/money-works/2026/11/26/with-the-rise-of-ai-are-we-close-to-having-universal-basic-income?traffic_source=rss",
   "https://www.aljazeera.com/news/2026/11/26/symbolic-why-did-uk-sanction-yemens-houthis-amid-attacks-on-saudi?traffic_source=rss",
   "https://variety.com/2026/film/global/qatar-film-tv-industry-regional-turbulence-1236958826/",
@@ -498,5 +488,15 @@
   "https://screenrant.com/hello-kitty-movie-new-story-details-sanrio-craig-takiguchi/",
   "https://news.google.com/rss/articles/CBMicEFVX3lxTE9mWWRCUUxlSEVXWFpDU1NXTnFoSDBnaGxSOTdYMmUwZTBrODFsY2FBX211VVZjQWpTd0JpLUc0ZkJaLU5uYWNIblNzVE5UNG1DZXo4dUM3aFI3YnNLb2NNQk5SOXpPcUdQaHp1MnltakI?oc=5",
   "https://news.google.com/rss/articles/CBMinwFBVV95cUxNWEZQa283VjdCNy0ycWd6aEpCeWo3T1lMTzFRbzNIRHoyN1BBQlFrT2N1THFrSWdlY0ZXNnZ4NU04b3dJbU0yQjJoaEozcGhGc0xVZWhxb0FEU3YxM0dZZEtjZmlQeG5JNTBVNVRvRlRNRGc2SWRMRXFqMnREWkoyT05qRUZ4N092UE9vWHpmMjFnT1NXbkUwQUxQSDZNOFU?oc=5",
-  "https://www.bbc.co.uk/news/articles/c820q9wgrpyyo?at_medium=RSS&amp;at_campaign=rss"
+  "https://www.bbc.co.uk/news/articles/c820q9wgrpyyo?at_medium=RSS&amp;at_campaign=rss",
+  "https://news.google.com/rss/articles/CBMiogFBVV95cUxNN1FuUlRmSFFYM2JCMnQzSEc0UXVvM0dIQmFUZ1RVMHVuLXJZQnBpZ01rdWNjS1NBd3BLOFpnakZPR3prYlBBUVRVYjVDMjU1ci1vWDNPOGhQVHM4VTFsamdUUk8xR0lkZkdpbWJLbUpmLXVxZS1fVGhuNmRtcHBXbk11eWNxQW11Z0M4Zm02RDZtd3lKajFub3VDWWZjZWk1X3c?oc=5",
+  "https://news.google.com/rss/articles/CBMidkFVX3lxTE9FRzV0R0ZIb2FySEtaekljMHpZOEtqaHVyZzRrQ28tc2dHQXBVWGFUTnRPbE1zbVVLQ2lqMEhKNWhONXBwbEpmdWE2Y2JUd2dRdDRUSHZBOUJDVGdseUo4Y2R3UHRrUWhWZVZ0Mm1NenBYZllJQ3c?oc=5",
+  "https://discussingfilm.net/2026/10/15/street-fighter-review-kitao-sakurai/",
+  "remarks/6567",
+  "https://www.politico.com/video/2026/11/25/moderates-want-a-medicare-for-all-rebrand-2237528",
+  "https://www.rollingstone.com/product-recommendations/lifestyle/shop-lola-blankets-black-friday-sale-get-50-percent-off-1235664228/",
+  "https://www.coindesk.com/markets/2026/11/26/major-crypto-trading-firm-auros-is-winding-down-operations-sources",
+  "https://www.ign.com/articles/chainsaws-would-have-been-too-much-even-for-gta-6-as-rockstar-explains-why-some-extra-violent-weapons-are-missing",
+  "https://screenrant.com/steven-spielberg-catch-me-if-you-can-leave-tubi-november-2026/",
+  "https://news.google.com/rss/articles/CBMivAFBVV95cUxQVFhsbGpTNjRVWjVxbkROX3habmZQX2syWHMwSDA5NkZ6TThjNllXRGFNZ3lDa3F4Tjd5anQ4NW1fSjJWTm9aVi1DQWpQcmF0dTI4dlpBbWVFam8yWEFwVWd5NjA3cmJnT1JxVG1uS2NXNWhPR1g0eG52OEtfakRtaml2ZjUtMU5rdDNMdnljT3VhUVktRXNCdXpZaDh4bkFaaUNRZGs3TFR3T1kxM0pieFJXbGVjaHJWeHVaRg?oc=5"
 ]
