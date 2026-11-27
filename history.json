@@ -1,15 +1,4 @@
 [
-  "https://www.dailymail.com/news/article-16326361/Britain-ditch-pound-wants-rejoin-EU.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
-  "cointelegraph/73560",
-  "https://www.coindesk.com/markets/2026/11/27/bitcoin-on-course-to-end-seven-week-losing-streak-while-trailing-stock-rebound",
-  "https://decrypt.co/384118/kalshi-courts-small-businesses-with-microinsurance-as-state-crackdowns-bite",
-  "https://www.eurogamer.net/world-of-warcraft-forever-summon-kicking-warlock-addon",
-  "https://www.polygon.com/not-alone-illumination-new-thanksgiving-teaser/",
-  "WatcherGuru/16344",
-  "https://theintercept.com/2026/11/27/yellowstone-wolf-hunt-montana/",
-  "https://www.dailymail.com/news/article-16326383/F1-boss-mother-sue-council-National-Highways-1-1million-tons-sludge-local-roads-spill-lake-2-2million-manor-house-smothering-lily-pads.html?ns_mchannel=rss&amp;ns_campaign=1490&amp;ito=1490",
-  "WatcherGuru/16353",
-  "https://www.videogameschronicle.com/news/story-of-seasons-and-rune-factory-developer-marvelous-is-offering-early-retirement-as-it-tries-to-cut-65-jobs/",
   "https://www.eurogamer.net/gta-6-rockstar-debated-changing-jason-lucias-big-secret",
   "https://www.gamespot.com/articles/mario-pikachu-and-other-gaming-icon-balloons-wont-be-flying-this-thanksgiving/",
   "https://screenrant.com/best-1970s-martial-arts-movies/",
@@ -498,5 +487,16 @@
   "https://kotaku.com/12-best-gifts-for-rpg-fans-2001000412",
   "https://kotaku.com/gta-6-is-a-tragedy-because-you-cannot-sit-down-and-eat-spaghetti-2001000633",
   "https://www.polygon.com/the-last-of-us-season-3-end-finale-hbo-2027/",
-  "https://news.google.com/rss/articles/CBMizgFBVV95cUxNN0gwR3BwUE1xdjhIdFBXc2hFOWRuS1I5NWNxUExKS014aDJPaEkwbURINmtIamJfRjR5bkdDVVRXdV95bHVNcWFqV1VDT2t6bmlqUklBdTNRTV91Zm1qUGFjb3QxQlRvMndYRzAtc2d6dDVfbFNsc1lVOERzVXUxTC1MaDA2a3BqQW1aMnF1VGNySElqUTNPWEhBLThxeUpXc1FjT1VReHRQX0pmdFpmT3ZPMVpuNUtZSzk1aVBrSHZBblMwYUJvVkNmcEhVQQ?oc=5"
+  "https://news.google.com/rss/articles/CBMizgFBVV95cUxNN0gwR3BwUE1xdjhIdFBXc2hFOWRuS1I5NWNxUExKS014aDJPaEkwbURINmtIamJfRjR5bkdDVVRXdV95bHVNcWFqV1VDT2t6bmlqUklBdTNRTV91Zm1qUGFjb3QxQlRvMndYRzAtc2d6dDVfbFNsc1lVOERzVXUxTC1MaDA2a3BqQW1aMnF1VGNySElqUTNPWEhBLThxeUpXc1FjT1VReHRQX0pmdFpmT3ZPMVpuNUtZSzk1aVBrSHZBblMwYUJvVkNmcEhVQQ?oc=5",
+  "insiderpaper/46205",
+  "https://www.politico.com/video/2026/11/25/alex-bores-on-whether-congress-can-regulate-ai-before-its-too-late-2235705",
+  "https://news.google.com/rss/articles/CBMizwFBVV95cUxPM2VTSXlwdl9GV3BlRzE4SDdmaUhzRjF1UllCSzZ5MDJUd2dxdzFjUVoxVWpVOS04OVJXSzNRT3lSQUJ1VkRsWVY1R0pNS0x3ZFZNbGNKaDZ5WHpFaldZN2Uxc2t6dC1icFdveWp3SVEzZDBUMURCbW11YU9jNEt1ZDh6dWRYMFJSZ3VmZWwwWWZQX2xRQ1g5TUc3WTNqb3VWNmU2Sm42SGhKRzY5X0tLV18yYU4zZHBBOWFLb3lWaTZlRk84Zk9rT0I5ZmZjME0?oc=5",
+  "https://www.coindesk.com/tech/2026/11/27/live-news-bitcoin-rebounds-above-usd61-000-as-ai-stocks-lead-premarket-gains",
+  "https://news.google.com/rss/articles/CBMigwFBVV95cUxNczFrdDU0ejFfRlFFQlBhZm1Ja3Jxb1lsYk5jU0lyZDVURlItdTkzU0c2TDl3S1B6djlhRk8tQ0pudmx5eVozV1hJeVJBTVJhVFlfeUNQN1dRQXdTdjF1b2xIVnZNSXl6OTNTRkZQZ1RZcnhsNHlsSDNvQnhSaFJCRnRPZw?oc=5",
+  "https://news.google.com/rss/articles/CBMitAFBVV95cUxPMGF2aTB6bjktdlRvOGJUUVNURmQ5QWM3X0ZwWmtnMGVqS3BMX1RDODR2TmhWaFN3aENYRU5fR0VHYnF6S3BzdDNvNWoyTGw3UHcyLXFpNTZrN2dyMDBmZDhXdmFNUDg3N0dqYzk0S1NKZXdjUzR4RVdUeERVMVNYMWZBbHR4MDlzQ3Y0MXoya1lEcGFBWTZIYTh5cnlxRkZmRTBXeHZ6QUhYWVZQZmVXNVAzblA?oc=5",
+  "https://www.gamespot.com/articles/another-live-service-game-is-going-extinct-and-this-one-has-dinosaurs/",
+  "https://screenrant.com/sebastian-stan-thunderbolts-mcu-flop-better-marvel-movies/",
+  "https://news.google.com/rss/articles/CBMi5AFBVV95cUxOcFhGdFhPbk5oMXlyZHJXZ25pTU82c1ljNmVUMkJWY0pjLWptMUZhRk9zVXBRVU5WLUg2QU5kOXh4NGRzcW5BMkxuTTc2TEFybV9nNW94RnhoTTJnbFdLUTd0UEtOZVpoaXlxamZlWmpPQ0xKU2taSlV5OU1TWW5GbWtOcEdoSjQ5MjA1RTlOSTE3NkZpdnZtVHBnVGt6LWdaWFZPamVmR205MDVHV1lGbHlIN3EzbktnNEtvLWJoU0J6NUJrZ2REdF95WXhJTm40RGhwT3dWWjFtakZJUWZZM1Y3MEg?oc=5",
+  "https://news.google.com/rss/articles/CBMifEFVX3lxTE5rMTVHeXhXY20wUEdVazN5Qlc1Q1BQMlJjUlVCMURVVUFvZjA0SlpPem1pbVRGRGoyT0IzT2RST2xXVzFXTEtVSThBR0xtLVo2WWpieDJLa2xQa3BtRzVMTEtFUmt5elF4bk9jN2VaZmwxRXYtU2t1bWkyWWk?oc=5",
+  "insiderpaper/46206"
 ]
